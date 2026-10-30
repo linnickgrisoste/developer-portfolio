@@ -1,0 +1,125 @@
+"use client";
+
+import { Check, Lock, RotateCcw } from "lucide-react";
+import { motion } from "motion/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
+import { useLocale } from "@/components/providers";
+import { achievements, gameCopy, levelFor, totalXp } from "@/content/game";
+import { spring } from "@/lib/motion";
+import { AchievementIcon } from "./achievement-icon";
+import { resetGame, setToastsEnabled, useGame, xpOf } from "./store";
+
+function XpBar({ progress, className }: { progress: number; className?: string }) {
+  return (
+    <span className={`relative block h-1.5 overflow-hidden rounded-full bg-rule ${className ?? ""}`}>
+      <motion.span
+        className="absolute inset-y-0 left-0 rounded-full bg-cobalt"
+        initial={false}
+        animate={{ width: `${Math.max(progress, 0.04) * 100}%` }}
+        transition={spring.soft}
+      />
+    </span>
+  );
+}
+
+export function ExplorerHud() {
+  const { t } = useLocale();
+  const unlocked = useGame((game) => game.unlocked);
+  const toastsEnabled = useGame((game) => game.toastsEnabled);
+  const xp = xpOf(unlocked);
+  const { level, progress, maxed } = levelFor(xp);
+  const count = achievements.filter((a) => unlocked[a.id]).length;
+
+  return (
+    <Popover>
+      <PopoverTrigger
+        aria-label={t(gameCopy.hudLabel)}
+        className="group flex h-9 items-center gap-2.5 rounded-full px-3 transition-colors hover:bg-muted data-[state=open]:bg-muted"
+      >
+        <motion.span
+          key={level}
+          initial={{ scale: 1.6, color: "var(--cobalt)" }}
+          animate={{ scale: 1, color: "var(--foreground)" }}
+          transition={spring.reward}
+          className="font-pixel text-[12px] leading-none"
+        >
+          {t(gameCopy.level)}
+          {level}
+        </motion.span>
+        <XpBar progress={maxed ? 1 : progress} className="w-12 sm:w-16" />
+        <span className="hidden text-[13px] tabular-nums text-graphite sm:inline">
+          {count}/{achievements.length}
+        </span>
+      </PopoverTrigger>
+
+      <PopoverContent align="end" sideOffset={10} className="w-[min(24rem,calc(100vw-2rem))] gap-0 p-0">
+        <div className="border-b border-rule p-5">
+          <div className="flex items-baseline justify-between gap-4">
+            <p className="text-lg font-semibold tracking-[-0.01em]">{t(gameCopy.title)}</p>
+            <p className="font-pixel text-[12px] text-cobalt">
+              {xp}/{totalXp} XP
+            </p>
+          </div>
+          <p className="mt-2 text-[14px] leading-relaxed text-graphite">{t(gameCopy.intro)}</p>
+          <div className="mt-4 flex items-center gap-3">
+            <span className="font-pixel text-[12px]">
+              {t(gameCopy.level)}
+              {level}
+            </span>
+            <XpBar progress={maxed ? 1 : progress} className="flex-1" />
+            <span className="text-[13px] tabular-nums text-graphite">
+              {count}/{achievements.length}
+            </span>
+          </div>
+        </div>
+
+        <ul className="max-h-[min(22rem,50vh)] overflow-y-auto p-2">
+          {achievements.map((achievement) => {
+            const done = Boolean(unlocked[achievement.id]);
+            const hidden = achievement.secret && !done;
+            return (
+              <li key={achievement.id} className="flex items-center gap-3 rounded-md p-3">
+                <span
+                  className={`grid size-10 shrink-0 place-items-center rounded-md ${
+                    done ? "bg-cobalt text-paper" : "bg-muted text-graphite"
+                  }`}
+                >
+                  {hidden ? <Lock className="size-4" aria-hidden /> : <AchievementIcon id={achievement.id} className="size-5" />}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className={`block text-[15px] font-semibold ${done ? "" : "text-graphite"}`}>
+                    {hidden ? "???" : t(achievement.name)}
+                  </span>
+                  <span className="block text-[13px] leading-snug text-graphite">
+                    {hidden && achievement.hint ? t(achievement.hint) : t(achievement.description)}
+                  </span>
+                </span>
+                {done ? (
+                  <Check className="size-4 shrink-0 text-cobalt" aria-label={t(gameCopy.done)} />
+                ) : (
+                  <span className="font-pixel shrink-0 text-[11px] text-graphite">{achievement.xp}</span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="flex items-center justify-between gap-4 border-t border-rule p-4">
+          <label className="flex cursor-pointer items-center gap-2.5 text-[13px]">
+            <Switch checked={toastsEnabled} onCheckedChange={setToastsEnabled} />
+            {t(gameCopy.toasts)}
+          </label>
+          <button
+            type="button"
+            onClick={resetGame}
+            className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] text-graphite transition-colors hover:bg-muted hover:text-ink"
+          >
+            <RotateCcw className="size-3.5" aria-hidden />
+            {t(gameCopy.reset)}
+          </button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
