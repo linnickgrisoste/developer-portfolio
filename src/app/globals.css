@@ -112,53 +112,17 @@
 }
 
 /*
- * Abertura do nome: composição tipográfica.
- * Cada letra chega de um ponto diferente, girada e com peso e largura próprios, e se encaixa
- * como um tipo numa prensa: assenta com um leve achatamento e volta ao peso de repouso.
- * Depois, o nome "respira": uma onda lenta e sutil passa pelas letras.
- *
- * As posições de partida saem de sin()/cos() do índice da letra (--n): parecem aleatórias,
- * mas são sempre as mesmas, então servidor e navegador desenham igual.
+ * Nome do hero: a abertura é a do texto cinético (nível assinatura, ver "Sistema de movimento").
+ * Assentado, o nome "respira": uma onda lenta e sutil passa pelas letras. É o único laço
+ * contínuo do site. Usa a propriedade `translate` (e não `transform`) para não brigar com a entrada.
  */
-.kinetic-name [data-letter] {
-  --n: calc(var(--i) + var(--offset, 0));
-  --from-x: calc(sin(calc(var(--n) * 2.4)) * 0.55em);
-  --from-y: calc(cos(calc(var(--n) * 1.7)) * 0.45em - 0.45em);
-  --from-rotate: calc(sin(calc(var(--n) * 3.1 + 1)) * 28deg);
-  --from-weight: calc(500 + sin(calc(var(--n) * 1.3)) * 400);
-  --from-width: calc(94 + cos(calc(var(--n) * 2.1)) * 31);
-
-  font-variation-settings: "wght" 800, "wdth" 100;
-  animation:
-    letter-set 1200ms var(--ease-brand) backwards,
-    breathe 6s ease-in-out infinite;
-  /* 35ms por letra mantém a cascata do nome inteiro abaixo de 500ms. A respiração começa depois da abertura. */
-  animation-delay:
-    calc(var(--n) * 35ms + 150ms),
-    calc(var(--n) * 140ms + 2s);
-}
-
-@keyframes letter-set {
-  0% {
-    opacity: 0;
-    transform: translate(var(--from-x), var(--from-y)) rotate(var(--from-rotate)) scale(0.7, 0.7);
-    font-variation-settings: "wght" var(--from-weight), "wdth" var(--from-width);
-  }
-  35% {
-    opacity: 1;
-  }
-  /* O impacto na prensa: a letra desce um fio e achata antes de assentar. */
-  62% {
-    transform: translate(0, 0.03em) rotate(0deg) scale(1.02, 0.94);
-    font-variation-settings: "wght" 900, "wdth" 116;
-  }
-  100% {
-    transform: translate(0, 0) rotate(0deg) scale(1, 1);
-    font-variation-settings: "wght" 800, "wdth" 100;
+@media (prefers-reduced-motion: no-preference) {
+  .hero-name .kinetic[data-settled] [data-k] {
+    animation: breathe 6s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 140ms);
   }
 }
 
-/* Usa a propriedade `translate` (e não `transform`) para não brigar com a abertura. */
 @keyframes breathe {
   0%,
   100% {
@@ -246,9 +210,12 @@
   }
 }
 
-/* Indicador "role para começar": a seta desce e volta, como um prompt de jogo. */
+/*
+ * Indicador "role para começar": a seta desce e volta, como um prompt de jogo.
+ * Três vezes e para: fora do nome do hero, nada no site fica em laço infinito.
+ */
 .scroll-cue {
-  animation: scroll-cue 1.8s ease-in-out infinite;
+  animation: scroll-cue 1.8s ease-in-out 2.2s 3;
 }
 
 @keyframes scroll-cue {
@@ -281,20 +248,15 @@
 }
 
 /*
- * Logo depois de trocar de idioma (a página monta de novo), a abertura já foi vista:
- * o nome nasce assentado, o ponto já carimbado e o texto de apoio no lugar. Só a respiração continua.
+ * Logo depois de trocar de idioma (a página monta de novo), a abertura já foi vista: o texto de apoio
+ * nasce no lugar e o ponto já carimbado. O nome cuida de si (o texto cinético pula a própria entrada).
  */
-.no-intro .rise-in {
+.no-intro .rise-in,
+.no-intro .scroll-cue {
   animation: none;
 }
 .no-intro .full-stop-dot {
   animation: dot-hue 9s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .no-intro .kinetic-name [data-letter] {
-    animation: breathe 6s ease-in-out infinite;
-    animation-delay: calc(var(--n) * 140ms);
-  }
 }
 
 /* =========================================================================================
@@ -474,7 +436,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .kinetic-name [data-letter],
   .nav-hop [data-hop],
   .scroll-cue,
   .rise-in {
