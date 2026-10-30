@@ -230,6 +230,19 @@
   }
 }
 
+/* Marco da experiência atual: três pulsos quando a linha do tempo chega até ele, e para. */
+.milestone-ping {
+  animation: milestone-ping 1s cubic-bezier(0, 0, 0.2, 1) 3 forwards;
+}
+
+@keyframes milestone-ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
 /* Tempo restante do aviso de conquista. Pausa enquanto o aviso está sob o cursor ou em foco. */
 .toast-countdown {
   transform-origin: left;

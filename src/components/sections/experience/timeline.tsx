@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Check } from "lucide-react";
 import { motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
+import { Extrude } from "@/components/motion/extrude";
 import { ease, reveal } from "@/lib/motion";
 import { useRevealGroup, useSkipEntrance } from "@/components/motion/entrance";
 
@@ -64,12 +65,15 @@ function TimelineEntry({ entry, labels }: { entry: TimelineEntryData; labels: Ti
           transition={{ duration: 0.5, ease: ease.out }}
         >
           {current && reached && (
-            <span className="absolute inset-0 animate-ping rounded-full bg-cobalt opacity-50 motion-reduce:hidden" />
+            <span className="milestone-ping absolute inset-0 rounded-full bg-cobalt opacity-50 motion-reduce:hidden" />
           )}
         </motion.span>
 
         <p className="text-[clamp(1.75rem,3.5vw,2.75rem)] leading-none font-bold tracking-[-0.03em] tabular-nums [font-variation-settings:'wdth'_125]">
-          {entry.period}
+          {/* O ano ganha volume quando a linha o alcança, e fica assim: o que foi percorrido fica marcado. */}
+          <Extrude level="title" raised={reached}>
+            {entry.period}
+          </Extrude>
         </p>
         <p className={`inline-flex items-center gap-1.5 text-[13px] font-semibold ${current ? "text-cobalt" : "text-graphite"}`}>
           {!current && <Check className="size-3.5" strokeWidth={2.5} aria-hidden />}
