@@ -1,6 +1,6 @@
 # Arquitetura do portfolio
 
-Status: **em execução**. Proposta em 29/10/2026; Fases 0, 1 e 2 concluídas. Vale para a reestruturação completa: sistema de movimento único, Hero 3D e Sala de troféus.
+Status: **em execução**. Proposta em 29/10/2026; Fases 0 a 3 concluídas. Vale para a reestruturação completa: sistema de movimento único, Hero 3D e Sala de troféus.
 
 ---
 
@@ -69,12 +69,12 @@ src/
     motion.ts  palette.ts  sections.ts  i18n.ts  utils.ts
   components/
     motion/
-      drivers/    pointer.ts  scroll-velocity.ts  focus-band.ts  capabilities.ts
+      drivers/    pointer.ts  scroll-velocity.ts  focus-band.ts  capabilities.ts  theme.ts
       engaged.ts  entrance.ts  depth.ts
       kinetic-text.tsx  extrude.tsx  tilt.tsx  reveal.tsx  odometer.tsx  magnetic.tsx
     three/
-      stage.tsx  world.tsx  materials.ts  fonts.ts
-      hero/       hero-scene.tsx  letter.tsx  dot.tsx
+      gate.ts  stage.tsx  world.tsx  materials.ts  fonts.ts
+      hero/       hero-scene.tsx  layout.ts
       trophies/   trophy-room.tsx  models.tsx  fallback.tsx
     game/         store.ts  triggers.tsx  hud.tsx  toasts.tsx  progress.tsx  seen-badge.tsx  game-layer.tsx
     layout/       section.tsx  section-heading.tsx
@@ -125,6 +125,7 @@ Ajustes de contexto aplicados pelas primitivas, não pelas seções:
 | `scroll-velocity` | velocidade do scroll | Um ouvinte, suavizado |
 | `focus-band` | elemento na faixa central da tela | Um `IntersectionObserver` compartilhado |
 | `capabilities` | movimento reduzido, ponteiro fino/grosso, WebGL, economia de dados | Lido uma vez, atualizado por `matchMedia` |
+| `theme` | tema escuro ativo | Lido da classe do `<html>`; no servidor e na hidratação é sempre claro, para o HTML bater (ler `useTheme` direto quebrava a hidratação no tema escuro) |
 
 Toda primitiva só fica ativa enquanto está na tela.
 
@@ -186,21 +187,23 @@ As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o 
 
 ### 7.1 Base comum (`three/`)
 
+- **`gate.ts`:** decide *se* e *quando* o 3D entra (`useStageAllowed`: WebGL 2, sem movimento reduzido, sem economia de dados; `useIdle`: navegador ocioso). Não importa three.js, para que a decisão não puxe a cena para o pacote inicial.
 - **`Stage`:** o único jeito de pôr um `<Canvas>` na página. Ele cuida de:
-  - carregar sob demanda (`next/dynamic`, `ssr: false`);
-  - liberar só com `capabilities` favoráveis;
-  - pausar o render fora da tela;
-  - limitar o `dpr` (1.5 no toque, 2 no desktop).
-- **`World`:** luz de estúdio (Lightformers, sem baixar arquivo de ambiente) e materiais `ink` e `cobalt` lidos de `lib/palette`. Hero e Sala usam o mesmo `World`, para parecerem o mesmo universo.
+  - limitar o `dpr` (1.5 no toque, 2 no desktop);
+  - pausar o render fora da tela (`active`);
+  - receber eventos de outro elemento (`eventSource`) medindo o cursor contra o próprio canvas, que fica sem eventos para não bloquear os links por cima.
+- **`World`:** luz de estúdio (Lightformers, sem baixar arquivo de ambiente). **`materials`:** cores `ink` e `cobalt` lidas de `lib/palette` no tema atual. Hero e Sala usam os dois, para parecerem o mesmo universo.
 - **`fonts`:** a Archivo convertida, servida de `public/three/`.
+- Toda cena é importada com `next/dynamic` (`ssr: false`) por quem a mostra. Verificado no build: nenhum script da carga inicial contém three.js.
 
 ### 7.2 Hero 3D (progressivo)
 
-1. O servidor entrega o nome em CSS, a abertura tipográfica de hoje. É o que aparece primeiro (LCP), o que buscadores leem e a versão de quem não tem 3D.
-2. Em aparelho capaz, o bundle 3D é baixado quando o navegador fica ocioso.
-3. Com fonte e primeiro quadro prontos, o nome em CSS some suavemente e as letras 3D caem no lugar dele. O `<h1>` continua no DOM para acessibilidade.
-4. A câmera segue o cursor e sobe com o scroll. O render pausa quando o hero sai da tela.
-5. **Ponto final:** clicado, a esfera 3D é lançada para fora do canvas e entrega a posição na tela ao `LooseDot` em DOM, que já existe. A conquista funciona igual nos dois modos.
+1. O servidor entrega o nome em CSS (texto cinético, entrada só em CSS desde a primeira pintura). É o que aparece primeiro (LCP), o que buscadores leem e a versão de quem não tem 3D.
+2. Em aparelho capaz, quando o navegador fica ocioso, o nome em CSS é **medido** (posição de cada letra, linha de base, ponto final) e a cena é baixada.
+3. **Câmera ortográfica:** de frente, a face das letras 3D é o mesmo desenho do CSS, no mesmo lugar e com a cor exata da tinta (material sem luz). A troca é um cruzamento de opacidade que não aparece. O volume só surge quando a câmera gira: é o "em repouso, impresso; ao interagir, objeto" em 3D de verdade.
+4. A câmera gira com o cursor sobre o hero (sozinha e devagar no toque) e sobe com o scroll, mostrando o topo das letras enquanto o nome some. As letras respiram como no CSS, inclinam com o cursor em cima e giram no clique. O render pausa fora da tela.
+5. **Ponto final:** o botão em DOM continua no lugar, invisível, e recebe o clique; solto, ele quica pela página como sempre (`LooseDot`) e a esfera 3D some até ele voltar. A conquista é a mesma nos dois modos. A esfera acompanha a cor do ponto em CSS, que muda devagar.
+6. Se o aparelho deixar de permitir o 3D (ex.: movimento reduzido ligado), o CSS volta na hora.
 
 ### 7.3 Sala de troféus
 
@@ -250,7 +253,7 @@ As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o 
 | **0. Fundação** ✅ | Pastas, Server Components, idioma por rota, conteúdo dividido | Site idêntico ao de hoje, build e testes ok |
 | **1. Sistema de movimento** ✅ | Tokens, drivers, `engaged`, primitivas e catálogo `/lab/motion` | Você aprova a linguagem no catálogo |
 | **2. Seções** ✅ | Cada seção migrada para primitivas, com a linguagem da tabela de seções | Toda seção usa as primitivas; o que fica na seção é só o seu momento único |
-| **3. Hero 3D** | `Stage`, `World`, entrega CSS → 3D, ponto final com passagem para o DOM | Funciona com e sem WebGL; LCP não piora |
+| **3. Hero 3D** ✅ | `Stage`, `World`, troca CSS → 3D sem emenda, ponto final em DOM sobre a esfera | Funciona com e sem WebGL; LCP não piora |
 | **4. Sala de troféus** | Rota, entradas, pré-carregamento, fallback em DOM | Acessível do rodapé, do HUD e do aviso final |
 | **5. Acabamento** | Revisão de acessibilidade, celular, Lighthouse; remoção do que sobrou | Sem dependência ou rota de laboratório órfã |
 
