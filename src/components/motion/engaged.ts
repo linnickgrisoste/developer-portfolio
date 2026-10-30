@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, type RefObject } from "react";
-import { useTheme } from "next-themes";
 import { levels, type Level } from "@/lib/motion";
 import { useCapabilities } from "./drivers/capabilities";
 import { observeBand } from "./drivers/focus-band";
+import { useDarkTheme } from "./drivers/theme";
 
 /**
  * "Engajado" é o mesmo estado em qualquer aparelho, e é a ele que toda primitiva reage:
@@ -75,7 +75,7 @@ export function useEngaged(
 
 /** Parâmetros do nível, com o ajuste de contexto: no tema escuro, a amplitude cai 15% (luz sobre escuro pesa mais). */
 export function useLevel(level: Level) {
-  const { resolvedTheme } = useTheme();
+  const dark = useDarkTheme();
   const base = levels[level];
-  return resolvedTheme === "dark" ? { ...base, amplitude: base.amplitude * 0.85 } : base;
+  return dark ? { ...base, amplitude: base.amplitude * 0.85 } : base;
 }
