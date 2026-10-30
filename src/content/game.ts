@@ -123,4 +123,22 @@ export const gameCopy = {
   seen: { pt: "vistos", en: "seen" },
   seenLabel: { pt: "Prévia vista", en: "Preview seen" },
   progress: { pt: "conquistas", en: "achievements" },
+  // Sala de troféus: cada conquista vira um objeto numa estante.
+  trophyRoom: { pt: "Sala de troféus", en: "Trophy room" },
+  openTrophyRoom: { pt: "Abrir a sala de troféus", en: "Open the trophy room" },
+  roomIntro: {
+    pt: "Cada conquista do modo explorador vira um troféu. O que falta aparece como silhueta.",
+    en: "Every explorer mode achievement becomes a trophy. What's missing shows as a silhouette.",
+  },
+  roomHint: {
+    pt: "Passe o mouse num troféu · clique para aproximar · arraste para girar a estante · Esc para voltar",
+    en: "Hover a trophy · click to zoom in · drag to turn the shelf · Esc to step back",
+  },
+  roomHintTouch: {
+    pt: "Toque num troféu para aproximar · arraste para girar a estante",
+    en: "Tap a trophy to zoom in · drag to turn the shelf",
+  },
+  locked: { pt: "Bloqueada", en: "Locked" },
+  backToSite: { pt: "Voltar ao site", en: "Back to the site" },
+  close: { pt: "Fechar", en: "Close" },
 };
