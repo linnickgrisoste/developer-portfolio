@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Lock, RotateCcw } from "lucide-react";
+import { ArrowRight, Check, Lock, RotateCcw, Trophy } from "lucide-react";
 import { motion } from "motion/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
@@ -9,6 +9,7 @@ import { achievements, gameCopy, levelFor, totalXp } from "@/content/game";
 import { spring } from "@/lib/motion";
 import { AchievementIcon } from "./achievement-icon";
 import { resetGame, setToastsEnabled, useGame, xpOf } from "./store";
+import { TrophyRoomLink } from "./trophy-room-link";
 
 function XpBar({ progress, className }: { progress: number; className?: string }) {
   return (
@@ -104,6 +105,15 @@ export function ExplorerHud() {
             );
           })}
         </ul>
+
+        {/* A sala de troféus: o mesmo progresso, com cada conquista como objeto. */}
+        <TrophyRoomLink className="group flex items-center justify-between gap-3 border-t border-rule px-5 py-3.5 text-[14px] font-semibold transition-colors hover:bg-muted hover:text-cobalt">
+          <span className="flex items-center gap-2.5">
+            <Trophy className="size-4" strokeWidth={1.75} aria-hidden />
+            {t(gameCopy.openTrophyRoom)}
+          </span>
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+        </TrophyRoomLink>
 
         <div className="flex items-center justify-between gap-4 border-t border-rule p-4">
           <label className="flex cursor-pointer items-center gap-2.5 text-[13px]">

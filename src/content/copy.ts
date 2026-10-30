@@ -81,7 +81,6 @@ export const copy = {
     resume: { pt: "Baixar currículo", en: "Download résumé" },
     copy: { pt: "Copiar e-mail", en: "Copy email" },
     copied: { pt: "E-mail copiado", en: "Email copied" },
-    progress: { pt: "Seu progresso", en: "Your progress" },
   },
   footer: {
     rights: { pt: "Todos os direitos reservados.", en: "All rights reserved." },

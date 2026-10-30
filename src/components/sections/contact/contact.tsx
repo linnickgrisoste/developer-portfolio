@@ -1,8 +1,11 @@
+import { ArrowRight } from "lucide-react";
 import { ProgressBadge } from "@/components/game/progress";
+import { TrophyRoomLink } from "@/components/game/trophy-room-link";
 import { containerClass } from "@/components/layout/section";
 import { KineticText } from "@/components/motion/kinetic-text";
 import { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { copy } from "@/content/copy";
+import { gameCopy } from "@/content/game";
 import { profile } from "@/content/profile";
 import type { Locale } from "@/lib/i18n";
 import { anchor, sections } from "@/lib/sections";
@@ -68,10 +71,12 @@ export function Contact({ locale }: { locale: Locale }) {
           </ul>
 
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-(--footer-fg)/50">
-            <p className="flex items-center gap-2">
-              {text.progress[locale]}
+            {/* A entrada principal da sala de troféus: o progresso do visitante vira a porta. */}
+            <TrophyRoomLink className="group inline-flex items-center gap-2 transition-colors hover:text-(--footer-fg)">
+              {gameCopy.trophyRoom[locale]}
               <ProgressBadge />
-            </p>
+              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+            </TrophyRoomLink>
             <p>
               © {year} {profile.firstName} {profile.lastName}. {copy.footer.rights[locale]}
             </p>

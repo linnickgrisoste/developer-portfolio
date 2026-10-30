@@ -1,12 +1,13 @@
 "use client";
 
-import { Trophy } from "lucide-react";
+import { ArrowRight, Trophy } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useLocale } from "@/components/providers";
 import { achievements, gameCopy } from "@/content/game";
 import { exit, spring } from "@/lib/motion";
 import { AchievementIcon } from "./achievement-icon";
 import { dismissToast, useGame, type ToastItem } from "./store";
+import { TrophyRoomLink } from "./trophy-room-link";
 
 const DURATION = 5200;
 
@@ -53,6 +54,16 @@ function Toast({ toast }: { toast: ToastItem }) {
           <span className="font-pixel shrink-0 self-start text-[13px] text-cobalt-soft">+{achievement.xp} XP</span>
         )}
       </button>
+      {/* Zerou: o convite para ver a estante completa. */}
+      {!achievement && (
+        <TrophyRoomLink
+          onNavigate={() => dismissToast(toast.key)}
+          className="group mx-4 mb-4 flex items-center justify-between gap-3 rounded-md bg-cobalt-deep px-4 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-cobalt-deep/85"
+        >
+          {t(gameCopy.openTrophyRoom)}
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+        </TrophyRoomLink>
+      )}
       {/* A barra é o relógio do aviso: quando ela termina de encolher, o aviso sai.
           A animação é CSS para poder pausar no hover (ver .toast-countdown em globals.css). */}
       <span
