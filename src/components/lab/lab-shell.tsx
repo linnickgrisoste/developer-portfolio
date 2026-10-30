@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 
 const prototypes = [
   { slug: "motion", label: "Movimento" },
-  { slug: "hero", label: "Hero 3D" },
   { slug: "trofeus", label: "Sala de troféus" },
 ];
 
