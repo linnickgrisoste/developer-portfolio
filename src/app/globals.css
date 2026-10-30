@@ -297,6 +297,182 @@
   }
 }
 
+/* =========================================================================================
+ * Sistema de movimento: "em repouso, é impresso; ao interagir, vira objeto".
+ * As primitivas em src/components/motion só ligam atributos e variáveis; o desenho fica aqui.
+ * ========================================================================================= */
+
+/* Registradas para poderem ser animadas por `transition` (variáveis comuns trocam de valor de uma vez). */
+@property --depth {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0em;
+}
+@property --dx {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.55;
+}
+@property --dy {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.85;
+}
+
+/*
+ * Lateral cobalto (Extrude). As camadas são cópias do texto atrás dele, deslocadas na direção
+ * (--dx, --dy) por uma fração (--k) da profundidade. As mais fundas escurecem, para dar volume.
+ */
+.extrude {
+  position: relative;
+  --depth: 0em;
+  transition:
+    --depth 350ms var(--ease-brand),
+    --dx 260ms var(--ease-brand),
+    --dy 260ms var(--ease-brand);
+}
+.extrude[data-depth-driver="engaged"][data-engaged] {
+  --depth: var(--depth-max);
+}
+/* No rastro do scroll quem suaviza é o driver; uma transição por cima só atrasaria. */
+.extrude[data-depth-driver="velocity"] {
+  transition: none;
+}
+.extrude[data-depth-driver="proximity"] {
+  transition: --depth 120ms linear;
+}
+.extrude-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  color: color-mix(in oklab, var(--extrude-color, var(--cobalt)), black calc(var(--k) * 32%));
+  transform: translate(
+    calc(var(--dx) * var(--depth) * var(--k)),
+    calc(var(--dy) * var(--depth) * var(--k))
+  );
+}
+/* Recolhida, a lateral some: senão a borda suavizada das letras deixaria um halo cobalto em volta. */
+.extrude:not([data-raised]) .extrude-layer {
+  opacity: 0;
+  transition: opacity 0s linear 350ms;
+}
+.extrude-face {
+  position: relative;
+}
+
+/*
+ * Texto cinético (KineticText). --amp vem do nível (assinatura 1, título 0,55, detalhe 0,3)
+ * e escala tudo: deslocamento, giro e peso da entrada, e a onda do toque.
+ */
+.kinetic-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.kinetic [data-k] {
+  position: relative;
+  display: inline-block;
+  font-variation-settings:
+    "wght" var(--kinetic-weight),
+    "wdth" var(--kinetic-width);
+  transition: font-variation-settings 260ms var(--ease-brand);
+}
+.kinetic[data-armed]:not([data-set]) [data-k] {
+  opacity: 0;
+}
+.kinetic[data-set] [data-k] {
+  animation: kinetic-set calc(700ms + 500ms * var(--amp)) var(--ease-brand) backwards;
+  animation-delay: calc(var(--i) * var(--kinetic-stagger));
+}
+/* No toque não há cursor: ao passar pela faixa central, uma onda de peso atravessa o texto. */
+.kinetic[data-touch][data-settled][data-engaged] [data-k] {
+  animation: kinetic-wave 700ms var(--ease-brand);
+  animation-delay: calc(var(--i) * 30ms);
+}
+
+@keyframes kinetic-set {
+  0% {
+    opacity: 0;
+    transform: translate(
+        calc(sin(calc(var(--i) * 2.4)) * 0.5em * var(--amp)),
+        calc((cos(calc(var(--i) * 1.7)) * 0.4em - 0.4em) * var(--amp))
+      )
+      rotate(calc(sin(calc(var(--i) * 3.1 + 1)) * 24deg * var(--amp))) scale(calc(1 - 0.3 * var(--amp)));
+    font-variation-settings:
+      "wght" calc(var(--kinetic-weight) - 300 * var(--amp)),
+      "wdth" var(--kinetic-width);
+  }
+  35% {
+    opacity: 1;
+  }
+  /* O impacto na prensa, como no nome: desce um fio, achata e engorda antes de assentar. */
+  62% {
+    transform: translate(0, calc(0.03em * var(--amp))) scale(calc(1 + 0.02 * var(--amp)), calc(1 - 0.06 * var(--amp)));
+    font-variation-settings:
+      "wght" calc(var(--kinetic-weight) + 100 * var(--amp)),
+      "wdth" calc(var(--kinetic-width) + 14 * var(--amp));
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes kinetic-wave {
+  40% {
+    translate: 0 calc(-0.04em * var(--amp));
+    font-variation-settings:
+      "wght" calc(var(--kinetic-weight) + 200 * var(--amp)),
+      "wdth" calc(var(--kinetic-width) + 20 * var(--amp));
+  }
+}
+
+/*
+ * Card com espessura (Tilt): placas cobalto atrás do card, afastadas em Z conforme --lift (0 a 1).
+ * Mais fundas, elas encolheriam com a perspectiva e ficariam escondidas atrás do card; o `scale`
+ * devolve o tamanho (900 é a distância da perspectiva), e só sobra o deslocamento da inclinação: a espessura.
+ */
+.tilt-plate {
+  background: color-mix(in oklab, var(--cobalt), black calc(var(--z) * 14%));
+  opacity: min(1, calc(var(--lift) * 4));
+  transform: translateZ(calc(var(--lift) * var(--z) * var(--plate-gap) * -1))
+    scale(calc(1 + var(--lift) * var(--z) * var(--plate-gap-n) / 900));
+}
+
+/* Hodômetro (Odometer): cada casa mostra uma fita de 20 dígitos; parar em 10 + dígito dá uma volta inteira. */
+.odometer-column {
+  display: inline-block;
+  height: 1lh;
+  overflow: hidden;
+}
+.odometer-strip {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc((10 + var(--digit)) * -1lh));
+}
+.odometer[data-armed]:not([data-set]) .odometer-strip {
+  transform: translateY(0);
+}
+.odometer[data-set] .odometer-strip {
+  transition: transform calc(1100ms + var(--column) * 180ms) var(--ease-brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kinetic[data-armed] [data-k] {
+    opacity: 1;
+    animation: none;
+  }
+  .kinetic[data-touch] [data-k] {
+    animation: none;
+  }
+  .extrude-layer {
+    display: none;
+  }
+  .odometer .odometer-strip {
+    transition: none;
+    transform: translateY(calc((10 + var(--digit)) * -1lh));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .kinetic-name [data-letter],
   .nav-hop [data-hop],
