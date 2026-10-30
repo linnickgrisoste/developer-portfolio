@@ -1,5 +1,6 @@
 import { ProgressBadge } from "@/components/game/progress";
 import { containerClass } from "@/components/layout/section";
+import { KineticText } from "@/components/motion/kinetic-text";
 import { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { copy } from "@/content/copy";
 import { profile } from "@/content/profile";
@@ -18,22 +19,34 @@ export function Contact({ locale }: { locale: Locale }) {
       className="scroll-mt-16 bg-night text-(--footer-fg) [--cobalt:var(--cobalt-soft)] [--footer-fg:var(--night-fg)]"
     >
       <RevealGroup className={cn(containerClass, "pt-24 pb-10 md:pt-32")}>
-        <RevealItem
+        {/* O título do rodapé é um título de seção como os outros, só maior. A lateral usa o cobalto suave do fundo noturno. */}
+        <KineticText
           as="h2"
-          className="max-w-[16ch] text-[clamp(2.5rem,6.5vw,6rem)] leading-[0.92] font-bold tracking-[-0.025em] [font-variation-settings:'wdth'_112]"
-        >
-          {text.title[locale]}
-        </RevealItem>
+          level="title"
+          text={text.title[locale]}
+          width={112}
+          extrude
+          className="max-w-[16ch] text-[clamp(2.5rem,6.5vw,6rem)] leading-[0.92] tracking-[-0.025em]"
+        />
         <RevealItem as="p" className="mt-6 max-w-[44ch] text-lg leading-relaxed text-(--footer-fg)/65">
           {text.lede[locale]}
         </RevealItem>
 
         <RevealItem className="mt-14 flex flex-wrap items-end gap-x-8 gap-y-6">
+          {/* O e-mail é o destino do site: as letras reagem ao cursor como o nome, e o sublinhado cresce. */}
           <a
             href={`mailto:${profile.email}`}
-            className="inline-block bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_3px] bg-left-bottom bg-no-repeat pb-2 text-[clamp(1.75rem,5vw,4.5rem)] leading-tight font-semibold tracking-[-0.02em] break-all transition-[background-size,color] duration-500 hover:bg-[length:100%_3px] hover:text-cobalt"
+            className="inline-block bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_3px] bg-left-bottom bg-no-repeat pb-2 text-[clamp(1.75rem,5vw,4.5rem)] leading-tight tracking-[-0.02em] transition-[background-size] duration-500 hover:bg-[length:100%_3px]"
           >
-            {profile.email}
+            <KineticText
+              text={profile.email}
+              level="title"
+              weight={600}
+              extrude
+              entrance={false}
+              wrap="anywhere"
+              engageWith="a"
+            />
           </a>
           <CopyEmail email={profile.email} labels={{ copy: text.copy[locale], copied: text.copied[locale] }} />
         </RevealItem>
