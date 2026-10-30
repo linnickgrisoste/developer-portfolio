@@ -12,6 +12,7 @@ import { useGame, xpOf } from "@/components/game/store";
 import { palette } from "@/lib/palette";
 import { cn } from "@/lib/utils";
 import { containerClass } from "@/components/layout/section";
+import { FONT_LABEL } from "@/components/three/fonts";
 import { trophyModels } from "./trophy-models";
 
 // Protótipo: a recompensa de quem zera o portfolio. Cada conquista vira um troféu numa estante;
@@ -19,8 +20,6 @@ import { trophyModels } from "./trophy-models";
 
 const SPACING = 2.3;
 const FOV = 35;
-/** Archivo servida localmente: o texto da cena (troika) não lê woff2 nem as fontes do next/font. */
-const LABEL_FONT = "/lab/archivo-600.ttf";
 const unlockedColors = { main: palette.dark.cobalt, accent: palette.light.paper };
 const lockedColors = { main: "#2a3350", accent: "#1a2135" };
 
@@ -294,7 +293,7 @@ function Trophy({ slot, unlocked, focused, hovered, dimmed, label, reduceMotion,
 
       {/* Plaquinha com o nome, como numa vitrine de museu. É texto da cena, então inclina junto com a estante. */}
       <Text
-        font={LABEL_FONT}
+        font={FONT_LABEL}
         position={[0, -1.12, 0.3]}
         fontSize={0.13}
         anchorX="center"
