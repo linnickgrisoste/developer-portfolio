@@ -5,6 +5,8 @@ import Image from "next/image";
 import { motion, useInView, useReducedMotion, type Variants } from "motion/react";
 import { markProjectSeen, useGame } from "@/components/game/store";
 import { SeenBadge } from "@/components/game/seen-badge";
+import { KineticText } from "@/components/motion/kinetic-text";
+import { Tilt } from "@/components/motion/tilt";
 import { ease, reveal } from "@/lib/motion";
 import { useSkipEntrance } from "@/components/motion/entrance";
 import type { ProjectCard } from "./project-card";
@@ -74,32 +76,41 @@ function FeaturedProject({
       viewport={reveal.viewport}
       className={`group/feature flex flex-col md:col-span-6 ${tall ? "md:row-span-2" : ""}`}
     >
-      <motion.div
-        variants={curtain(order)}
-        className={`relative aspect-[4/3] overflow-hidden rounded-lg bg-muted ${tall ? "md:aspect-auto md:min-h-[28rem] md:flex-1" : "md:aspect-[2/1]"}`}
-        style={featured.fit === "contain" ? { backgroundColor: featured.background } : undefined}
-      >
+      {/* Ao passar sobre o card inteiro, o pôster inclina e mostra a espessura cobalto. */}
+      <Tilt level="title" engageWith="a" className={tall ? "md:flex-1" : undefined}>
         <motion.div
-          variants={settle(order)}
-          className="absolute inset-0 grid place-items-center transition-[scale] duration-700 ease-brand group-hover/feature:scale-[1.04]"
+          variants={curtain(order)}
+          className={`relative aspect-[4/3] overflow-hidden rounded-lg bg-muted ${tall ? "md:aspect-auto md:min-h-[28rem] md:flex-1" : "md:aspect-[2/1]"}`}
+          style={featured.fit === "contain" ? { backgroundColor: featured.background } : undefined}
         >
-          {featured.fit === "cover" ? (
-            <Image src={project.image} alt="" fill sizes="(min-width: 768px) 42vw, 100vw" className="object-cover" />
-          ) : (
-            // Logos e capas pequenas ficam perto do tamanho original (sem borrar), com as bordas
-            // dissolvidas no painel da mesma cor para não aparecer emenda.
-            <div className="relative aspect-square h-[78%] [mask-image:radial-gradient(closest-side,black_72%,transparent)]">
-              <Image src={project.image} alt="" fill sizes="400px" className="object-contain" />
-            </div>
-          )}
+          <motion.div
+            variants={settle(order)}
+            className="absolute inset-0 grid place-items-center transition-[scale] duration-700 ease-brand group-hover/feature:scale-[1.04]"
+          >
+            {featured.fit === "cover" ? (
+              <Image src={project.image} alt="" fill sizes="(min-width: 768px) 42vw, 100vw" className="object-cover" />
+            ) : (
+              // Logos e capas pequenas ficam perto do tamanho original (sem borrar), com as bordas
+              // dissolvidas no painel da mesma cor para não aparecer emenda.
+              <div className="relative aspect-square h-[78%] [mask-image:radial-gradient(closest-side,black_72%,transparent)]">
+                <Image src={project.image} alt="" fill sizes="400px" className="object-contain" />
+              </div>
+            )}
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </Tilt>
 
       <div className="mt-5 flex items-baseline justify-between gap-4">
         <h3 className="flex items-center gap-3">
-          <span className="text-[clamp(1.5rem,2.6vw,2.25rem)] leading-none font-semibold tracking-[-0.02em] transition-[font-variation-settings,color] duration-300 ease-brand [font-variation-settings:'wdth'_100] group-hover/feature:text-cobalt group-hover/feature:[font-variation-settings:'wdth'_118]">
-            {project.title}
-          </span>
+          <KineticText
+            text={project.title}
+            level="title"
+            weight={600}
+            extrude
+            entrance={false}
+            engageWith="a"
+            className="text-[clamp(1.5rem,2.6vw,2.25rem)] leading-none tracking-[-0.02em]"
+          />
           <SeenBadge seen={seen} />
         </h3>
         <p className="shrink-0 text-[15px] tabular-nums text-graphite">

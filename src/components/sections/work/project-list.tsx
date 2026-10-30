@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import type { ProjectCard } from "./project-card";
 import { markProjectSeen, useGame } from "@/components/game/store";
 import { SeenBadge } from "@/components/game/seen-badge";
+import { KineticText } from "@/components/motion/kinetic-text";
 import { reveal } from "@/lib/motion";
 import { useRevealGroup } from "@/components/motion/entrance";
 import { FloatingPreview, useFloatingPreview } from "./floating-preview";
@@ -73,9 +74,16 @@ export function ProjectList({ items, total, labels }: { items: ProjectCard[]; to
             >
               <div className="md:col-span-6">
                 <h3 className="flex items-center gap-3">
-                  <span className="text-[clamp(1.75rem,4vw,3.25rem)] leading-none font-semibold tracking-[-0.02em] transition-[font-variation-settings,color] duration-300 ease-brand [font-variation-settings:'wdth'_100] group-hover/row:text-cobalt group-hover/row:[font-variation-settings:'wdth'_118]">
-                    {project.title}
-                  </span>
+                  {/* A linha inteira engaja o título; a entrada é a da revelação da lista. */}
+                  <KineticText
+                    text={project.title}
+                    level="title"
+                    weight={600}
+                    extrude
+                    entrance={false}
+                    engageWith="a"
+                    className="text-[clamp(1.75rem,4vw,3.25rem)] leading-none tracking-[-0.02em]"
+                  />
                   <SeenBadge seen={seenProjects.includes(project.title)} />
                 </h3>
                 <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-graphite">{project.summary}</p>
