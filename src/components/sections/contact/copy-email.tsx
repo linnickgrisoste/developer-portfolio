@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { unlock } from "@/components/game/store";
-import { Magnetic } from "@/components/ui/magnetic";
+import { Magnetic } from "@/components/motion/magnetic";
 import { exit, spring } from "@/lib/motion";
 
 // Copiar o e-mail também desbloqueia "Sinal enviado". Sem acesso à área de transferência, abre o e-mail.
@@ -29,7 +29,7 @@ export function CopyEmail({ email, labels }: { email: string; labels: { copy: st
   };
 
   return (
-    <Magnetic intensity={0.3} range={100}>
+    <Magnetic intensity={0.3}>
       <button
         type="button"
         onClick={copyEmail}

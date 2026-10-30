@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { ArrowDown, Gamepad2 } from "lucide-react";
-import { Magnetic } from "@/components/ui/magnetic";
+import { Magnetic } from "@/components/motion/magnetic";
 import { copy } from "@/content/copy";
 import { achievements, gameCopy } from "@/content/game";
 import { profile } from "@/content/profile";
@@ -18,7 +18,7 @@ export function Hero({ locale }: { locale: Locale }) {
           <p className="text-[15px] font-semibold text-cobalt">{text.role[locale]}</p>
           <p className="mt-3 max-w-[44ch] text-xl leading-[1.55] text-pretty sm:text-2xl">{text.intro[locale]}</p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-            <Magnetic intensity={0.25} range={120}>
+            <Magnetic intensity={0.25}>
               <a
                 href={anchor(sections.work)}
                 className="inline-flex h-12 items-center rounded-full bg-ink px-6 text-[15px] font-semibold text-paper transition-[background-color,scale] hover:bg-cobalt active:scale-[0.97]"
