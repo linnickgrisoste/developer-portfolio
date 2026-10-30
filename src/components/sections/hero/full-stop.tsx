@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { animate, useReducedMotion } from "motion/react";
 import { useLocale } from "@/components/providers";
@@ -17,6 +17,24 @@ const BOUNCE = 0.72; // energia que sobra a cada quique
 const ROLLING_FRICTION = 3; // quanto o rolar no chão freia por segundo
 const REST_BEFORE_RETURN_MS = 1500; // parado no chão por esse tempo, ele volta para casa
 const MAX_LOOSE_MS = 9000; // limite total solto, mesmo se ainda estiver quicando
+
+// Se o ponto está solto pela página. O nome em 3D lê para esconder a esfera dele enquanto isso.
+let looseNow = false;
+const looseListeners = new Set<() => void>();
+
+function subscribeLoose(listener: () => void) {
+  looseListeners.add(listener);
+  return () => looseListeners.delete(listener);
+}
+
+function publishLoose(value: boolean) {
+  looseNow = value;
+  looseListeners.forEach((listener) => listener());
+}
+
+export function useFullStopLoose() {
+  return useSyncExternalStore(subscribeLoose, () => looseNow, () => false);
+}
 
 /** De onde o ponto saiu: o botão no nome (para onde ele volta), a posição, o tamanho e a cor. */
 type Origin = { home: HTMLButtonElement; left: number; top: number; size: number; color: string };
@@ -43,6 +61,10 @@ export function FullStop() {
   const returnHome = useCallback(() => setOrigin(null), []);
 
   const loose = origin !== null;
+
+  useEffect(() => {
+    publishLoose(loose);
+  }, [loose]);
 
   return (
     <>

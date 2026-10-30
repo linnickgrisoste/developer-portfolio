@@ -134,6 +134,32 @@
 }
 
 /*
+ * Hero em 3D: a cena e o nome em CSS trocam de lugar num cruzamento de opacidade. De frente, as letras
+ * 3D são o mesmo desenho do CSS, então a troca não aparece; o volume surge quando a câmera gira.
+ * O ponto em DOM continua no lugar, invisível: é ele que recebe o clique e se solta pela página.
+ */
+.hero-3d {
+  opacity: 0;
+  transition: opacity 600ms var(--ease-brand);
+}
+.hero-3d[data-ready] {
+  opacity: 1;
+}
+.hero-print,
+.hero-name .full-stop-dot {
+  transition:
+    opacity 600ms var(--ease-brand),
+    scale 200ms;
+}
+[data-hero-3d] .hero-print {
+  opacity: 0;
+}
+/* !important vence o estilo inline do ponto (ele some enquanto está solto) e as animações de entrada. */
+[data-hero-3d] .hero-name .full-stop-dot {
+  opacity: 0 !important;
+}
+
+/*
  * O ponto final cai por último e carimba o nome: acelera na queda e achata no impacto.
  * Depois, parado, ele troca de cor devagar entre vizinhos do cobalto (violeta e azul-piscina).
  */
