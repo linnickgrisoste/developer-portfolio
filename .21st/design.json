@@ -1,0 +1,264 @@
+{
+  "version": 1,
+  "project": {
+    "name": "developer-portfolio",
+    "productType": null,
+    "stack": [
+      "nextjs",
+      "react",
+      "shadcn",
+      "tailwind-v4"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/app/globals.css"
+    ],
+    "components": [
+      "src/components/ui"
+    ],
+    "assets": [],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "light-and-dark",
+    "colors": {
+      "--color-background": {
+        "value": "var(--background)",
+        "source": "src/app/globals.css"
+      },
+      "--color-foreground": {
+        "value": "var(--foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-paper": {
+        "value": "var(--background)",
+        "source": "src/app/globals.css"
+      },
+      "--color-ink": {
+        "value": "var(--foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-graphite": {
+        "value": "var(--muted-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-rule": {
+        "value": "var(--border)",
+        "source": "src/app/globals.css"
+      },
+      "--color-cobalt": {
+        "value": "var(--cobalt)",
+        "source": "src/app/globals.css"
+      },
+      "--color-ring": {
+        "value": "var(--ring)",
+        "source": "src/app/globals.css"
+      },
+      "--color-input": {
+        "value": "var(--input)",
+        "source": "src/app/globals.css"
+      },
+      "--color-border": {
+        "value": "var(--border)",
+        "source": "src/app/globals.css"
+      },
+      "--color-destructive": {
+        "value": "var(--destructive)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent-foreground": {
+        "value": "var(--accent-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent": {
+        "value": "var(--accent)",
+        "source": "src/app/globals.css"
+      },
+      "--color-muted-foreground": {
+        "value": "var(--muted-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-muted": {
+        "value": "var(--muted)",
+        "source": "src/app/globals.css"
+      },
+      "--color-secondary-foreground": {
+        "value": "var(--secondary-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-secondary": {
+        "value": "var(--secondary)",
+        "source": "src/app/globals.css"
+      },
+      "--color-primary-foreground": {
+        "value": "var(--primary-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-primary": {
+        "value": "var(--primary)",
+        "source": "src/app/globals.css"
+      },
+      "--color-popover-foreground": {
+        "value": "var(--popover-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-popover": {
+        "value": "var(--popover)",
+        "source": "src/app/globals.css"
+      },
+      "--color-card-foreground": {
+        "value": "var(--card-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-card": {
+        "value": "var(--card)",
+        "source": "src/app/globals.css"
+      },
+      "--background": {
+        "value": "#0a0f1c",
+        "source": "src/app/globals.css"
+      },
+      "--foreground": {
+        "value": "#e6e9ef",
+        "source": "src/app/globals.css"
+      },
+      "--muted": {
+        "value": "#141b2c",
+        "source": "src/app/globals.css"
+      },
+      "--muted-foreground": {
+        "value": "#8b93a7",
+        "source": "src/app/globals.css"
+      },
+      "--border": {
+        "value": "#232b3d",
+        "source": "src/app/globals.css"
+      },
+      "--card-foreground": {
+        "value": "var(--foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--popover-foreground": {
+        "value": "var(--foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--primary": {
+        "value": "var(--foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--primary-foreground": {
+        "value": "var(--background)",
+        "source": "src/app/globals.css"
+      },
+      "--secondary": {
+        "value": "var(--muted)",
+        "source": "src/app/globals.css"
+      },
+      "--secondary-foreground": {
+        "value": "var(--foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--accent": {
+        "value": "var(--muted)",
+        "source": "src/app/globals.css"
+      },
+      "--accent-foreground": {
+        "value": "var(--foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--destructive": {
+        "value": "#ff6b6b",
+        "source": "src/app/globals.css"
+      },
+      "--ring": {
+        "value": "var(--cobalt)",
+        "source": "src/app/globals.css"
+      }
+    },
+    "typography": {
+      "--font-sans": {
+        "value": "var(--font-archivo)",
+        "source": "src/app/globals.css"
+      },
+      "--font-heading": {
+        "value": "var(--font-archivo)",
+        "source": "src/app/globals.css"
+      }
+    },
+    "spacing": {},
+    "radius": {
+      "--radius-sm": {
+        "value": "calc(var(--radius) * 0.6)",
+        "source": "src/app/globals.css"
+      },
+      "--radius-md": {
+        "value": "calc(var(--radius) * 0.8)",
+        "source": "src/app/globals.css"
+      },
+      "--radius-lg": {
+        "value": "var(--radius)",
+        "source": "src/app/globals.css"
+      },
+      "--radius-xl": {
+        "value": "calc(var(--radius) * 1.4)",
+        "source": "src/app/globals.css"
+      },
+      "--radius": {
+        "value": "0.5rem",
+        "source": "src/app/globals.css"
+      }
+    },
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [
+      "button"
+    ],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [
+    {
+      "date": "2026-10-14",
+      "decision": "Base editorial (papel frio, tinta azul-marinho, acento cobalto, Archivo variável) + camada leve de gamificação: modo explorador com 8 conquistas, XP/níveis no HUD do topo, avisos discretos não bloqueantes, ficha de personagem com níveis segmentados, títulos que decodificam ao entrar na tela. Silkscreen só para números de nível/XP. Sem modais e sem pixel-art no layout; tudo respeita prefers-reduced-motion e pode ter os avisos desligados."
+    }
+  ],
+  "evidence": [
+    {
+      "fact": "components.installed",
+      "source": "src/components/ui"
+    },
+    {
+      "fact": "design.colorMode:light-and-dark",
+      "source": "src/app/globals.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/app/globals.css"
+    },
+    {
+      "fact": "project.stack:nextjs",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:shadcn",
+      "source": "components.json"
+    },
+    {
+      "fact": "project.stack:tailwind-v4",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-10-15T00:57:12.010Z"
+}
