@@ -57,6 +57,8 @@ export default async function RootLayout({ children, params }: LayoutProps) {
     <html
       lang={htmlLang[locale]}
       className={`${archivo.variable} ${silkscreen.variable} scroll-smooth`}
+      // A rolagem suave é para as âncoras da página; trocando de página (ex.: ir à sala de troféus), o Next a desliga.
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body className="antialiased">
