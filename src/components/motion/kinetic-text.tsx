@@ -45,6 +45,7 @@ export function KineticText({
   engageWith,
   offset = 0,
   raised,
+  proximity = true,
   className,
 }: {
   text: string;
@@ -65,6 +66,8 @@ export function KineticText({
   offset?: number;
   /** Lateral acesa por fora do engajamento. */
   raised?: boolean;
+  /** Peso e largura seguindo o cursor. Desligue quando o texto estiver só ocupando lugar (ex.: o 3D por cima dele). */
+  proximity?: boolean;
   className?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -117,7 +120,7 @@ export function KineticText({
   // Proximidade: só enquanto engajado com mouse. Lê todas as posições, depois escreve todos os pesos.
   useEffect(() => {
     const element = ref.current;
-    if (!element || !engaged || !finePointer || reducedMotion) return;
+    if (!element || !proximity || !engaged || !finePointer || reducedMotion) return;
     const letters = Array.from(element.querySelectorAll<HTMLElement>("[data-k]"));
     const fontSize = parseFloat(getComputedStyle(element).fontSize);
     // Alcance da proximidade: cerca de duas letras para cada lado no nível assinatura, menos nos outros.
@@ -140,7 +143,7 @@ export function KineticText({
       stop();
       letters.forEach((letter) => (letter.style.fontVariationSettings = ""));
     };
-  }, [engaged, finePointer, reducedMotion, amplitude, weight, width]);
+  }, [proximity, engaged, finePointer, reducedMotion, amplitude, weight, width]);
 
   const Component = motion[as] as typeof motion.span;
   let index = offset;
