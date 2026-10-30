@@ -4,7 +4,7 @@ import { useRef, type CSSProperties } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import VariableProximity from "@/components/vendor/bits/VariableProximity";
 import { containerClass } from "@/components/layout/section";
-import { useSkipEntrance } from "@/lib/motion";
+import { useSkipEntrance } from "@/components/motion/entrance";
 import { HERO_NAME_ID, sections } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import { FullStop } from "./full-stop";

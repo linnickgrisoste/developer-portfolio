@@ -2,7 +2,7 @@
 
 import { useReducedMotion } from "motion/react";
 import DecryptedText from "@/components/vendor/bits/DecryptedText";
-import { useSkipEntrance } from "@/lib/motion";
+import { useSkipEntrance } from "@/components/motion/entrance";
 import { cn } from "@/lib/utils";
 
 // Tempo de cada letra e o teto da animação inteira (ms): títulos longos aceleram em vez de se arrastar.

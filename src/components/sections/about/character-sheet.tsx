@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { markClassSeen } from "@/components/game/store";
-import { spring, useSkipEntrance } from "@/lib/motion";
+import { spring } from "@/lib/motion";
+import { useSkipEntrance } from "@/components/motion/entrance";
 
 const MAX_LEVEL = 10;
 

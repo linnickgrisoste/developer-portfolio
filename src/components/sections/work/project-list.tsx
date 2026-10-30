@@ -6,7 +6,8 @@ import { motion } from "motion/react";
 import type { ProjectCard } from "./project-card";
 import { markProjectSeen, useGame } from "@/components/game/store";
 import { SeenBadge } from "@/components/game/seen-badge";
-import { reveal, useRevealGroup } from "@/lib/motion";
+import { reveal } from "@/lib/motion";
+import { useRevealGroup } from "@/components/motion/entrance";
 import { FloatingPreview, useFloatingPreview } from "./floating-preview";
 
 /** Rótulos do cabeçalho da lista, já no idioma da página. */

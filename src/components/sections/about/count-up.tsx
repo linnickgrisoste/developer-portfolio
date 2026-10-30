@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { animate, useInView, useReducedMotion } from "motion/react";
-import { ease, useSkipEntrance } from "@/lib/motion";
+import { ease } from "@/lib/motion";
+import { useSkipEntrance } from "@/components/motion/entrance";
 
 // Número que conta do zero até o valor quando aparece na tela.
 // O servidor entrega o valor final: é o que buscadores e prévias de link leem. No navegador,

@@ -3,7 +3,8 @@
 import { useRef } from "react";
 import { Check } from "lucide-react";
 import { motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
-import { ease, reveal, useRevealGroup, useSkipEntrance } from "@/lib/motion";
+import { ease, reveal } from "@/lib/motion";
+import { useRevealGroup, useSkipEntrance } from "@/components/motion/entrance";
 
 /** Uma experiência já no idioma da página. */
 export type TimelineEntryData = { company: string; role: string; period: string; note: string; current: boolean };

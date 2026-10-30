@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeProvider } from "next-themes";
 import { htmlLang, otherLocale, rememberLocale, type Locale, type Localized } from "@/lib/i18n";
-import { markLocaleSwitch } from "@/lib/motion";
+import { markLocaleSwitch } from "@/components/motion/entrance";
 
 type LocaleContextValue = {
   locale: Locale;

@@ -5,7 +5,8 @@ import Image from "next/image";
 import { motion, useInView, useReducedMotion, type Variants } from "motion/react";
 import { markProjectSeen, useGame } from "@/components/game/store";
 import { SeenBadge } from "@/components/game/seen-badge";
-import { ease, reveal, useSkipEntrance } from "@/lib/motion";
+import { ease, reveal } from "@/lib/motion";
+import { useSkipEntrance } from "@/components/motion/entrance";
 import type { ProjectCard } from "./project-card";
 
 // Entrada do pôster: uma cortina se abre de baixo para cima (primário) enquanto a imagem

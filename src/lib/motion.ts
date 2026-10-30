@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useReducedMotion, type Transition, type Variants } from "motion/react";
+import type { Transition, Variants } from "motion/react";
 
 // Identidade de movimento do site. Duas personalidades, com papéis separados:
 // - Editorial: entra desacelerando e pousa sem passar do ponto.
@@ -48,36 +47,3 @@ export const reveal = {
     shown: { opacity: 1, y: 0, transition: { duration: duration.slow, ease: ease.out } },
   },
 } satisfies { viewport: object; group: Variants; item: Variants };
-
-/**
- * Props do contêiner de uma revelação em cascata. Os filhos usam `variants={reveal.item}`.
- * Com movimento reduzido, o conteúdo já nasce no lugar.
- */
-export function useRevealGroup() {
-  const reduceMotion = useReducedMotion();
-  const skipEntrance = useSkipEntrance();
-  return {
-    initial: reduceMotion || skipEntrance ? false : "hidden",
-    whileInView: "shown",
-    viewport: reveal.viewport,
-    variants: reveal.group,
-  } as const;
-}
-
-/*
- * Entradas acontecem uma vez por visita, não uma vez por idioma. Trocar de idioma navega para a
- * outra página estática, que monta de novo; o que a pessoa já viu entrar não deve entrar outra vez.
- * O seletor de idioma marca a troca, e a página que monta em seguida nasce com tudo no lugar.
- */
-let localeSwitchedAt = 0;
-const SKIP_WINDOW_MS = 4000;
-
-export function markLocaleSwitch() {
-  localeSwitchedAt = Date.now();
-}
-
-/** true na página montada logo depois de uma troca de idioma. No servidor e na primeira visita, sempre false. */
-export function useSkipEntrance() {
-  const [skip] = useState(() => Date.now() - localeSwitchedAt < SKIP_WINDOW_MS);
-  return skip;
-}

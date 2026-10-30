@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
-import { reveal, useRevealGroup } from "@/lib/motion";
+import { reveal } from "@/lib/motion";
+import { useRevealGroup } from "./entrance";
 
 // Revelação ao rolar como componentes, para que seções do servidor possam usá-la.
 // O grupo dispara uma vez e os itens sobem em cascata (ver `reveal` em lib/motion.ts).
