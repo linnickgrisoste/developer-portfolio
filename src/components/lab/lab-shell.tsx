@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 // Moldura das páginas de laboratório: protótipos fora do site principal, para comparar ideias.
 
 const prototypes = [
+  { slug: "motion", label: "Movimento" },
   { slug: "hero", label: "Hero 3D" },
   { slug: "trofeus", label: "Sala de troféus" },
 ];
@@ -16,18 +17,21 @@ export function LabShell({
   current,
   hint,
   dark,
+  scroll,
   children,
 }: {
   locale: Locale;
   current: string;
   /** O que experimentar no protótipo, mostrado no rodapé da tela. */
-  hint: string;
+  hint?: string;
   /** Cabeçalho claro sobre fundo noturno, para cenas escuras. */
   dark?: boolean;
+  /** Página que rola (o catálogo). Sem isto, a moldura ocupa exatamente a tela, para cenas 3D. */
+  scroll?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn("relative flex h-svh flex-col overflow-hidden", dark && "bg-night text-night-fg")}>
+    <div className={cn("relative flex flex-col", scroll ? "min-h-svh" : "h-svh overflow-hidden", dark && "bg-night text-night-fg")}>
       <header className={cn(containerClass, "relative z-10 flex h-16 w-full shrink-0 items-center justify-between gap-6")}>
         <Link
           href={`/${locale}`}
@@ -62,15 +66,17 @@ export function LabShell({
 
       <main className="relative min-h-0 flex-1">{children}</main>
 
-      <p
-        className={cn(
-          containerClass,
-          "pointer-events-none absolute inset-x-0 bottom-6 z-10 text-center text-[13px]",
-          dark ? "text-night-fg/60" : "text-graphite",
-        )}
-      >
-        {hint}
-      </p>
+      {hint && (
+        <p
+          className={cn(
+            containerClass,
+            "pointer-events-none absolute inset-x-0 bottom-6 z-10 text-center text-[13px]",
+            dark ? "text-night-fg/60" : "text-graphite",
+          )}
+        >
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
