@@ -1,5 +1,6 @@
 import { Section } from "@/components/layout/section";
 import { SectionHeading } from "@/components/layout/section-heading";
+import { Odometer } from "@/components/motion/odometer";
 import { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { copy } from "@/content/copy";
 import { stats } from "@/content/profile";
@@ -7,7 +8,6 @@ import { stack } from "@/content/stack";
 import type { Locale } from "@/lib/i18n";
 import { sections } from "@/lib/sections";
 import { CharacterSheet } from "./character-sheet";
-import { CountUp } from "./count-up";
 
 export function About({ locale }: { locale: Locale }) {
   const text = copy.about;
@@ -32,7 +32,7 @@ export function About({ locale }: { locale: Locale }) {
             <div key={stat.label.en}>
               <dt className="sr-only">{stat.label[locale]}</dt>
               <dd className="text-[clamp(2.25rem,5vw,4rem)] leading-none font-bold tracking-[-0.03em] [font-variation-settings:'wdth'_125]">
-                <CountUp value={stat.value} suffix={stat.suffix} />
+                <Odometer value={stat.value} suffix={stat.suffix} />
               </dd>
               <dd aria-hidden className="mt-2 text-[14px] leading-snug text-graphite">
                 {stat.label[locale]}

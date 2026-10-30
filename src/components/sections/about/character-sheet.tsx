@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { markClassSeen } from "@/components/game/store";
+import { Tilt } from "@/components/motion/tilt";
 import { spring } from "@/lib/motion";
 import { useSkipEntrance } from "@/components/motion/entrance";
 
@@ -49,34 +50,36 @@ export function CharacterSheet({ classes, labels }: { classes: CharacterClass[];
         {classes.map((group, index) => {
           const active = index === selected;
           return (
-            <button
-              key={group.id}
-              ref={(node) => {
-                tabRefs.current[index] = node;
-              }}
-              type="button"
-              role="tab"
-              id={`class-tab-${index}`}
-              aria-selected={active}
-              aria-controls="class-panel"
-              tabIndex={active ? 0 : -1}
-              onClick={() => select(index)}
-              className={`relative overflow-hidden rounded-lg border px-4 py-3 text-left transition-colors ${
-                active ? "border-ink text-paper" : "border-rule hover:border-graphite"
-              }`}
-            >
-              {active && (
-                <motion.span
-                  layoutId="class-highlight"
-                  className="absolute inset-0 bg-ink"
-                  transition={reduceMotion ? { duration: 0 } : spring.ui}
-                />
-              )}
-              <span className="relative block text-lg font-semibold tracking-[-0.01em]">{group.name}</span>
-              <span className={`relative block text-[13px] ${active ? "text-paper/70" : "text-graphite"}`}>
-                {group.role}
-              </span>
-            </button>
+            // Cada classe é um card com espessura: inclina ao passar o mouse ou ao receber foco pelo teclado.
+            <Tilt key={group.id} level="detail">
+              <button
+                ref={(node) => {
+                  tabRefs.current[index] = node;
+                }}
+                type="button"
+                role="tab"
+                id={`class-tab-${index}`}
+                aria-selected={active}
+                aria-controls="class-panel"
+                tabIndex={active ? 0 : -1}
+                onClick={() => select(index)}
+                className={`relative overflow-hidden rounded-lg border bg-paper px-4 py-3 text-left transition-colors ${
+                  active ? "border-ink text-paper" : "border-rule hover:border-graphite"
+                }`}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="class-highlight"
+                    className="absolute inset-0 bg-ink"
+                    transition={reduceMotion ? { duration: 0 } : spring.ui}
+                  />
+                )}
+                <span className="relative block text-lg font-semibold tracking-[-0.01em]">{group.name}</span>
+                <span className={`relative block text-[13px] ${active ? "text-paper/70" : "text-graphite"}`}>
+                  {group.role}
+                </span>
+              </button>
+            </Tilt>
           );
         })}
       </div>
