@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { useReducedMotion } from "motion/react";
 import ScrollVelocity from "@/components/vendor/bits/ScrollVelocity";
 import { Container } from "@/components/layout/section";
+import { Extrude } from "@/components/motion/extrude";
 
 function Row({ items }: { items: string[] }) {
   return (
@@ -19,7 +20,8 @@ function Row({ items }: { items: string[] }) {
   );
 }
 
-// Faixa com a stack que acelera e inverte conforme a velocidade do scroll.
+// Faixa com a stack que acelera e inverte conforme a velocidade do scroll. Rolando rápido, as palavras
+// ganham a lateral cobalto como um rastro (Extrude no driver "velocity"); paradas, voltam a ser impressas.
 export function Marquee({ tools }: { tools: string[] }) {
   const reduceMotion = useReducedMotion();
   const half = Math.ceil(tools.length / 2);
@@ -38,7 +40,9 @@ export function Marquee({ tools }: { tools: string[] }) {
       ) : (
         <ScrollVelocity
           texts={rows.map((items, index) => (
-            <Row key={index} items={items} />
+            <Extrude key={index} level="title" driver="velocity">
+              <Row items={items} />
+            </Extrude>
           ))}
           velocity={40}
           numCopies={4}
