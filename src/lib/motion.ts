@@ -47,3 +47,22 @@ export const reveal = {
     shown: { opacity: 1, y: 0, transition: { duration: duration.slow, ease: ease.out } },
   },
 } satisfies { viewport: object; group: Variants; item: Variants };
+
+/*
+ * Níveis de intensidade. Toda primitiva de movimento recebe um nível, nunca números soltos:
+ * - assinatura: um por página (o nome do hero);
+ * - título: títulos de seção, nomes de projeto, o e-mail do contato;
+ * - detalhe: cards, links, botões, números.
+ * `amplitude` escala deslocamentos, giros e variação de fonte; `depth` é a lateral cobalto
+ * quando engajado (em `em`, para acompanhar o tamanho do texto); `layers` é quantas camadas a formam.
+ */
+export type Level = "signature" | "title" | "detail";
+
+export const levels = {
+  signature: { amplitude: 1, depth: 0.12, layers: 12 },
+  title: { amplitude: 0.55, depth: 0.07, layers: 6 },
+  detail: { amplitude: 0.3, depth: 0.04, layers: 4 },
+} satisfies Record<Level, { amplitude: number; depth: number; layers: number }>;
+
+/** Cascatas: entre itens de uma lista, entre letras, e o teto da cascata inteira (segundos). */
+export const stagger = { micro: 0.025, base: 0.06, max: 0.5 };
