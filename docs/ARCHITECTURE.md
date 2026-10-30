@@ -1,6 +1,6 @@
 # Arquitetura do portfolio
 
-Status: **em execução**. Proposta em 29/10/2026; Fase 0 concluída; Fase 1 implementada, aguardando aprovação no catálogo. Vale para a reestruturação completa: sistema de movimento único, Hero 3D e Sala de troféus.
+Status: **em execução**. Proposta em 29/10/2026; Fases 0, 1 e 2 concluídas. Vale para a reestruturação completa: sistema de movimento único, Hero 3D e Sala de troféus.
 
 ---
 
@@ -23,7 +23,7 @@ A lateral cobalto do Hero 3D é a assinatura visual. Em 2D ela é reproduzida co
 ## 2. Princípios
 
 1. **Uma linguagem, três níveis.** Toda animação é uma primitiva do sistema, usada em um de três níveis: *assinatura*, *título* ou *detalhe* (ver 6.5).
-2. **Seções compõem, não animam.** Nenhuma seção escreve lógica de animação. Se falta um efeito, ele vira primitiva.
+2. **Seções compõem, não animam.** Entrar, engajar e ganhar volume vêm sempre das primitivas. Uma seção só guarda o seu *momento único* (a cortina dos pôsteres, a prévia que segue o cursor, a linha do tempo, o nome prensado no scroll), e mesmo ele usa os tokens e drivers do sistema. Se a mesma ideia aparecer numa segunda seção, vira primitiva.
 3. **Servidor por padrão.** Seções são Server Components. Só vai para o navegador o que reage a algo (ilhas).
 4. **3D é progressivo.** A página funciona e impressiona sem WebGL. O 3D entra por cima quando o aparelho aguenta.
 5. **Uma fonte por entrada.** Cursor, scroll e viewport têm um único ouvinte cada, compartilhado por todas as primitivas.
@@ -248,8 +248,8 @@ As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o 
 | Fase | Entrega | Pronto quando |
 |---|---|---|
 | **0. Fundação** ✅ | Pastas, Server Components, idioma por rota, conteúdo dividido | Site idêntico ao de hoje, build e testes ok |
-| **1. Sistema de movimento** 🔶 | Tokens, drivers, `engaged`, primitivas e catálogo `/lab/motion` | Você aprova a linguagem no catálogo |
-| **2. Seções** | Cada seção migrada para primitivas, com a linguagem da tabela de seções | Nenhuma seção com código de animação próprio |
+| **1. Sistema de movimento** ✅ | Tokens, drivers, `engaged`, primitivas e catálogo `/lab/motion` | Você aprova a linguagem no catálogo |
+| **2. Seções** ✅ | Cada seção migrada para primitivas, com a linguagem da tabela de seções | Toda seção usa as primitivas; o que fica na seção é só o seu momento único |
 | **3. Hero 3D** | `Stage`, `World`, entrega CSS → 3D, ponto final com passagem para o DOM | Funciona com e sem WebGL; LCP não piora |
 | **4. Sala de troféus** | Rota, entradas, pré-carregamento, fallback em DOM | Acessível do rodapé, do HUD e do aviso final |
 | **5. Acabamento** | Revisão de acessibilidade, celular, Lighthouse; remoção do que sobrou | Sem dependência ou rota de laboratório órfã |
