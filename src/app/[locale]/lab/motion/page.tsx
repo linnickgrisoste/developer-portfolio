@@ -40,7 +40,7 @@ export default async function LabMotionPage({ params }: { params: Promise<{ loca
   const locale = (await params).locale as Locale;
 
   return (
-    <LabShell locale={locale} current="motion" scroll>
+    <LabShell locale={locale}>
       <Container className="pb-40">
         <header className="py-16 md:py-24">
           <p className="font-pixel text-[11px] text-cobalt">CATÁLOGO DE MOVIMENTO</p>
