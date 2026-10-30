@@ -1,6 +1,6 @@
 # Arquitetura do portfolio
 
-Status: **em execução**. Proposta em 29/10/2026; Fases 0 a 3 concluídas. Vale para a reestruturação completa: sistema de movimento único, Hero 3D e Sala de troféus.
+Status: **em execução**. Proposta em 29/10/2026; Fases 0 a 4 concluídas. Vale para a reestruturação completa: sistema de movimento único, Hero 3D e Sala de troféus.
 
 ---
 
@@ -75,10 +75,10 @@ src/
     three/
       gate.ts  stage.tsx  world.tsx  materials.ts  fonts.ts
       hero/       hero-scene.tsx  layout.ts
-      trophies/   trophy-room.tsx  models.tsx  fallback.tsx
+      trophies/   trophy-scene.tsx  models.tsx  preload.ts
     game/         store.ts  triggers.tsx  hud.tsx  toasts.tsx  progress.tsx  seen-badge.tsx  game-layer.tsx
     layout/       section.tsx  section-heading.tsx
-    sections/     header/  hero/  stack/  work/  about/  experience/  contact/
+    sections/     header/  hero/  stack/  work/  about/  experience/  contact/  trophies/
     ui/           button  popover  switch
     vendor/bits/  componentes do React Bits, sem edição
 public/three/     fontes convertidas para o 3D (typeface.json, ttf)
@@ -211,6 +211,8 @@ As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o 
 - **Entradas:** rodapé ("Sala de troféus · 3/8"), HUD e o aviso "Portfólio zerado". O bundle é pré-carregado no hover ou foco do link.
 - **Conteúdo:** lê o store do jogo. O que ainda não foi conquistado aparece como silhueta, e a conquista secreta como "???".
 - **Fallback:** sem WebGL ou com movimento reduzido, a mesma rota mostra uma grade em DOM com os mesmos dados.
+- **A lista em DOM tem três papéis:** é a sala sem 3D, é o que aparece enquanto a cena carrega, e continua na página (invisível, fora da vista) para leitores de tela quando o 3D assume.
+- **Pacotes verificados no build:** nem a home nem a sala carregam three.js no início; a cena da sala só vem com a página ou no pré-carregamento do link.
 
 ---
 
@@ -254,7 +256,7 @@ As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o 
 | **1. Sistema de movimento** ✅ | Tokens, drivers, `engaged`, primitivas e catálogo `/lab/motion` | Você aprova a linguagem no catálogo |
 | **2. Seções** ✅ | Cada seção migrada para primitivas, com a linguagem da tabela de seções | Toda seção usa as primitivas; o que fica na seção é só o seu momento único |
 | **3. Hero 3D** ✅ | `Stage`, `World`, troca CSS → 3D sem emenda, ponto final em DOM sobre a esfera | Funciona com e sem WebGL; LCP não piora |
-| **4. Sala de troféus** | Rota, entradas, pré-carregamento, fallback em DOM | Acessível do rodapé, do HUD e do aviso final |
+| **4. Sala de troféus** ✅ | Rota, entradas, pré-carregamento, fallback em DOM | Acessível do rodapé, do HUD e do aviso final |
 | **5. Acabamento** | Revisão de acessibilidade, celular, Lighthouse; remoção do que sobrou | Sem dependência ou rota de laboratório órfã |
 
 ---
