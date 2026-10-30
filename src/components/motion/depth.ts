@@ -27,6 +27,10 @@ type DepthOptions = {
   driver?: DepthDriver;
   /** A lateral se afasta do cursor, como a sombra de uma luz que o acompanha. */
   follow?: boolean;
+  /** Engaja pelo ancestral mais próximo que casa com o seletor (ex.: "a" para o card inteiro). */
+  engageWith?: string;
+  /** Mantém a lateral acesa por fora do engajamento (ex.: o ano que a linha do tempo já alcançou). */
+  raised?: boolean;
 };
 
 function setRaised(element: HTMLElement, raised: boolean) {
@@ -38,24 +42,27 @@ function setRaised(element: HTMLElement, raised: boolean) {
  * Devolve `engaged` e as props que o elemento precisa; o CSS em globals.css faz o resto.
  * As props devem ir para um componente `motion.*`: o driver "velocity" passa MotionValues no estilo.
  */
-export function useDepth(ref: RefObject<HTMLElement | null>, { level, driver = "engaged", follow = false }: DepthOptions) {
+export function useDepth(
+  ref: RefObject<HTMLElement | null>,
+  { level, driver = "engaged", follow = false, engageWith, raised = false }: DepthOptions,
+) {
   const { reducedMotion } = useCapabilities();
   const { depth, layers } = useLevel(level);
-  const engaged = useEngaged(ref);
-  const active = !reducedMotion;
-  const velocity = useScrollVelocity(active && driver === "velocity");
+  const engaged = useEngaged(ref, { closest: engageWith }) || raised;
+  const animated = !reducedMotion;
+  const velocity = useScrollVelocity(animated && driver === "velocity");
   // Rastro do scroll: profundidade proporcional à velocidade, do lado oposto ao movimento.
   const velocityDepth = useTransform(velocity, (v) => `${Math.min(Math.abs(v) / FULL_VELOCITY, 1) * depth}em`);
   const velocityDirection = useTransform(velocity, (v) => (v >= 0 ? 1 : -1));
 
   useMotionValueEvent(velocity, "change", (v) => {
-    if (active && driver === "velocity" && ref.current) setRaised(ref.current, Math.abs(v) > RAISED_VELOCITY);
+    if (animated && driver === "velocity" && ref.current) setRaised(ref.current, Math.abs(v) > RAISED_VELOCITY);
   });
 
   // Proximidade e direção pelo cursor: escrevem direto no elemento, sem re-render a cada quadro.
   useEffect(() => {
     const element = ref.current;
-    if (!element || !active || (driver !== "proximity" && !follow)) return;
+    if (!element || !animated || (driver !== "proximity" && !follow)) return;
     return subscribePointer(({ x, y }) => {
       const rect = element.getBoundingClientRect();
       const dx = rect.left + rect.width / 2 - x;
@@ -74,13 +81,13 @@ export function useDepth(ref: RefObject<HTMLElement | null>, { level, driver = "
         setRaised(element, closeness > RAISED_CLOSENESS);
       }
     });
-  }, [ref, active, driver, follow, depth]);
+  }, [ref, animated, driver, follow, depth]);
 
   const style: CSSProperties & Record<string, unknown> = {
     "--layers": layers,
     "--depth-max": `${depth}em`,
   };
-  if (active && driver === "velocity") {
+  if (animated && driver === "velocity") {
     style["--depth"] = velocityDepth;
     style["--dy"] = velocityDirection;
     style["--dx"] = 0;
@@ -89,10 +96,10 @@ export function useDepth(ref: RefObject<HTMLElement | null>, { level, driver = "
   return {
     engaged,
     props: {
-      "data-depth-driver": active ? driver : undefined,
-      "data-engaged": active && engaged ? "" : undefined,
+      "data-depth-driver": animated ? driver : undefined,
+      "data-engaged": animated && engaged ? "" : undefined,
       // No driver "engaged" quem decide é o React; nos outros, o próprio driver liga e desliga o atributo.
-      ...(driver === "engaged" ? { "data-raised": active && engaged ? "" : undefined } : {}),
+      ...(driver === "engaged" ? { "data-raised": animated && engaged ? "" : undefined } : {}),
       style,
     },
   };

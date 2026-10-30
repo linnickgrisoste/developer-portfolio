@@ -17,17 +17,23 @@ export function Extrude({
   level = "title",
   driver,
   follow,
+  engageWith,
+  raised,
   className,
 }: {
   children: React.ReactNode;
   level?: Level;
   driver?: DepthDriver;
   follow?: boolean;
+  /** Engaja pelo ancestral mais próximo que casa com o seletor (ex.: "a" para o card inteiro). */
+  engageWith?: string;
+  /** Lateral acesa por fora do engajamento. */
+  raised?: boolean;
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const { layers } = useLevel(level);
-  const { props } = useDepth(ref, { level, driver, follow });
+  const { props } = useDepth(ref, { level, driver, follow, engageWith, raised });
 
   return (
     <motion.span ref={ref} className={cn("extrude inline-block", className)} {...props}>

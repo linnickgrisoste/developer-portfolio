@@ -429,13 +429,13 @@
 /*
  * Card com espessura (Tilt): placas cobalto atrás do card, afastadas em Z conforme --lift (0 a 1).
  * Mais fundas, elas encolheriam com a perspectiva e ficariam escondidas atrás do card; o `scale`
- * devolve o tamanho (900 é a distância da perspectiva), e só sobra o deslocamento da inclinação: a espessura.
+ * devolve o tamanho (--perspective-n é a distância da câmera, em px), e só sobra o deslocamento da inclinação: a espessura.
  */
 .tilt-plate {
   background: color-mix(in oklab, var(--cobalt), black calc(var(--z) * 14%));
   opacity: min(1, calc(var(--lift) * 4));
   transform: translateZ(calc(var(--lift) * var(--z) * var(--plate-gap) * -1))
-    scale(calc(1 + var(--lift) * var(--z) * var(--plate-gap-n) / 900));
+    scale(calc(1 + var(--lift) * var(--z) * var(--plate-gap-n) / var(--perspective-n, 900)));
 }
 
 /* Hodômetro (Odometer): cada casa mostra uma fita de 20 dígitos; parar em 10 + dígito dá uma volta inteira. */

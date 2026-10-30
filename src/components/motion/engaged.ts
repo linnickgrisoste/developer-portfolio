@@ -12,12 +12,20 @@ import { observeBand } from "./drivers/focus-band";
  * - teclado: o elemento (ou algo dentro dele) tem foco visível;
  * - toque: o elemento atravessa a faixa central da tela ao rolar.
  */
-export function useEngaged(ref: RefObject<HTMLElement | null>) {
+export function useEngaged(
+  ref: RefObject<HTMLElement | null>,
+  {
+    closest,
+  }: {
+    /** Engaja pelo ancestral mais próximo que casa com o seletor (ex.: o link do card inteiro), e não só pelo elemento. */
+    closest?: string;
+  } = {},
+) {
   const { finePointer } = useCapabilities();
   const [engaged, setEngaged] = useState(false);
 
   useEffect(() => {
-    const element = ref.current;
+    const element = closest ? (ref.current?.closest<HTMLElement>(closest) ?? ref.current) : ref.current;
     if (!element) return;
     let hover = false;
     let focus = false;
@@ -60,7 +68,7 @@ export function useEngaged(ref: RefObject<HTMLElement | null>) {
       element.removeEventListener("focusout", onFocusOut);
       stopBand();
     };
-  }, [ref, finePointer]);
+  }, [ref, finePointer, closest]);
 
   return engaged;
 }

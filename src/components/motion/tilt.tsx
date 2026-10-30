@@ -15,31 +15,43 @@ import { useEngaged, useLevel } from "./engaged";
 /** Placas atrás do card, da mais rasa para a mais funda. */
 const PLATES = [1, 2, 3];
 const TILT_SPRING = { stiffness: 220, damping: 22, mass: 0.6 };
+/** Distância mínima da câmera (px). Cards grandes afastam mais (2,5× a largura). */
+const MIN_PERSPECTIVE = 900;
 
 export function Tilt({
   children,
   level = "detail",
   className,
   plateClassName = "rounded-lg",
+  engageWith,
 }: {
   children: React.ReactNode;
   level?: "title" | "detail";
   className?: string;
   /** Arredondamento das placas: o mesmo do conteúdo, para a espessura acompanhar o formato. */
   plateClassName?: string;
+  /** Engaja pelo ancestral mais próximo que casa com o seletor (ex.: "a" para inclinar ao passar sobre o card inteiro). */
+  engageWith?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const { reducedMotion, finePointer } = useCapabilities();
   const { amplitude } = useLevel(level as Level);
-  const engaged = useEngaged(ref);
+  const engaged = useEngaged(ref, { closest: engageWith });
   const rotateX = useSpring(0, TILT_SPRING);
   const rotateY = useSpring(0, TILT_SPRING);
   const lift = useSpring(0, TILT_SPRING);
-  const maxDeg = 6 + 14 * amplitude;
+  const maxDeg = 6 + 10 * amplitude;
   const plateGap = 6 + 8 * amplitude;
 
   useEffect(() => {
-    if (reducedMotion) return;
+    const element = ref.current;
+    if (reducedMotion || !element) return;
+    // A câmera se afasta para cards grandes: com a mesma perspectiva, um pôster largo distorceria demais.
+    if (engaged) {
+      const perspective = Math.max(MIN_PERSPECTIVE, element.offsetWidth * 2.5);
+      element.style.setProperty("--perspective", `${perspective}px`);
+      element.style.setProperty("--perspective-n", String(perspective));
+    }
     lift.set(engaged ? 1 : 0);
     if (!engaged) {
       rotateX.set(0);
@@ -50,8 +62,6 @@ export function Tilt({
       rotateX.set(maxDeg * 0.45);
       return;
     }
-    const element = ref.current;
-    if (!element) return;
     return subscribePointer(({ x, y }) => {
       const rect = element.getBoundingClientRect();
       const nx = ((x - rect.left) / rect.width - 0.5) * 2;
@@ -62,10 +72,9 @@ export function Tilt({
   }, [engaged, finePointer, reducedMotion, maxDeg, lift, rotateX, rotateY]);
 
   return (
-    // A distância da perspectiva (900px) também aparece em globals.css (.tilt-plate): mude as duas juntas.
-    <div ref={ref} className={cn("[perspective:900px]", className)}>
+    <div ref={ref} className={cn("flex flex-col [perspective:var(--perspective,900px)]", className)}>
       <motion.div
-        className="relative [transform-style:preserve-3d]"
+        className="relative flex flex-1 flex-col [transform-style:preserve-3d]"
         style={{ rotateX, rotateY, "--lift": lift, "--plate-gap": `${plateGap}px`, "--plate-gap-n": plateGap } as never}
       >
         {PLATES.map((z) => (
@@ -76,7 +85,7 @@ export function Tilt({
             style={{ "--z": z } as CSSProperties}
           />
         ))}
-        <div className="relative">{children}</div>
+        <div className="relative flex flex-1 flex-col">{children}</div>
       </motion.div>
     </div>
   );

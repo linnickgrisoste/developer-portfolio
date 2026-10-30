@@ -3,21 +3,29 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import { motion, useInView } from "motion/react";
 import { stagger, type Level } from "@/lib/motion";
-import { useSkipEntrance } from "./entrance";
 import { cn } from "@/lib/utils";
 import { useDepth, type DepthDriver } from "./depth";
 import { useCapabilities } from "./drivers/capabilities";
 import { subscribePointer } from "./drivers/pointer";
 import { useLevel } from "./engaged";
+import { useSkipEntrance } from "./entrance";
 import { ExtrudeLayers } from "./extrude";
 
 // Texto em que cada letra é um tipo físico. Três comportamentos, todos escalados pelo nível:
-// 1. Entrada: ao aparecer na tela, as letras chegam de pontos diferentes e assentam como numa prensa.
+// 1. Entrada: as letras chegam de pontos diferentes e assentam como numa prensa.
 // 2. Proximidade (mouse): enquanto engajado, peso e largura de cada letra crescem perto do cursor.
 // 3. Onda (toque): ao passar pela faixa central, uma onda de peso atravessa as letras.
 // Com `extrude`, cada letra ganha a lateral cobalto, que acompanha a letra na entrada e na proximidade.
 
 type Tag = "span" | "h1" | "h2" | "h3" | "p";
+
+/**
+ * Quando a entrada toca:
+ * - "view": ao aparecer na tela (o padrão);
+ * - "load": desde a primeira pintura, só com CSS, sem esperar o JavaScript (para o que já nasce na tela, como o hero);
+ * - false: sem entrada (quando outra coisa já anima o bloco, como uma revelação ou uma cortina).
+ */
+export type Entrance = "view" | "load" | false;
 
 /** Tempo entre letras na entrada (ms). Textos longos aceleram para caber no teto de cascata. */
 const LETTER_MS = 35;
@@ -32,6 +40,11 @@ export function KineticText({
   weight = 700,
   width = 100,
   extrude = false,
+  entrance = "view",
+  wrap = "word",
+  engageWith,
+  offset = 0,
+  raised,
   className,
 }: {
   text: string;
@@ -43,43 +56,63 @@ export function KineticText({
   width?: number;
   /** Lateral cobalto por letra. `true` usa o driver "engaged"; um driver escolhe outro. */
   extrude?: boolean | DepthDriver;
+  entrance?: Entrance;
+  /** "word" não quebra palavras no meio; "anywhere" quebra em qualquer letra (e-mails, URLs). */
+  wrap?: "word" | "anywhere";
+  /** Engaja pelo ancestral mais próximo que casa com o seletor (ex.: "a" para a linha inteira de uma lista). */
+  engageWith?: string;
+  /** Posição da primeira letra na cascata, para um texto continuar outro (ex.: nome e sobrenome em linhas separadas). */
+  offset?: number;
+  /** Lateral acesa por fora do engajamento. */
+  raised?: boolean;
   className?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
   const { reducedMotion, finePointer } = useCapabilities();
   const skipEntrance = useSkipEntrance();
   const { amplitude, layers } = useLevel(level);
-  const { engaged, props } = useDepth(ref, { level, driver: typeof extrude === "string" ? extrude : "engaged" });
+  const { engaged, props } = useDepth(ref, {
+    level,
+    driver: typeof extrude === "string" ? extrude : "engaged",
+    engageWith,
+    raised,
+  });
   const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
 
-  const letterCount = text.replace(/\s/g, "").length;
+  const letterCount = offset + text.replace(/\s/g, "").length;
   const letterMs = Math.min(LETTER_MS, (stagger.max * 1000) / Math.max(letterCount, 1));
   const entranceMs = 700 + 500 * amplitude + letterMs * letterCount;
+  // "load" já sai do servidor armado e tocando; logo após trocar de idioma, nasce assentado.
+  const playsOnLoad = entrance === "load" && !skipEntrance;
 
-  // Arma a entrada antes da primeira pintura: as letras esperam escondidas até o texto aparecer.
+  // "view": arma a entrada antes da primeira pintura; as letras esperam escondidas até o texto aparecer.
   // Atributos no DOM (e não estado) para não re-renderizar o texto inteiro a cada fase.
   useLayoutEffect(() => {
     const element = ref.current;
-    if (!element) return;
+    if (!element || entrance !== "view") return;
     element.toggleAttribute("data-armed", !reducedMotion && !skipEntrance);
-  }, [reducedMotion, skipEntrance]);
+  }, [entrance, reducedMotion, skipEntrance]);
 
-  // Ao aparecer: toca a entrada e, quando ela acaba, solta o texto para a proximidade e a onda.
+  // Quando a entrada acaba (ou se não houver), solta o texto para a proximidade, a onda e a respiração.
   useEffect(() => {
     const element = ref.current;
-    if (!element || !inView) return;
-    if (!element.hasAttribute("data-armed")) {
-      element.setAttribute("data-settled", "");
-      return;
-    }
-    element.setAttribute("data-set", "");
-    const timer = window.setTimeout(() => {
+    if (!element) return;
+    const settle = () => {
       element.removeAttribute("data-armed");
       element.removeAttribute("data-set");
       element.setAttribute("data-settled", "");
-    }, entranceMs);
+    };
+    if (playsOnLoad) {
+      if (reducedMotion) return settle();
+      const timer = window.setTimeout(settle, entranceMs);
+      return () => window.clearTimeout(timer);
+    }
+    if (!inView) return;
+    if (!element.hasAttribute("data-armed")) return settle();
+    element.setAttribute("data-set", "");
+    const timer = window.setTimeout(settle, entranceMs);
     return () => window.clearTimeout(timer);
-  }, [inView, entranceMs]);
+  }, [playsOnLoad, inView, entranceMs, reducedMotion]);
 
   // Proximidade: só enquanto engajado com mouse. Lê todas as posições, depois escreve todos os pesos.
   useEffect(() => {
@@ -110,16 +143,25 @@ export function KineticText({
   }, [engaged, finePointer, reducedMotion, amplitude, weight, width]);
 
   const Component = motion[as] as typeof motion.span;
-  const words = text.split(" ");
-  let index = 0;
+  let index = offset;
+  const letter = (char: string) => {
+    const i = index++;
+    return (
+      <span key={i} data-k style={{ "--i": i } as CSSProperties}>
+        {extrude && <ExtrudeLayers count={layers}>{char}</ExtrudeLayers>}
+        <span className="extrude-face">{char}</span>
+      </span>
+    );
+  };
 
   return (
     <Component
       ref={ref}
-      aria-label={text}
       className={cn("kinetic", extrude && "extrude", className)}
       {...props}
       data-touch={finePointer ? undefined : ""}
+      data-armed={playsOnLoad ? "" : undefined}
+      data-set={playsOnLoad ? "" : undefined}
       style={
         {
           ...props.style,
@@ -130,23 +172,19 @@ export function KineticText({
         } as CSSProperties
       }
     >
-      {words.map((word, wordIndex) => (
-        <Fragment key={wordIndex}>
-          {/* Cada palavra não quebra no meio: as letras são inline-block e quebrariam em qualquer ponto. */}
-          <span aria-hidden className="kinetic-word">
-            {Array.from(word).map((char) => {
-              const i = index++;
-              return (
-                <span key={i} data-k style={{ "--i": i } as CSSProperties}>
-                  {extrude && <ExtrudeLayers count={layers}>{char}</ExtrudeLayers>}
-                  <span className="extrude-face">{char}</span>
-                </span>
-              );
-            })}
-          </span>
-          {wordIndex < words.length - 1 && " "}
-        </Fragment>
-      ))}
+      {/* Leitores de tela leem o texto inteiro uma vez; as letras soltas são só desenho. */}
+      <span className="sr-only">{text}</span>
+      <span aria-hidden>
+        {wrap === "anywhere"
+          ? Array.from(text).map(letter)
+          : text.split(" ").map((word, wordIndex, words) => (
+              <Fragment key={wordIndex}>
+                {/* Cada palavra não quebra no meio: as letras são inline-block e quebrariam em qualquer ponto. */}
+                <span className="kinetic-word">{Array.from(word).map(letter)}</span>
+                {wordIndex < words.length - 1 && " "}
+              </Fragment>
+            ))}
+      </span>
     </Component>
   );
 }
