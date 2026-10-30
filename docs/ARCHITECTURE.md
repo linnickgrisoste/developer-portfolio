@@ -1,6 +1,6 @@
 # Arquitetura do portfolio
 
-Status: **em execução**. Proposta em 29/10/2026; Fase 0 concluída. Vale para a reestruturação completa: sistema de movimento único, Hero 3D e Sala de troféus.
+Status: **em execução**. Proposta em 29/10/2026; Fase 0 concluída; Fase 1 implementada, aguardando aprovação no catálogo. Vale para a reestruturação completa: sistema de movimento único, Hero 3D e Sala de troféus.
 
 ---
 
@@ -70,7 +70,8 @@ src/
   components/
     motion/
       drivers/    pointer.ts  scroll-velocity.ts  focus-band.ts  capabilities.ts
-      engaged.ts  kinetic-text.tsx  extrude.tsx  tilt.tsx  reveal.tsx  odometer.tsx  magnetic.tsx
+      engaged.ts  entrance.ts  depth.ts
+      kinetic-text.tsx  extrude.tsx  tilt.tsx  reveal.tsx  odometer.tsx  magnetic.tsx
     three/
       stage.tsx  world.tsx  materials.ts  fonts.ts
       hero/       hero-scene.tsx  letter.tsx  dot.tsx
@@ -167,6 +168,18 @@ Regras:
 - Toda entrada acontece uma vez por visita: trocar de idioma não a repete (`useSkipEntrance`). Toda resposta ao cursor começa em menos de 100ms.
 - Propriedades animadas: `transform` e `opacity`. Cor e `clip-path` com moderação. Nunca `box-shadow`, `filter` ou `text-shadow`.
 
+### 6.6 Onde vive cada coisa
+
+| O quê | Onde | Por quê |
+|---|---|---|
+| Tokens (curvas, durações, springs, níveis, cascata) | `lib/motion.ts` | Puro, sem React: páginas do servidor também leem (o catálogo mostra os valores) |
+| Hooks de entrada (`useSkipEntrance`, `useRevealGroup`, `markLocaleSwitch`) | `components/motion/entrance.ts` | Usam estado do cliente; não podem morar em `lib/` |
+| Estado engajado e nível com ajuste de tema (`useEngaged`, `useLevel`) | `components/motion/engaged.ts` | Base de toda primitiva |
+| Lateral cobalto ligada a um driver (`useDepth`) | `components/motion/depth.ts` | Usado por `Extrude` e por `KineticText` com `extrude` |
+| Desenho (camadas, entrada das letras, onda, placas, fitas) | `globals.css`, bloco "Sistema de movimento" | As primitivas só ligam atributos (`data-armed`, `data-engaged`, `data-raised`...) e variáveis (`--depth`, `--amp`...) |
+
+As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o que permite que a lateral cresça com `transition`, sem JavaScript a cada quadro no driver "engaged".
+
 ---
 
 ## 7. 3D
@@ -235,7 +248,7 @@ Regras:
 | Fase | Entrega | Pronto quando |
 |---|---|---|
 | **0. Fundação** ✅ | Pastas, Server Components, idioma por rota, conteúdo dividido | Site idêntico ao de hoje, build e testes ok |
-| **1. Sistema de movimento** | Tokens, drivers, `engaged`, primitivas e catálogo `/lab/motion` | Você aprova a linguagem no catálogo |
+| **1. Sistema de movimento** 🔶 | Tokens, drivers, `engaged`, primitivas e catálogo `/lab/motion` | Você aprova a linguagem no catálogo |
 | **2. Seções** | Cada seção migrada para primitivas, com a linguagem da tabela de seções | Nenhuma seção com código de animação próprio |
 | **3. Hero 3D** | `Stage`, `World`, entrega CSS → 3D, ponto final com passagem para o DOM | Funciona com e sem WebGL; LCP não piora |
 | **4. Sala de troféus** | Rota, entradas, pré-carregamento, fallback em DOM | Acessível do rodapé, do HUD e do aviso final |
