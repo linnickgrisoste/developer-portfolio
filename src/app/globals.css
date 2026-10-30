@@ -1,18 +1,315 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #0b0e16;
-  --foreground: #ededed;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-poppins);
+  --color-paper: var(--background);
+  --color-ink: var(--foreground);
+  --color-graphite: var(--muted-foreground);
+  --color-rule: var(--border);
+  --color-cobalt: var(--cobalt);
+  --color-night: var(--night);
+  --color-night-fg: var(--night-fg);
+  --color-cobalt-deep: var(--cobalt-deep);
+  --color-cobalt-soft: var(--cobalt-soft);
+  --font-sans: var(--font-archivo);
+  --font-heading: var(--font-archivo);
+  --font-pixel: var(--font-silkscreen);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+/* Curva de assinatura do movimento (a mesma de `ease.out` em src/lib/motion.ts). Gera a classe `ease-brand`. */
+@theme {
+  --ease-brand: cubic-bezier(0.2, 0.7, 0.1, 1);
 }
+
+/* Papel frio, tinta azul-marinho e um único acento cobalto. */
+:root {
+  --background: #eceef1;
+  --foreground: #0d1321;
+  --muted: #e1e5ea;
+  --muted-foreground: #5a6275;
+  --border: #cbd1da;
+  --cobalt: #2440e6;
+  /* Superfície escura fixa (rodapé e avisos) e as duas versões do cobalto. */
+  --night: #0d1321;
+  --night-fg: #eceef1;
+  --cobalt-deep: #2440e6;
+  --cobalt-soft: #8495ff;
+  --card: #f4f5f7;
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
+  --secondary: var(--muted);
+  --secondary-foreground: var(--foreground);
+  --accent: var(--muted);
+  --accent-foreground: var(--foreground);
+  --destructive: #c62a2a;
+  --input: var(--border);
+  --ring: var(--cobalt);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0a0f1c;
+  --foreground: #e6e9ef;
+  --muted: #141b2c;
+  --muted-foreground: #8b93a7;
+  --border: #232b3d;
+  --cobalt: #8495ff;
+  --card: #10172a;
+  /* No escuro, a superfície "noturna" (rodapé e avisos) puxa para o cobalto para se destacar do fundo. */
+  --night: #141d42;
+  --destructive: #ff6b6b;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    font-variation-settings: "wdth" 100;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "kern";
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--cobalt);
+    color: var(--background);
+  }
+  :focus-visible {
+    outline: 2px solid var(--cobalt);
+    outline-offset: 3px;
+  }
+}
+
+/*
+ * Abertura do nome: composição tipográfica.
+ * Cada letra chega de um ponto diferente, girada e com peso e largura próprios, e se encaixa
+ * como um tipo numa prensa: assenta com um leve achatamento e volta ao peso de repouso.
+ * Depois, o nome "respira": uma onda lenta e sutil passa pelas letras.
+ *
+ * As posições de partida saem de sin()/cos() do índice da letra (--n): parecem aleatórias,
+ * mas são sempre as mesmas, então servidor e navegador desenham igual.
+ */
+.kinetic-name [data-letter] {
+  --n: calc(var(--i) + var(--offset, 0));
+  --from-x: calc(sin(calc(var(--n) * 2.4)) * 0.55em);
+  --from-y: calc(cos(calc(var(--n) * 1.7)) * 0.45em - 0.45em);
+  --from-rotate: calc(sin(calc(var(--n) * 3.1 + 1)) * 28deg);
+  --from-weight: calc(500 + sin(calc(var(--n) * 1.3)) * 400);
+  --from-width: calc(94 + cos(calc(var(--n) * 2.1)) * 31);
+
+  font-variation-settings: "wght" 800, "wdth" 100;
+  animation:
+    letter-set 1200ms var(--ease-brand) backwards,
+    breathe 6s ease-in-out infinite;
+  /* 35ms por letra mantém a cascata do nome inteiro abaixo de 500ms. A respiração começa depois da abertura. */
+  animation-delay:
+    calc(var(--n) * 35ms + 150ms),
+    calc(var(--n) * 140ms + 2s);
+}
+
+@keyframes letter-set {
+  0% {
+    opacity: 0;
+    transform: translate(var(--from-x), var(--from-y)) rotate(var(--from-rotate)) scale(0.7, 0.7);
+    font-variation-settings: "wght" var(--from-weight), "wdth" var(--from-width);
+  }
+  35% {
+    opacity: 1;
+  }
+  /* O impacto na prensa: a letra desce um fio e achata antes de assentar. */
+  62% {
+    transform: translate(0, 0.03em) rotate(0deg) scale(1.02, 0.94);
+    font-variation-settings: "wght" 900, "wdth" 116;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1, 1);
+    font-variation-settings: "wght" 800, "wdth" 100;
+  }
+}
+
+/* Usa a propriedade `translate` (e não `transform`) para não brigar com a abertura. */
+@keyframes breathe {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -0.02em;
+  }
+}
+
+/*
+ * O ponto final cai por último e carimba o nome: acelera na queda e achata no impacto.
+ * Depois, parado, ele troca de cor devagar entre vizinhos do cobalto (violeta e azul-piscina).
+ */
+.full-stop-dot {
+  animation:
+    stamp 480ms backwards,
+    dot-hue 9s ease-in-out infinite;
+  animation-delay: 1.3s, 2s;
+}
+
+@keyframes dot-hue {
+  0%,
+  100% {
+    background-color: var(--cobalt);
+  }
+  33% {
+    background-color: oklch(0.58 0.22 305);
+  }
+  66% {
+    background-color: oklch(0.66 0.14 215);
+  }
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: translateY(-1.4em) scale(0.5, 0.5);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.4);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0) scale(1.4, 0.65);
+    animation-timing-function: var(--ease-brand);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+/*
+ * Menu: ao passar o mouse (ou focar pelo teclado), as letras sobem uma depois da outra e voltam
+ * com um leve quique. 20ms entre letras mantém a onda inteira abaixo de meio segundo.
+ */
+.nav-hop [data-hop] {
+  display: inline-block;
+  white-space: pre;
+}
+
+.nav-hop:hover [data-hop],
+.nav-hop:focus-visible [data-hop] {
+  animation: hop 300ms var(--ease-brand);
+  animation-delay: calc(var(--i) * 20ms);
+}
+
+@keyframes hop {
+  35% {
+    translate: 0 -3px;
+  }
+  70% {
+    translate: 0 0.5px;
+  }
+}
+
+/* Texto de apoio do hero: sobe e aparece enquanto o nome ainda assenta. */
+.rise-in {
+  animation: rise-in 700ms var(--ease-brand) backwards;
+  animation-delay: var(--delay, 600ms);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Indicador "role para começar": a seta desce e volta, como um prompt de jogo. */
+.scroll-cue {
+  animation: scroll-cue 1.8s ease-in-out infinite;
+}
+
+@keyframes scroll-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 0.4;
+  }
+}
+
+/* Tempo restante do aviso de conquista. Pausa enquanto o aviso está sob o cursor ou em foco. */
+.toast-countdown {
+  transform-origin: left;
+  animation: countdown linear forwards;
+}
+
+[data-toast]:hover .toast-countdown,
+[data-toast]:focus-within .toast-countdown {
+  animation-play-state: paused;
+}
+
+@keyframes countdown {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/*
+ * Logo depois de trocar de idioma (a página monta de novo), a abertura já foi vista:
+ * o nome nasce assentado, o ponto já carimbado e o texto de apoio no lugar. Só a respiração continua.
+ */
+.no-intro .rise-in {
+  animation: none;
+}
+.no-intro .full-stop-dot {
+  animation: dot-hue 9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .no-intro .kinetic-name [data-letter] {
+    animation: breathe 6s ease-in-out infinite;
+    animation-delay: calc(var(--n) * 140ms);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kinetic-name [data-letter],
+  .nav-hop [data-hop],
+  .scroll-cue,
+  .rise-in {
+    animation: none;
+  }
+  /* Sem a queda; a troca de cor fica, porque não é movimento. */
+  .full-stop-dot {
+    animation: dot-hue 9s ease-in-out infinite;
+  }
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
