@@ -18,9 +18,16 @@ const curtain = (order: number): Variants => ({
   shown: { clipPath: "inset(0% 0% 0% 0%)", transition: { duration: 1, ease: ease.out, delay: order * 0.12 } },
 });
 
+// `transform` inteiro (e não `scale`) para a animação rodar na placa de vídeo, com alvo explícito e
+// `transitionEnd` (ver `reveal` em lib/motion.ts). O zoom do hover usa a propriedade `scale` do CSS,
+// separada, então os dois não se atropelam.
 const settle = (order: number): Variants => ({
-  hidden: { scale: 1.15 },
-  shown: { scale: 1, transition: { duration: 1.2, ease: ease.out, delay: order * 0.12 } },
+  hidden: { transform: "scale(1.15)" },
+  shown: {
+    transform: "scale(1)",
+    transitionEnd: { transform: "none" },
+    transition: { duration: 1.2, ease: ease.out, delay: order * 0.12 },
+  },
 });
 
 /** Grade de pôsteres. O primeiro destaque ocupa a coluna alta à esquerda; os outros empilham à direita. */
@@ -76,7 +83,7 @@ function FeaturedProject({
       viewport={reveal.viewport}
       className={`group/feature flex flex-col md:col-span-6 ${tall ? "md:row-span-2" : ""}`}
     >
-      {/* Ao passar sobre o card inteiro, o pôster inclina e mostra a espessura cobalto. */}
+      {/* Ao passar sobre o card inteiro, o pôster inclina e mostra a espessura neon. */}
       <Tilt level="title" engageWith="a" className={tall ? "md:flex-1" : undefined}>
         <motion.div
           variants={curtain(order)}

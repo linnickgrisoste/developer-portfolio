@@ -15,7 +15,7 @@ import { ExtrudeLayers } from "./extrude";
 // 1. Entrada: as letras chegam de pontos diferentes e assentam como numa prensa.
 // 2. Proximidade (mouse): enquanto engajado, peso e largura de cada letra crescem perto do cursor.
 // 3. Onda (toque): ao passar pela faixa central, uma onda de peso atravessa as letras.
-// Com `extrude`, cada letra ganha a lateral cobalto, que acompanha a letra na entrada e na proximidade.
+// Com `extrude`, cada letra ganha a lateral neon, que acompanha a letra na entrada e na proximidade.
 
 type Tag = "span" | "h1" | "h2" | "h3" | "p";
 
@@ -32,6 +32,9 @@ const LETTER_MS = 35;
 /** Quanto a proximidade soma ao peso e à largura no nível assinatura (os outros níveis escalam por baixo). */
 const NEAR_WEIGHT = 200;
 const NEAR_WIDTH = 25;
+/** Limites dos eixos da Archivo. */
+const MAX_WEIGHT = 900;
+const MAX_WIDTH = 125;
 
 export function KineticText({
   text,
@@ -55,7 +58,7 @@ export function KineticText({
   weight?: number;
   /** Largura de repouso (eixo `wdth` da Archivo). */
   width?: number;
-  /** Lateral cobalto por letra. `true` usa o driver "engaged"; um driver escolhe outro. */
+  /** Lateral neon por letra. `true` usa o driver "engaged"; um driver escolhe outro. */
   extrude?: boolean | DepthDriver;
   entrance?: Entrance;
   /** "word" não quebra palavras no meio; "anywhere" quebra em qualquer letra (e-mails, URLs). */
@@ -141,19 +144,25 @@ export function KineticText({
     window.addEventListener("scroll", measure, { passive: true });
     window.addEventListener("resize", measure);
 
+    // Escreve quanto somar ao peso e à largura (--kinetic-dw/--kinetic-dwd); o CSS arredonda e suaviza
+    // (ver "Texto cinético" em globals.css).
     const stop = subscribePointer(({ x, y }) => {
       letters.forEach((letter, index) => {
         const [cx, cy] = centers[index];
         const d2 = (cx - x) ** 2 + (cy - y) ** 2;
         const pull = Math.exp(-d2 / (2 * sigma * sigma));
-        letter.style.fontVariationSettings = `"wght" ${Math.min(weight + addWeight * pull, 900).toFixed(0)}, "wdth" ${Math.min(width + addWidth * pull, 125).toFixed(1)}`;
+        letter.style.setProperty("--kinetic-dw", Math.min(addWeight * pull, MAX_WEIGHT - weight).toFixed(1));
+        letter.style.setProperty("--kinetic-dwd", Math.min(addWidth * pull, MAX_WIDTH - width).toFixed(2));
       });
     });
     return () => {
       stop();
       window.removeEventListener("scroll", measure);
       window.removeEventListener("resize", measure);
-      letters.forEach((letter) => (letter.style.fontVariationSettings = ""));
+      letters.forEach((letter) => {
+        letter.style.removeProperty("--kinetic-dw");
+        letter.style.removeProperty("--kinetic-dwd");
+      });
     };
   }, [proximity, engaged, finePointer, reducedMotion, amplitude, weight, width]);
 

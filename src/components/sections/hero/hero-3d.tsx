@@ -6,7 +6,7 @@ import { motion, useInView, type MotionValue } from "motion/react";
 import { unlock } from "@/components/game/store";
 import type { HeroSceneControl } from "@/components/three/hero/hero-scene";
 import type { HeroLayout } from "@/components/three/hero/layout";
-import { setFullStopCommand } from "./full-stop";
+import { currentDotColor, setFullStopCommand } from "./full-stop";
 import { setHeroIntro } from "./hero-intro";
 
 // A cena só é baixada quando este componente monta (desktop capaz): nunca entra no pacote inicial.
@@ -124,7 +124,7 @@ export function Hero3D({
 
   const onCatch = useCallback(() => unlock("full-stop"), []);
 
-  // A cor do ponto em CSS pode vir em qualquer formato (oklch durante a troca de cor):
+  // A cor do ponto em CSS vem como mistura (color-mix com oklch, ver `currentDotColor`):
   // pintar num canvas de 1 px e ler de volta dá sempre RGB, que o three.js entende.
   const readDotColor = useCallback(() => {
     const dot = sectionRef.current?.querySelector<HTMLElement>(".full-stop-dot");
@@ -133,7 +133,7 @@ export function Hero3D({
     const context = colorProbe.current;
     if (!context) return null;
     context.clearRect(0, 0, 1, 1);
-    context.fillStyle = getComputedStyle(dot).backgroundColor;
+    context.fillStyle = currentDotColor(dot);
     context.fillRect(0, 0, 1, 1);
     const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
     return `rgb(${r}, ${g}, ${b})`;

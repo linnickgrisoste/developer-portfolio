@@ -76,7 +76,11 @@ export function HeroFrame({
       <motion.h1
         id={HERO_NAME_ID}
         aria-label={`${firstName} ${lastName}`}
-        className="hero-name origin-top-left text-[clamp(4rem,15.25vw,15rem)] leading-[0.84] tracking-[-0.025em] uppercase"
+        // Camada própria: a prensa da rolagem só redimensiona a camada na placa de vídeo, sem repintar a página.
+        className={cn(
+          "hero-name origin-top-left text-[clamp(4rem,15.25vw,15rem)] leading-[0.84] tracking-[-0.025em] uppercase",
+          !reduceMotion && "will-change-transform",
+        )}
         style={reduceMotion ? undefined : { scaleX: nameScaleX, scaleY: nameScaleY, opacity: nameOpacity }}
       >
         <span className="hero-print">

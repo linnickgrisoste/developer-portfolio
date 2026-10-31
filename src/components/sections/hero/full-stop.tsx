@@ -7,7 +7,7 @@ import { useLocale } from "@/components/providers";
 import { gameCopy } from "@/content/game";
 import { unlock } from "@/components/game/store";
 import { spring } from "@/lib/motion";
-import { cobaltPair } from "@/lib/palette";
+import { rewardPair } from "@/lib/palette";
 
 // O ponto final do nome é a conquista escondida: clicado, ele se solta e quica pela tela.
 // Quem pegar de volta desbloqueia "Ponto final". Se ninguém pegar, ele volta sozinho.
@@ -25,6 +25,17 @@ let command3d: (() => void) | null = null;
 /** O hero em 3D registra aqui o comando do ponto (soltar ou, se já está solto, pegar). `null` desfaz. */
 export function setFullStopCommand(command: (() => void) | null) {
   command3d = command;
+}
+
+/**
+ * A cor que o ponto mostra agora: o neon de base com as camadas violeta (::before) e azul-piscina
+ * (::after) por cima, cada uma com a opacidade do instante (ver .full-stop-dot em globals.css).
+ */
+export function currentDotColor(dot: HTMLElement) {
+  const over = (layer: CSSStyleDeclaration, under: string) =>
+    `color-mix(in srgb, ${layer.backgroundColor} ${(Number(layer.opacity) * 100).toFixed(1)}%, ${under})`;
+  const base = getComputedStyle(dot).backgroundColor;
+  return over(getComputedStyle(dot, "::after"), over(getComputedStyle(dot, "::before"), base));
 }
 
 /** De onde o ponto saiu: o botão no nome (para onde ele volta), a posição, o tamanho e a cor. */
@@ -49,7 +60,7 @@ export function FullStop() {
     const home = event.currentTarget;
     const rect = home.getBoundingClientRect();
     // O ponto solto sai com a cor que o ciclo tinha no instante do clique.
-    const color = getComputedStyle(home).backgroundColor;
+    const color = currentDotColor(home);
     setOrigin({ home, left: rect.left, top: rect.top, size: rect.width, color });
   };
 
@@ -65,7 +76,7 @@ export function FullStop() {
         aria-label={t(gameCopy.fullStop)}
         // Enquanto o ponto está solto, o lugar dele fica vazio, sem mexer no layout.
         style={{ opacity: loose ? 0 : 1 }}
-        className="full-stop-dot ml-[0.04em] inline-block size-[0.17em] cursor-pointer rounded-full bg-cobalt align-baseline transition-[scale] duration-200 hover:scale-125"
+        className="full-stop-dot ml-[0.04em] inline-block size-[0.17em] cursor-pointer rounded-full bg-neon align-baseline transition-[scale] duration-200 hover:scale-125"
       />
       {loose &&
         createPortal(
@@ -209,7 +220,7 @@ async function burst(x: number, y: number) {
     scalar: 0.7,
     ticks: 120,
     origin: { x: x / window.innerWidth, y: y / window.innerHeight },
-    colors: cobaltPair,
+    colors: rewardPair,
     disableForReducedMotion: true,
   });
 }

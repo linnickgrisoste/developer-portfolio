@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
+  cancelFrame,
+  frame,
   motion,
-  useAnimationFrame,
+  type FrameData,
   useInView,
   useMotionValue,
   useScroll,
@@ -106,24 +108,32 @@ function VelocityText({
   });
 
   const directionFactor = useRef<number>(1);
-  useAnimationFrame((_, delta) => {
-    // Fora da tela ninguém vê a faixa: não há por que movê-la a cada frame.
+  // Fora da tela ninguém vê a faixa: ela sai do laço de quadros (com useAnimationFrame, o laço do
+  // Motion continuava rodando a cada quadro mesmo com o callback voltando cedo).
+  useEffect(() => {
     if (!inView) return;
+    const step = ({ delta }: FrameData) => {
+      if (velocityFactor.get() < 0) {
+        directionFactor.current = -1;
+      } else if (velocityFactor.get() > 0) {
+        directionFactor.current = 1;
+      }
 
-    if (velocityFactor.get() < 0) {
-      directionFactor.current = -1;
-    } else if (velocityFactor.get() > 0) {
-      directionFactor.current = 1;
-    }
-
-    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
-    moveBy += directionFactor.current * moveBy * velocityFactor.get();
-    baseX.set(baseX.get() + moveBy);
-  });
+      let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
+      moveBy += directionFactor.current * moveBy * velocityFactor.get();
+      baseX.set(baseX.get() + moveBy);
+    };
+    frame.update(step, true);
+    return () => cancelFrame(step);
+  }, [inView, baseVelocity, baseX, velocityFactor]);
 
   return (
     <div ref={rootRef} className={`${parallaxClassName} relative overflow-hidden`} style={parallaxStyle}>
-      <motion.div className={`${scrollerClassName} flex whitespace-nowrap`} style={{ x, ...scrollerStyle }}>
+      {/* Camada própria: o deslocamento de todo quadro só move a camada na placa de vídeo, sem repintar a página. */}
+      <motion.div
+        className={`${scrollerClassName} flex whitespace-nowrap will-change-transform`}
+        style={{ x, ...scrollerStyle }}
+      >
         {Array.from({ length: numCopies }, (_, index) => (
           <span className={`flex-shrink-0 ${className}`} key={index} ref={index === 0 ? copyRef : null}>
             {children}&nbsp;

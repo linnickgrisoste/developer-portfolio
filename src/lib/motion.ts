@@ -35,6 +35,12 @@ export const exit: Transition = { duration: duration.fast, ease: ease.in };
 /**
  * Revelação ao rolar. O grupo dispara uma vez, quando entra 15% na tela,
  * e os itens sobem em cascata. Uso: `initial="hidden" whileInView="shown"`.
+ *
+ * O deslocamento vai como `transform` inteiro (e não `y`): assim o Motion entrega a animação ao
+ * navegador (WAAPI), que a roda na placa de vídeo. Com `y`, cada quadro era calculado em JS e
+ * repintava a página inteira enquanto a seção entrava.
+ * O alvo é explícito: com `"none"`, o Motion zera os números da origem (`scale(1.15)` viraria
+ * `scale(0)`). No fim, `transitionEnd` tira o transform, para não sobrar um contexto de empilhamento.
  */
 export const reveal = {
   viewport: { once: true, margin: "0px 0px -15% 0px" },
@@ -43,8 +49,13 @@ export const reveal = {
     shown: { transition: { staggerChildren: 0.06 } },
   },
   item: {
-    hidden: { opacity: 0, y: 16 },
-    shown: { opacity: 1, y: 0, transition: { duration: duration.slow, ease: ease.out } },
+    hidden: { opacity: 0, transform: "translateY(16px)" },
+    shown: {
+      opacity: 1,
+      transform: "translateY(0px)",
+      transitionEnd: { transform: "none" },
+      transition: { duration: duration.slow, ease: ease.out },
+    },
   },
 } satisfies { viewport: object; group: Variants; item: Variants };
 
@@ -53,7 +64,7 @@ export const reveal = {
  * - assinatura: um por página (o nome do hero);
  * - título: títulos de seção, nomes de projeto, o e-mail do contato;
  * - detalhe: cards, links, botões, números.
- * `amplitude` escala deslocamentos, giros e variação de fonte; `depth` é a lateral cobalto
+ * `amplitude` escala deslocamentos, giros e variação de fonte; `depth` é a lateral neon
  * quando engajado (em `em`, para acompanhar o tamanho do texto); `layers` é quantas camadas a formam.
  * Camadas são cópias do texto no DOM: poucas bastam para a lateral parecer sólida, e cada uma a mais pesa.
  */
