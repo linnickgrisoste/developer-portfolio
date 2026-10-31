@@ -33,8 +33,3 @@ export function subscribePointer(listener: (pointer: PointerPosition) => void) {
     frame = 0;
   };
 }
-
-/** Última posição conhecida, para quem precisa dela fora de uma notificação (ex.: ao engajar). */
-export function getPointer(): PointerPosition {
-  return position;
-}
