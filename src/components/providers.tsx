@@ -42,9 +42,20 @@ export function useLocale() {
   return context;
 }
 
+// O next-themes põe um <script> que aplica o tema antes da primeira pintura. Ele só roda vindo do HTML do
+// servidor; no cliente, o React avisa ("Encountered a script tag...") porque nunca o executaria. Marcado
+// como dado no cliente, o aviso some e nada muda: o script do servidor já rodou.
+const themeScriptProps = typeof window === "undefined" ? undefined : { type: "application/json" };
+
 export function Providers({ locale, children }: { locale: Locale; children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+      scriptProps={themeScriptProps}
+    >
       <LocaleProvider locale={locale}>{children}</LocaleProvider>
     </ThemeProvider>
   );
