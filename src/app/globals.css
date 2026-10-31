@@ -223,7 +223,11 @@
   }
 }
 
-/* Texto de apoio do hero: sobe e aparece enquanto o nome ainda assenta. */
+/*
+ * Texto de apoio do hero: sobe e ganha força enquanto o nome ainda assenta. Parte de 30% (e não de zero):
+ * é o maior texto do hero no celular, e conteúdo com opacidade zero não conta como pintado para o
+ * Largest Contentful Paint. Nascendo visível, o LCP não espera a animação.
+ */
 .rise-in {
   animation: rise-in 700ms var(--ease-brand) backwards;
   animation-delay: var(--delay, 600ms);
@@ -231,7 +235,7 @@
 
 @keyframes rise-in {
   from {
-    opacity: 0;
+    opacity: 0.3;
     transform: translateY(12px);
   }
 }
