@@ -11,11 +11,12 @@
   --color-ink: var(--foreground);
   --color-graphite: var(--muted-foreground);
   --color-rule: var(--border);
-  --color-cobalt: var(--cobalt);
+  --color-neon: var(--neon);
   --color-night: var(--night);
   --color-night-fg: var(--night-fg);
-  --color-cobalt-deep: var(--cobalt-deep);
-  --color-cobalt-soft: var(--cobalt-soft);
+  --color-neon-deep: var(--neon-deep);
+  --color-neon-soft: var(--neon-soft);
+  --color-reward: var(--reward);
   --font-sans: var(--font-archivo);
   --font-heading: var(--font-archivo);
   --font-pixel: var(--font-silkscreen);
@@ -46,20 +47,9 @@
   --ease-brand: cubic-bezier(0.2, 0.7, 0.1, 1);
 }
 
-/* Papel frio, tinta azul-marinho e um único acento cobalto. */
+/* Papel frio, tinta azul-marinho e um único acento neon. */
 :root {
-  --background: #eceef1;
-  --foreground: #0d1321;
-  --muted: #e1e5ea;
-  --muted-foreground: #5a6275;
-  --border: #cbd1da;
-  --cobalt: #2440e6;
-  /* Superfície escura fixa (rodapé e avisos) e as duas versões do cobalto. */
-  --night: #0d1321;
-  --night-fg: #eceef1;
-  --cobalt-deep: #2440e6;
-  --cobalt-soft: #8495ff;
-  --card: #f4f5f7;
+  /* Superfície escura fixa (rodapé e avisos) e as duas versões do neon. */
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
@@ -71,21 +61,34 @@
   --accent-foreground: var(--foreground);
   --destructive: #c62a2a;
   --input: var(--border);
-  --ring: var(--cobalt);
+  --ring: var(--neon);
   --radius: 0.5rem;
+  --background: #f2f2ec;
+  --foreground: #0d0f12;
+  --muted: #e6e6de;
+  --muted-foreground: #5f636b;
+  --border: #d5d6cf;
+  --neon: #806500;
+  /* Cor da camada de jogo (XP, conquistas, troféus), separada do acento editorial. */
+  --reward: #0089a8;
+  --neon-deep: #0d0f12;
+  --neon-soft: #fcee0a;
+  --card: #f8f8f3;
+  --night: #0d0f12;
+  --night-fg: #f2f2ec;
 }
 
 .dark {
-  --background: #0a0f1c;
-  --foreground: #e6e9ef;
-  --muted: #141b2c;
-  --muted-foreground: #8b93a7;
-  --border: #232b3d;
-  --cobalt: #8495ff;
-  --card: #10172a;
-  /* No escuro, a superfície "noturna" (rodapé e avisos) puxa para o cobalto para se destacar do fundo. */
-  --night: #141d42;
   --destructive: #ff6b6b;
+  --background: #0d0f12;
+  --foreground: #f2f2ec;
+  --muted: #171a1f;
+  --muted-foreground: #8d9199;
+  --border: #262a31;
+  --neon: #fcee0a;
+  --reward: #00f0ff;
+  --card: #12151a;
+  --night: #050608;
 }
 
 @layer base {
@@ -102,11 +105,11 @@
     text-rendering: optimizeLegibility;
   }
   ::selection {
-    background: var(--cobalt);
+    background: var(--neon);
     color: var(--background);
   }
   :focus-visible {
-    outline: 2px solid var(--cobalt);
+    outline: 2px solid var(--neon);
     outline-offset: 3px;
   }
 }
@@ -142,6 +145,14 @@
 html[data-hero3d] .hero-print {
   opacity: 0;
 }
+/*
+ * Oculto, o nome em CSS também não anima: a entrada mexe no peso e na largura das letras, e é dele que
+ * a cena mede onde cada letra 3D pousa. Medido no meio da animação, o nome 3D saía mais estreito que o
+ * lugar real (e o ponto, deslocado do botão que recebe o teclado).
+ */
+html[data-hero3d] .hero-name .kinetic [data-k] {
+  animation: none;
+}
 /* !important vence o estilo inline do ponto e as animações de entrada (o carimbo). */
 html[data-hero3d] .hero-name .full-stop-dot {
   opacity: 0 !important;
@@ -171,25 +182,61 @@ html[data-hero3d="on"] .hero-3d {
 
 /*
  * O ponto final cai por último e carimba o nome: acelera na queda e achata no impacto.
- * Depois, parado, ele troca de cor devagar entre vizinhos do cobalto (violeta e azul-piscina).
+ * Depois, parado, ele troca de cor devagar entre vizinhos do neon (violeta e azul-piscina).
+ *
+ * A troca de cor é feita com duas camadas por cima do neon (violeta em ::before, azul-piscina em
+ * ::after) que acendem e apagam só com opacidade. Animar `background-color` direto rodava na thread
+ * principal a cada quadro, para sempre, e não deixava a página ficar parada. Opacidade roda na placa
+ * de vídeo. A cor visível num instante é lida por `currentDotColor` (full-stop.tsx).
  */
 .full-stop-dot {
-  animation:
-    stamp 480ms backwards,
-    dot-hue 9s ease-in-out infinite;
-  animation-delay: 1.3s, 2s;
+  --dot-violet: #ff9f1a;
+  --dot-teal: #00f0ff;
+  position: relative;
+  animation: stamp 480ms 1.3s backwards;
+}
+.full-stop-dot::before,
+.full-stop-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+.full-stop-dot::before {
+  background-color: var(--dot-violet);
+  animation: dot-violet 9s ease-in-out 2s infinite;
+}
+.full-stop-dot::after {
+  background-color: var(--dot-teal);
+  animation: dot-teal 9s ease-in-out 2s infinite;
 }
 
-@keyframes dot-hue {
-  0%,
-  100% {
-    background-color: var(--cobalt);
+/* Neon → violeta → azul-piscina → neon. O azul-piscina acende por cima do violeta aceso, e o violeta só apaga escondido sob ele. */
+@keyframes dot-violet {
+  0% {
+    opacity: 0;
   }
+  33%,
+  66% {
+    opacity: 1;
+  }
+  66.5%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes dot-teal {
+  0%,
   33% {
-    background-color: oklch(0.58 0.22 305);
+    opacity: 0;
   }
   66% {
-    background-color: oklch(0.66 0.14 215);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
@@ -309,7 +356,7 @@ html[data-hero3d="on"] .hero-3d {
   animation: none;
 }
 .no-intro .full-stop-dot {
-  animation: dot-hue 9s ease-in-out infinite;
+  animation: none;
 }
 
 /* =========================================================================================
@@ -335,7 +382,7 @@ html[data-hero3d="on"] .hero-3d {
 }
 
 /*
- * Lateral cobalto (Extrude). As camadas são cópias do texto atrás dele, deslocadas na direção
+ * Lateral neon (Extrude). As camadas são cópias do texto atrás dele, deslocadas na direção
  * (--dx, --dy) por uma fração (--k) da profundidade. As mais fundas escurecem, para dar volume.
  */
 .extrude {
@@ -361,16 +408,20 @@ html[data-hero3d="on"] .hero-3d {
   inset: 0;
   pointer-events: none;
   user-select: none;
-  color: color-mix(in oklab, var(--extrude-color, var(--cobalt)), black calc(var(--k) * 32%));
+  color: color-mix(in oklab, var(--extrude-color, var(--neon)), black calc(var(--k) * 32%));
   transform: translate(
     calc(var(--dx) * var(--depth) * var(--k)),
     calc(var(--dy) * var(--depth) * var(--k))
   );
 }
-/* Recolhida, a lateral some: senão a borda suavizada das letras deixaria um halo cobalto em volta. */
+/*
+ * Recolhida, a lateral some: senão a borda suavizada das letras deixaria um halo neon em volta.
+ * `visibility` (e não só opacidade) tira as centenas de camadas paradas do teste de cursor do navegador,
+ * que antes as percorria a cada movimento do mouse.
+ */
 .extrude:not([data-raised]) .extrude-layer {
-  opacity: 0;
-  transition: opacity 0s linear 350ms;
+  visibility: hidden;
+  transition: visibility 0s linear 350ms;
 }
 .extrude-face {
   position: relative;
@@ -384,19 +435,46 @@ html[data-hero3d="on"] .hero-3d {
   display: inline-block;
   white-space: nowrap;
 }
+/*
+ * Peso e largura de cada letra = repouso + um acréscimo (--kinetic-dw, --kinetic-dwd) que a entrada, a onda e
+ * a proximidade animam. O acréscimo anda suave, com a curva de sempre; a fonte recebe o valor arredondado
+ * (passos de 10 no peso, 1 na largura). Cada valor inédito de eixo obriga o navegador a montar outra
+ * instância da fonte variável, e interpolando direto o `font-variation-settings` toda letra pedia um valor
+ * inédito a cada quadro: era o maior custo da rolagem. Arredondado, os valores se repetem entre letras e
+ * títulos e saem do cache. O passo é pequeno demais para se ver.
+ */
+@property --kinetic-dw {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --kinetic-dwd {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
 .kinetic [data-k] {
   position: relative;
   display: inline-block;
   font-variation-settings:
-    "wght" var(--kinetic-weight),
-    "wdth" var(--kinetic-width);
-  transition: font-variation-settings 260ms var(--ease-brand);
+    "wght" calc(var(--kinetic-weight) + round(var(--kinetic-dw), 10)),
+    "wdth" calc(var(--kinetic-width) + round(var(--kinetic-dwd), 1));
+  transition:
+    --kinetic-dw 260ms var(--ease-brand),
+    --kinetic-dwd 260ms var(--ease-brand);
 }
 .kinetic[data-armed]:not([data-set]) [data-k] {
   opacity: 0;
 }
+/*
+ * Movimento e peso em duas animações com o mesmo tempo: juntas, a parte de peso (que não roda na placa
+ * de vídeo) prendia também o deslocamento e o giro na thread principal.
+ */
 .kinetic[data-set] [data-k] {
-  animation: kinetic-set calc(700ms + 500ms * var(--amp)) var(--ease-brand) backwards;
+  animation-name: kinetic-set, kinetic-set-weight;
+  animation-duration: calc(700ms + 500ms * var(--amp));
+  animation-timing-function: var(--ease-brand);
+  animation-fill-mode: backwards;
   animation-delay: calc(var(--i) * var(--kinetic-stagger));
 }
 /* No toque não há cursor: ao passar pela faixa central, uma onda de peso atravessa o texto. */
@@ -413,9 +491,6 @@ html[data-hero3d="on"] .hero-3d {
         calc((cos(calc(var(--i) * 1.7)) * 0.4em - 0.4em) * var(--amp))
       )
       rotate(calc(sin(calc(var(--i) * 3.1 + 1)) * 24deg * var(--amp))) scale(calc(1 - 0.3 * var(--amp)));
-    font-variation-settings:
-      "wght" calc(var(--kinetic-weight) - 300 * var(--amp)),
-      "wdth" var(--kinetic-width);
   }
   35% {
     opacity: 1;
@@ -423,31 +498,39 @@ html[data-hero3d="on"] .hero-3d {
   /* O impacto na prensa, como no nome: desce um fio, achata e engorda antes de assentar. */
   62% {
     transform: translate(0, calc(0.03em * var(--amp))) scale(calc(1 + 0.02 * var(--amp)), calc(1 - 0.06 * var(--amp)));
-    font-variation-settings:
-      "wght" calc(var(--kinetic-weight) + 100 * var(--amp)),
-      "wdth" calc(var(--kinetic-width) + 14 * var(--amp));
   }
   100% {
     transform: none;
   }
 }
 
+/* O peso da mesma entrada: chega leve, engorda no impacto e assenta no peso de repouso. */
+@keyframes kinetic-set-weight {
+  0% {
+    --kinetic-dw: calc(-300 * var(--amp));
+    --kinetic-dwd: 0;
+  }
+  62% {
+    --kinetic-dw: calc(100 * var(--amp));
+    --kinetic-dwd: calc(14 * var(--amp));
+  }
+}
+
 @keyframes kinetic-wave {
   40% {
     translate: 0 calc(-0.04em * var(--amp));
-    font-variation-settings:
-      "wght" calc(var(--kinetic-weight) + 200 * var(--amp)),
-      "wdth" calc(var(--kinetic-width) + 20 * var(--amp));
+    --kinetic-dw: calc(200 * var(--amp));
+    --kinetic-dwd: calc(20 * var(--amp));
   }
 }
 
 /*
- * Card com espessura (Tilt): placas cobalto atrás do card, afastadas em Z conforme --lift (0 a 1).
+ * Card com espessura (Tilt): placas neon atrás do card, afastadas em Z conforme --lift (0 a 1).
  * Mais fundas, elas encolheriam com a perspectiva e ficariam escondidas atrás do card; o `scale`
  * devolve o tamanho (--perspective-n é a distância da câmera, em px), e só sobra o deslocamento da inclinação: a espessura.
  */
 .tilt-plate {
-  background: color-mix(in oklab, var(--cobalt), black calc(var(--z) * 14%));
+  background: color-mix(in oklab, var(--neon), black calc(var(--z) * 14%));
   opacity: min(1, calc(var(--lift) * 4));
   transform: translateZ(calc(var(--lift) * var(--z) * var(--plate-gap) * -1))
     scale(calc(1 + var(--lift) * var(--z) * var(--plate-gap-n) / var(--perspective-n, 900)));
@@ -494,12 +577,13 @@ html[data-hero3d="on"] .hero-3d {
   .rise-in {
     animation: none;
   }
-  /* Sem a queda; a troca de cor fica, porque não é movimento. */
+  /* Sem a queda; a troca de cor (as camadas ::before e ::after) fica, porque não é movimento. */
   .full-stop-dot {
-    animation: dot-hue 9s ease-in-out infinite;
+    animation: none;
   }
   html {
     scroll-behavior: auto !important;
   }
 }
+
 

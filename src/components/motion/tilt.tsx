@@ -8,7 +8,7 @@ import { useCapabilities } from "./drivers/capabilities";
 import { subscribePointer } from "./drivers/pointer";
 import { useEngaged, useLevel } from "./engaged";
 
-// Card com espessura: engajado, ele inclina em perspectiva e revela placas cobalto atrás de si,
+// Card com espessura: engajado, ele inclina em perspectiva e revela placas neon atrás de si,
 // a mesma lateral do texto, agora em 3D de verdade (preserve-3d). Com mouse, a inclinação segue
 // o cursor; no toque, o card só se ergue ao passar pela faixa central.
 

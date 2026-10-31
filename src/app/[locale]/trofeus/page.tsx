@@ -24,7 +24,7 @@ export default async function TrophiesPage({ params }: PageProps) {
   const locale = (await params).locale as Locale;
 
   return (
-    <div className="flex min-h-svh flex-col bg-night text-night-fg [--cobalt:var(--cobalt-soft)]">
+    <div className="flex min-h-svh flex-col bg-night text-night-fg [--neon:var(--neon-soft)]">
       <header className={cn(containerClass, "flex h-16 w-full shrink-0 items-center")}>
         <Link
           href={`/${locale}`}

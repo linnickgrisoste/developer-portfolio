@@ -18,7 +18,7 @@ export function SeenBadge({ seen }: { seen: boolean }) {
           initial={reduceMotion ? { opacity: 0 } : { scale: 0, rotate: -90 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }}
           transition={spring.reward}
-          className="grid size-5 shrink-0 place-items-center rounded-full bg-cobalt text-paper"
+          className="grid size-5 shrink-0 place-items-center rounded-full bg-reward text-paper"
           title={t(gameCopy.seenLabel)}
         >
           <Check className="size-3" strokeWidth={3} aria-hidden />

@@ -14,7 +14,7 @@ export function LabShell({ locale, children }: { locale: Locale; children: React
           <ArrowLeft className="size-4" aria-hidden />
           Voltar ao site
         </Link>
-        <span className="font-pixel text-[11px] text-cobalt">LAB · MOVIMENTO</span>
+        <span className="font-pixel text-[11px] text-neon">LAB · MOVIMENTO</span>
       </header>
       <main className="relative min-h-0 flex-1">{children}</main>
     </div>

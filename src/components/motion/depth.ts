@@ -9,7 +9,7 @@ import { useScrollVelocity } from "./drivers/scroll-velocity";
 import { useEngaged, useLevel } from "./engaged";
 
 /**
- * O que acende a lateral cobalto:
+ * O que acende a lateral neon:
  * - "engaged": aparece quando o elemento é engajado (hover, foco ou faixa central) e some ao sair;
  * - "velocity": cresce com a velocidade do scroll, para cima ou para baixo, como um rastro;
  * - "proximity": cresce conforme o cursor se aproxima, sem precisar tocar no elemento.

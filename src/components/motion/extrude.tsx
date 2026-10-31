@@ -8,7 +8,7 @@ import { useDepth, type DepthDriver } from "./depth";
 import { useLevel } from "./engaged";
 
 /**
- * A lateral cobalto: cópias do conteúdo atrás dele, deslocadas por `transform` conforme `--depth`.
+ * A lateral neon: cópias do conteúdo atrás dele, deslocadas por `transform` conforme `--depth`.
  * Em repouso não aparece; o driver decide quando ela cresce (ver `DepthDriver`).
  * Feito para texto: o conteúdo é duplicado em camadas `aria-hidden`, então não ponha links ou botões dentro.
  */

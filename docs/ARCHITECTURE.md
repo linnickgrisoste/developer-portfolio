@@ -13,10 +13,10 @@ Tudo no site segue uma frase:
 | Estado | Como parece | Personalidade | O que muda |
 |---|---|---|---|
 | **Repouso** | Editorial, plano, legível | — | Nada se mexe sozinho (exceto o hero) |
-| **Engajado** | O elemento ganha volume | Editorial premium: 350–600ms, sem overshoot | Lateral cobalto aparece, inclina, ganha peso |
+| **Engajado** | O elemento ganha volume | Editorial premium: 350–600ms, sem overshoot | Lateral neon aparece, inclina, ganha peso |
 | **Recompensa** | Objeto com física | Lúdica: spring com overshoot | Quique, carimbo, confete. **Só a camada de jogo usa** |
 
-A lateral cobalto do Hero 3D é a assinatura visual. Em 2D ela é reproduzida com camadas deslocadas por `transform` (ver 6.4), para que o site inteiro fale a mesma língua do 3D.
+A lateral neon do Hero 3D é a assinatura visual. Em 2D ela é reproduzida com camadas deslocadas por `transform` (ver 6.4), para que o site inteiro fale a mesma língua do 3D.
 
 ---
 
@@ -108,7 +108,7 @@ docs/             este documento
 | `duration` | fast 0.2s · base 0.35s · slow 0.6s | Saídas · cards e engajamento · revelações |
 | `spring.ui` | stiffness 380, damping 32 | Layout e avisos, sem overshoot |
 | `spring.reward` | stiffness 420, damping 14 | **Só recompensa do jogo** |
-| `depth` | repouso 0 · detalhe 0.04em · título 0.07em · assinatura 0.12em | Profundidade da lateral cobalto quando engajado |
+| `depth` | repouso 0 · detalhe 0.04em · título 0.07em · assinatura 0.12em | Profundidade da lateral neon quando engajado |
 | `stagger` | micro 25ms · padrão 60ms · **teto 500ms** | Cascatas |
 | `level` | assinatura 1 · título 0.55 · detalhe 0.3 | Multiplicador de amplitude das primitivas |
 
@@ -144,8 +144,8 @@ Todas as primitivas reagem a `engaged`. Por isso, no celular o site também "ace
 | Primitiva | O que faz | Dirigida por | Com movimento reduzido |
 |---|---|---|---|
 | `KineticText` | Letras assentam como tipos ao entrar na tela; peso e largura reagem ao cursor | viewport + pointer | Texto parado |
-| `Extrude` | Lateral cobalto: camadas `aria-hidden` atrás do texto, deslocadas por `transform` conforme `--depth` | engajado, velocidade ou proximidade | Profundidade 0 |
-| `Tilt` | Inclinação em perspectiva com borda cobalto, para cards e pôsteres | engajado + pointer | Sem inclinação |
+| `Extrude` | Lateral neon: camadas `aria-hidden` atrás do texto, deslocadas por `transform` conforme `--depth` | engajado, velocidade ou proximidade | Profundidade 0 |
+| `Tilt` | Inclinação em perspectiva com borda neon, para cards e pôsteres | engajado + pointer | Sem inclinação |
 | `Reveal` / `RevealGroup` | Entrada uma única vez, em cascata dentro do orçamento | viewport | Só opacidade |
 | `Odometer` | Dígitos giram até o valor | viewport | Valor final |
 | `Magnetic` | Botão puxado pelo cursor | pointer | Parado |
@@ -170,10 +170,15 @@ Regras:
 - Propriedades animadas: `transform` e `opacity`. Cor e `clip-path` com moderação. Nunca `box-shadow`, `filter` ou `text-shadow`.
 
 Orçamento de desempenho (desempenho é a prioridade do projeto):
-- **Camadas da lateral cobalto:** 8 na assinatura, 4 no título, 3 no detalhe. Cada camada é uma cópia do texto no DOM.
-- **Nada contínuo e caro:** o que já se mexe sozinho (a faixa da stack) não ganha lateral cobalto; cenas 3D que ficam paradas desenham sob demanda.
-- **Nada de medir a cada quadro:** proximidade e afins medem posições ao engajar (e de novo só em rolagem ou redimensionamento), nunca dentro do laço de quadros.
-- **Teste de desempenho só em build de produção** (`npm run build && npm start`): o modo de desenvolvimento é muito mais pesado e engana.
+- **Camadas da lateral neon:** 8 na assinatura, 4 no título, 3 no detalhe. Cada camada é uma cópia do texto no DOM.
+- **Nada contínuo e caro:** o que já se mexe sozinho (a faixa da stack) não ganha lateral neon; cenas 3D que ficam paradas desenham sob demanda.
+- **Nada de medir a cada quadro:** proximidade e afins medem posições ao engajar (e de novo só em rolagem ou redimensionamento), nunca dentro do laço de quadros. Nas cenas 3D, o retângulo do canvas vem de `screenRect` (three/screen-rect.ts), que faz o mesmo.
+- **Nada de mexer no `body` por interação:** trocar estilo do `body` (ex.: o cursor) invalida a página inteira. O cursor de clique das cenas vai no elemento que recebe os eventos.
+- **Camadas recolhidas saem do teste de cursor:** a lateral parada fica com `visibility: hidden`, não só transparente; senão o navegador percorre centenas de camadas a cada movimento do mouse.
+- **Parada, a página não desenha:** nenhum laço infinito na thread principal. A troca de cor do ponto é feita com opacidade (roda na placa de vídeo), e a faixa da stack sai do laço de quadros fora da tela. Em repouso, a página gera só uns 4 quadros por segundo (os da cena 3D sincronizando a cor).
+- **Revelações e entradas na placa de vídeo:** variantes do Motion animam `transform` como string inteira (`"translateY(16px)"`) e `opacity`, nunca `x`/`y`/`scale` soltos; assim viram WAAPI. Alvo sempre explícito (`"none"` zera os números da origem) e `transitionEnd: { transform: "none" }` no fim. O que o JS move a cada quadro (a faixa, o nome do hero ao rolar) fica em camada própria (`will-change-transform`).
+- **Peso de fonte só em degraus:** nunca interpolar `font-variation-settings` direto. Cada valor inédito de eixo cria outra instância da fonte variável, e isso era o maior custo da rolagem. Anime `--kinetic-dw`/`--kinetic-dwd` (o CSS arredonda com `round()`), e escreva neles também no JS.
+- **Teste de desempenho só em build de produção** (`npm run build && npm start`): o modo de desenvolvimento é muito mais pesado e engana. A métrica de decisão é o intervalo entre quadros medido na página (p95, p99 e quadros acima de 16,7 ms numa rolagem completa, primeira passada), com CPU normal e com 4x de lentidão. O trace do DevTools serve para achar a causa, mas infla o custo de layout e estilo.
 
 ### 6.6 Onde vive cada coisa
 
@@ -182,7 +187,7 @@ Orçamento de desempenho (desempenho é a prioridade do projeto):
 | Tokens (curvas, durações, springs, níveis, cascata) | `lib/motion.ts` | Puro, sem React: páginas do servidor também leem (o catálogo mostra os valores) |
 | Hooks de entrada (`useSkipEntrance`, `useRevealGroup`, `markLocaleSwitch`) | `components/motion/entrance.ts` | Usam estado do cliente; não podem morar em `lib/` |
 | Estado engajado e nível com ajuste de tema (`useEngaged`, `useLevel`) | `components/motion/engaged.ts` | Base de toda primitiva |
-| Lateral cobalto ligada a um driver (`useDepth`) | `components/motion/depth.ts` | Usado por `Extrude` e por `KineticText` com `extrude` |
+| Lateral neon ligada a um driver (`useDepth`) | `components/motion/depth.ts` | Usado por `Extrude` e por `KineticText` com `extrude` |
 | Desenho (camadas, entrada das letras, onda, placas, fitas) | `globals.css`, bloco "Sistema de movimento" | As primitivas só ligam atributos (`data-armed`, `data-engaged`, `data-raised`...) e variáveis (`--depth`, `--amp`...) |
 
 As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o que permite que a lateral cresça com `transition`, sem JavaScript a cada quadro no driver "engaged".
@@ -198,7 +203,7 @@ As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o 
   - limitar o `dpr` (1.5 no toque, 2 no desktop);
   - pausar o render fora da tela (`active`);
   - receber eventos de outro elemento (`eventSource`) medindo o cursor contra o próprio canvas, que fica sem eventos para não bloquear os links por cima.
-- **`World`:** luz de estúdio (Lightformers, sem baixar arquivo de ambiente). **`materials`:** cores `ink` e `cobalt` lidas de `lib/palette` no tema atual. Hero e Sala usam os dois, para parecerem o mesmo universo.
+- **`World`:** luz de estúdio (Lightformers, sem baixar arquivo de ambiente). **`materials`:** cores `ink` e `neon` lidas de `lib/palette` no tema atual. Hero e Sala usam os dois, para parecerem o mesmo universo.
 - **`fonts`:** a Archivo convertida, servida de `public/three/`.
 - Toda cena é importada com `next/dynamic` (`ssr: false`) por quem a mostra. Verificado no build: nenhum script da carga inicial contém three.js.
 
@@ -230,7 +235,7 @@ No desktop capaz, o nome **é** a cena 3D: a entrada é a queda das letras com f
 - O store continua com `useSyncExternalStore`. A chave do localStorage ganha versão (`explorer-mode:v1`), para poder mudar o formato sem quebrar quem já tem progresso salvo.
 - Gatilhos são declarativos: `useAchievementOnView(ref, id)` e eventos de interação.
 - A personalidade lúdica (`spring.reward`, confete) é exclusiva daqui.
-- O `ClickSpark` vira `click-spark-layer`, com a cor do cobalto do tema atual.
+- O `ClickSpark` vira `click-spark-layer`, com a cor do neon do tema atual.
 
 ---
 

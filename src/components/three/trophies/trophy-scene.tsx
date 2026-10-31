@@ -17,8 +17,8 @@ import { trophyModels } from "./models";
 
 const SPACING = 2.3;
 const FOV = 35;
-const unlockedColors = { main: palette.dark.cobalt, accent: palette.light.paper };
-const lockedColors = { main: "#2a3350", accent: "#1a2135" };
+const unlockedColors = { main: palette.dark.reward, accent: palette.light.paper };
+const lockedColors = { main: "#2a2e35", accent: "#1a1d22" };
 
 /** Um troféu já pronto para a cena: o nome (ou "???") no idioma da página e se foi conquistado. */
 export type TrophyItem = { id: AchievementId; label: string; unlocked: boolean };
@@ -48,9 +48,9 @@ export default function TrophyScene({
 }) {
   return (
     <Stage camera={{ position: [0, 0, 14], fov: FOV }} onPointerMissed={onDismiss}>
-      <World accent={palette.dark.cobalt} />
+      <World accent={palette.dark.reward} />
       <spotLight position={[0, 8, 8]} angle={0.6} penumbra={0.8} intensity={60} />
-      <pointLight position={[0, -3, 4]} intensity={8} color={palette.dark.cobalt} />
+      <pointLight position={[0, -3, 4]} intensity={8} color={palette.dark.reward} />
       <Shelf
         items={items}
         focused={focused}
@@ -177,11 +177,11 @@ function Trophy({
       {/* Pedestal. */}
       <mesh position={[0, -0.82, 0]}>
         <cylinderGeometry args={[0.5, 0.58, 0.16, 48]} />
-        <meshStandardMaterial color={unlocked ? "#1f2a55" : "#161c2e"} roughness={0.5} metalness={0.3} />
+        <meshStandardMaterial color={unlocked ? "#2a2e35" : "#16181c"} roughness={0.5} metalness={0.3} />
       </mesh>
       <mesh position={[0, -0.735, 0]} rotation-x={-Math.PI / 2}>
         <ringGeometry args={[0.42, 0.47, 48]} />
-        <meshBasicMaterial color={unlocked ? palette.dark.cobalt : "#2a3350"} />
+        <meshBasicMaterial color={unlocked ? palette.dark.reward : "#2a2e35"} />
       </mesh>
 
       <Float enabled={!reduceMotion} speed={1.6} rotationIntensity={0.25} floatIntensity={0.5} floatingRange={[-0.04, 0.08]}>
@@ -215,7 +215,7 @@ function Trophy({
         fontSize={0.13}
         anchorX="center"
         anchorY="middle"
-        color={hovered ? palette.dark.cobalt : palette.dark.ink}
+        color={hovered ? palette.dark.reward : palette.dark.ink}
         fillOpacity={dimmed ? 0.12 : unlocked ? 1 : 0.4}
       >
         {label}

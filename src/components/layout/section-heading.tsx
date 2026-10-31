@@ -2,7 +2,7 @@ import { KineticText } from "@/components/motion/kinetic-text";
 import { cn } from "@/lib/utils";
 
 // Título de seção: nível "título" do texto cinético. As letras assentam como tipos ao aparecer,
-// e, engajado, ganham peso perto do cursor e a lateral cobalto.
+// e, engajado, ganham peso perto do cursor e a lateral neon.
 export function SectionHeading({ text, className }: { text: string; className?: string }) {
   return (
     <KineticText

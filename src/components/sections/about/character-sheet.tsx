@@ -104,7 +104,7 @@ export function CharacterSheet({ classes, labels }: { classes: CharacterClass[];
                   return (
                     <motion.span
                       key={segment}
-                      className={`h-2.5 flex-1 origin-bottom rounded-[2px] ${filled ? "bg-cobalt" : "bg-rule"}`}
+                      className={`h-2.5 flex-1 origin-bottom rounded-[2px] ${filled ? "bg-neon" : "bg-rule"}`}
                       initial={reduceMotion || skipEntrance || !filled ? false : { opacity: 0, scaleY: 0.2 }}
                       animate={inView ? { opacity: 1, scaleY: 1 } : undefined}
                       transition={{ ...spring.ui, delay: row * 0.06 + segment * 0.035 }}

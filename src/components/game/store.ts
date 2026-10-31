@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { achievements, type AchievementId } from "@/content/game";
-import { cobaltPair, palette } from "@/lib/palette";
+import { rewardPair, palette } from "@/lib/palette";
 
 // Estado do modo explorador, salvo no localStorage e compartilhado por toda a página.
 
@@ -77,7 +77,7 @@ export function useGame<T>(select: (game: GameState) => T): T {
 async function celebrate() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const { default: confetti } = await import("canvas-confetti");
-  const colors = [...cobaltPair, palette.light.ink, palette.light.paper];
+  const colors = [...rewardPair, palette.light.ink, palette.light.paper];
   confetti({ particleCount: 90, spread: 70, startVelocity: 45, origin: { x: 0.2, y: 0.9 }, colors });
   confetti({ particleCount: 90, spread: 70, startVelocity: 45, origin: { x: 0.8, y: 0.9 }, colors });
 }

@@ -134,7 +134,7 @@ function Envelope({ main, accent }: ModelProps) {
   );
 }
 
-// Ponto final: a esfera cobalto do fim do nome.
+// Ponto final: a esfera ciano do fim do nome.
 function FullStop({ main }: ModelProps) {
   return (
     <mesh>

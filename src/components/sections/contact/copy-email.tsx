@@ -33,7 +33,7 @@ export function CopyEmail({ email, labels }: { email: string; labels: { copy: st
       <button
         type="button"
         onClick={copyEmail}
-        className="relative mb-3 inline-flex h-11 items-center gap-2 rounded-full border border-(--footer-fg)/25 px-5 text-[15px] font-semibold transition-[color,border-color,scale] hover:border-cobalt hover:text-cobalt active:scale-[0.97]"
+        className="relative mb-3 inline-flex h-11 items-center gap-2 rounded-full border border-(--footer-fg)/25 px-5 text-[15px] font-semibold transition-[color,border-color,scale] hover:border-neon hover:text-neon active:scale-[0.97]"
       >
         {/* O check entra com o pop de recompensa: copiar o e-mail também desbloqueia uma conquista. */}
         <AnimatePresence mode="popLayout" initial={false}>

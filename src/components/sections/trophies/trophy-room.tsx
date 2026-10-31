@@ -87,7 +87,7 @@ export function TrophyRoom({ entries, labels }: { entries: TrophyEntry[]; labels
           </h1>
           <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-night-fg/65">{labels.intro}</p>
         </div>
-        <p className="font-pixel text-[12px] text-cobalt">
+        <p className="font-pixel text-[12px] text-reward">
           {labels.level}
           {level} · {xp}/{totalXp} XP · {count}/{cards.length}
         </p>
@@ -142,7 +142,7 @@ export function TrophyRoom({ entries, labels }: { entries: TrophyEntry[]; labels
             <p className="mt-2 text-[14px] leading-relaxed text-night-fg/70">
               {!focusedCard.unlocked && focusedCard.hint ? focusedCard.hint : focusedCard.description}
             </p>
-            <p className="font-pixel mt-4 text-[12px] text-cobalt">+{focusedCard.xp} XP</p>
+            <p className="font-pixel mt-4 text-[12px] text-reward">+{focusedCard.xp} XP</p>
           </div>
         )}
       </div>

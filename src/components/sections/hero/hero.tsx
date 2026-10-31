@@ -15,20 +15,20 @@ export function Hero({ locale }: { locale: Locale }) {
     <HeroFrame firstName={profile.firstName} lastName={profile.lastName}>
       <div className="grid gap-10 md:grid-cols-12">
         <div className="rise-in md:col-span-7 lg:col-span-6">
-          <p className="text-[15px] font-semibold text-cobalt">{text.role[locale]}</p>
+          <p className="text-[15px] font-semibold text-neon">{text.role[locale]}</p>
           <p className="mt-3 max-w-[44ch] text-xl leading-[1.55] text-pretty sm:text-2xl">{text.intro[locale]}</p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Magnetic intensity={0.25}>
               <a
                 href={anchor(sections.work)}
-                className="inline-flex h-12 items-center rounded-full bg-ink px-6 text-[15px] font-semibold text-paper transition-[background-color,scale] hover:bg-cobalt active:scale-[0.97]"
+                className="inline-flex h-12 items-center rounded-full bg-ink px-6 text-[15px] font-semibold text-paper transition-[background-color,scale] hover:bg-neon active:scale-[0.97]"
               >
                 {text.ctaWork[locale]}
               </a>
             </Magnetic>
             <a
               href={anchor(sections.experience)}
-              className="text-[15px] font-semibold underline decoration-rule decoration-2 underline-offset-[6px] transition-colors hover:decoration-cobalt"
+              className="text-[15px] font-semibold underline decoration-rule decoration-2 underline-offset-[6px] transition-colors hover:decoration-neon"
             >
               {text.ctaAbout[locale]}
             </a>
@@ -42,7 +42,7 @@ export function Hero({ locale }: { locale: Locale }) {
           <dl className="grid gap-4">
             <div className="flex items-center gap-2.5">
               <dt className="sr-only">{text.statusLabel[locale]}</dt>
-              <span aria-hidden className="size-2 rounded-full bg-cobalt" />
+              <span aria-hidden className="size-2 rounded-full bg-neon" />
               <dd>{text.status[locale]}</dd>
             </div>
             <div>
@@ -51,7 +51,7 @@ export function Hero({ locale }: { locale: Locale }) {
             </div>
             <div className="mt-4 flex items-start gap-2.5 border-t border-rule pt-4">
               <dt className="sr-only">{gameCopy.title[locale]}</dt>
-              <Gamepad2 className="mt-0.5 size-4 shrink-0 text-cobalt" strokeWidth={1.75} aria-hidden />
+              <Gamepad2 className="mt-0.5 size-4 shrink-0 text-neon" strokeWidth={1.75} aria-hidden />
               <dd className="text-graphite">{gameCopy.hint[locale].replace("{count}", String(achievements.length))}</dd>
             </div>
           </dl>

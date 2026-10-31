@@ -47,7 +47,7 @@ export function ProjectList({ items, total, labels }: { items: ProjectCard[]; to
       <div className="mt-24 hidden grid-cols-12 gap-6 border-b border-rule pb-3 text-[13px] text-graphite md:grid">
         <span className="col-span-6 flex items-center gap-3">
           {labels.project}
-          <span className="font-pixel text-[11px] text-cobalt">
+          <span className="font-pixel text-[11px] text-neon">
             {seenProjects.length}/{total} {labels.seen}
           </span>
         </span>

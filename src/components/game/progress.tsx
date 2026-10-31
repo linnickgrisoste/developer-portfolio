@@ -12,7 +12,7 @@ export function ProgressBadge() {
   const { level } = levelFor(xpOf(unlocked));
 
   return (
-    <span className="font-pixel text-[11px] text-cobalt">
+    <span className="font-pixel text-[11px] text-reward">
       {t(gameCopy.level)}
       {level} · {count}/{achievements.length}
     </span>

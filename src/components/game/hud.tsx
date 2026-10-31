@@ -15,7 +15,7 @@ function XpBar({ progress, className }: { progress: number; className?: string }
   return (
     <span className={`relative block h-1.5 overflow-hidden rounded-full bg-rule ${className ?? ""}`}>
       <motion.span
-        className="absolute inset-y-0 left-0 rounded-full bg-cobalt"
+        className="absolute inset-y-0 left-0 rounded-full bg-reward"
         initial={false}
         animate={{ width: `${Math.max(progress, 0.04) * 100}%` }}
         transition={spring.soft}
@@ -40,7 +40,7 @@ export function ExplorerHud() {
       >
         <motion.span
           key={level}
-          initial={{ scale: 1.6, color: "var(--cobalt)" }}
+          initial={{ scale: 1.6, color: "var(--reward)" }}
           animate={{ scale: 1, color: "var(--foreground)" }}
           transition={spring.reward}
           className="font-pixel text-[12px] leading-none"
@@ -59,7 +59,7 @@ export function ExplorerHud() {
         <div className="border-b border-rule p-5">
           <div className="flex items-baseline justify-between gap-4">
             <p className="text-lg font-semibold tracking-[-0.01em]">{t(gameCopy.title)}</p>
-            <p className="font-pixel text-[12px] text-cobalt">
+            <p className="font-pixel text-[12px] text-reward">
               {xp}/{totalXp} XP
             </p>
           </div>
@@ -84,7 +84,7 @@ export function ExplorerHud() {
               <li key={achievement.id} className="flex items-center gap-3 rounded-md p-3">
                 <span
                   className={`grid size-10 shrink-0 place-items-center rounded-md ${
-                    done ? "bg-cobalt text-paper" : "bg-muted text-graphite"
+                    done ? "bg-reward text-paper" : "bg-muted text-graphite"
                   }`}
                 >
                   {hidden ? <Lock className="size-4" aria-hidden /> : <AchievementIcon id={achievement.id} className="size-5" />}
@@ -98,7 +98,7 @@ export function ExplorerHud() {
                   </span>
                 </span>
                 {done ? (
-                  <Check className="size-4 shrink-0 text-cobalt" aria-label={t(gameCopy.done)} />
+                  <Check className="size-4 shrink-0 text-reward" aria-label={t(gameCopy.done)} />
                 ) : (
                   <span className="font-pixel shrink-0 text-[11px] text-graphite">{achievement.xp}</span>
                 )}
@@ -108,7 +108,7 @@ export function ExplorerHud() {
         </ul>
 
         {/* A sala de troféus: o mesmo progresso, com cada conquista como objeto. */}
-        <TrophyRoomLink className="group flex items-center justify-between gap-3 border-t border-rule px-5 py-3.5 text-[14px] font-semibold transition-colors hover:bg-muted hover:text-cobalt">
+        <TrophyRoomLink className="group flex items-center justify-between gap-3 border-t border-rule px-5 py-3.5 text-[14px] font-semibold transition-colors hover:bg-muted hover:text-reward">
           <span className="flex items-center gap-2.5">
             <Trophy className="size-4" strokeWidth={1.75} aria-hidden />
             {t(gameCopy.openTrophyRoom)}

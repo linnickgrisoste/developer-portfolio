@@ -12,7 +12,7 @@ function Row({ items }: { items: string[] }) {
       {items.map((item) => (
         <Fragment key={item}>
           <span className="whitespace-nowrap">{item}</span>
-          <span aria-hidden className="mx-[0.45em] inline-block size-[0.22em] rotate-45 bg-cobalt" />
+          <span aria-hidden className="mx-[0.45em] inline-block size-[0.22em] rotate-45 bg-neon" />
         </Fragment>
       ))}
     </span>
@@ -20,7 +20,7 @@ function Row({ items }: { items: string[] }) {
 }
 
 // Faixa com a stack que acelera e inverte conforme a velocidade do scroll. Ela já se mexe o tempo todo,
-// então fica sem lateral cobalto: recalcular camadas de 8 cópias do texto a cada quadro de scroll pesava demais.
+// então fica sem lateral neon: recalcular camadas de 8 cópias do texto a cada quadro de scroll pesava demais.
 export function Marquee({ tools }: { tools: string[] }) {
   const reduceMotion = useReducedMotion();
   const half = Math.ceil(tools.length / 2);

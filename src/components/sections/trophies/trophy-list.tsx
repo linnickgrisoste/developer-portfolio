@@ -26,7 +26,7 @@ export function TrophyList({ cards, labels, className }: { cards: TrophyCard[]; 
             <span
               className={cn(
                 "grid size-12 shrink-0 place-items-center rounded-md",
-                card.unlocked ? "bg-cobalt-deep text-white" : "bg-white/5 text-night-fg/40",
+                card.unlocked ? "bg-neon-deep text-white" : "bg-white/5 text-night-fg/40",
               )}
             >
               {hidden ? <Lock className="size-5" aria-hidden /> : <AchievementIcon id={card.id} className="size-6" />}
@@ -36,13 +36,13 @@ export function TrophyList({ cards, labels, className }: { cards: TrophyCard[]; 
                 <span className={cn("text-[15px] font-semibold", !card.unlocked && "text-night-fg/60")}>
                   {hidden ? "???" : card.name}
                 </span>
-                <span className="font-pixel shrink-0 text-[11px] text-cobalt">+{card.xp} XP</span>
+                <span className="font-pixel shrink-0 text-[11px] text-reward">+{card.xp} XP</span>
               </span>
               <span className="mt-1 block text-[13px] leading-snug text-night-fg/60">
                 {hidden && card.hint ? card.hint : card.description}
               </span>
               <span className="mt-2 flex items-center gap-1.5 text-[12px] text-night-fg/65">
-                {card.unlocked ? <Check className="size-3.5 shrink-0 text-cobalt" aria-hidden /> : null}
+                {card.unlocked ? <Check className="size-3.5 shrink-0 text-reward" aria-hidden /> : null}
                 {card.unlocked ? labels.done : labels.locked}
                 {card.date && ` · ${card.date}`}
               </span>

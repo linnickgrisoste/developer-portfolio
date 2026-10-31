@@ -3,12 +3,12 @@
 import { Environment, Lightformer } from "@react-three/drei";
 
 // A luz de estúdio comum a todas as cenas, montada na própria cena (Lightformers): dá reflexo
-// nas laterais cobalto sem baixar arquivo de ambiente. Hero e sala de troféus usam a mesma,
+// nas laterais neon sem baixar arquivo de ambiente. Hero e sala de troféus usam a mesma,
 // para parecerem o mesmo universo.
 export function World({
   accent,
 }: {
-  /** Um anel de luz colorida a mais no ambiente: dá aos reflexos o tom da cena (a sala usa o cobalto). */
+  /** Um anel de luz colorida a mais no ambiente: dá aos reflexos o tom da cena (a sala usa o neon). */
   accent?: string;
 }) {
   return (

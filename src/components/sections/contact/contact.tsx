@@ -19,10 +19,10 @@ export function Contact({ locale }: { locale: Locale }) {
   return (
     <footer
       id={sections.contact}
-      className="scroll-mt-16 bg-night text-(--footer-fg) [--cobalt:var(--cobalt-soft)] [--footer-fg:var(--night-fg)]"
+      className="scroll-mt-16 bg-night text-(--footer-fg) [--neon:var(--neon-soft)] [--footer-fg:var(--night-fg)]"
     >
       <RevealGroup className={cn(containerClass, "pt-24 pb-10 md:pt-32")}>
-        {/* O título do rodapé é um título de seção como os outros, só maior. A lateral usa o cobalto suave do fundo noturno. */}
+        {/* O título do rodapé é um título de seção como os outros, só maior. A lateral usa o neon suave do fundo noturno. */}
         <KineticText
           as="h2"
           level="title"
@@ -56,7 +56,7 @@ export function Contact({ locale }: { locale: Locale }) {
 
         <div className="mt-20 flex flex-col gap-10 border-t border-(--footer-fg)/15 pt-8 md:flex-row md:items-end md:justify-between">
           {/* Os links do rodapé falam a mesma língua do resto, no nível detalhe: com o cursor (ou o foco),
-              as letras ganham peso e a lateral cobalto, discretas. */}
+              as letras ganham peso e a lateral neon, discretas. */}
           <ul className="flex flex-wrap gap-x-8 gap-y-3 text-[15px]">
             {profile.socials.map((social) => (
               <li key={social.label}>

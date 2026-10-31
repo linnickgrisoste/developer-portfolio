@@ -21,7 +21,7 @@ function Block({ title, note, children }: { title: string; note: string; childre
     <section className="border-t border-rule py-16 md:py-20">
       <div className="grid gap-10 md:grid-cols-12">
         <div className="md:col-span-4">
-          <h2 className="text-[13px] font-semibold tracking-wide text-cobalt uppercase">{title}</h2>
+          <h2 className="text-[13px] font-semibold tracking-wide text-neon uppercase">{title}</h2>
           <p className="mt-3 max-w-[40ch] text-[15px] leading-relaxed text-graphite">{note}</p>
         </div>
         <div className="md:col-span-8">{children}</div>
@@ -43,7 +43,7 @@ export default async function LabMotionPage({ params }: { params: Promise<{ loca
     <LabShell locale={locale}>
       <Container className="pb-40">
         <header className="py-16 md:py-24">
-          <p className="font-pixel text-[11px] text-cobalt">CATÁLOGO DE MOVIMENTO</p>
+          <p className="font-pixel text-[11px] text-neon">CATÁLOGO DE MOVIMENTO</p>
           <h1 className="mt-4 max-w-[18ch] text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] font-bold tracking-[-0.025em]">
             Em repouso, é impresso. Ao interagir, vira objeto.
           </h1>
@@ -74,7 +74,7 @@ export default async function LabMotionPage({ params }: { params: Promise<{ loca
 
         <Block
           title="KineticText"
-          note="As letras assentam como tipos ao entrar na tela; engajado, o peso segue o cursor. Com extrude, cada letra ganha a lateral cobalto."
+          note="As letras assentam como tipos ao entrar na tela; engajado, o peso segue o cursor. Com extrude, cada letra ganha a lateral neon."
         >
           <div className="grid gap-14">
             <Replay>
@@ -101,7 +101,7 @@ export default async function LabMotionPage({ params }: { params: Promise<{ loca
 
         <Block
           title="Extrude"
-          note="A lateral cobalto, sempre a mesma peça. Muda só o que a acende: o engajamento, o cursor por perto ou a velocidade do scroll."
+          note="A lateral neon, sempre a mesma peça. Muda só o que a acende: o engajamento, o cursor por perto ou a velocidade do scroll."
         >
           <div className="grid gap-14">
             <div>
@@ -145,7 +145,7 @@ export default async function LabMotionPage({ params }: { params: Promise<{ loca
 
         <Block
           title="Tilt"
-          note="Cards com espessura: inclinam em perspectiva e revelam placas cobalto atrás. No toque, só se erguem ao passar pelo meio da tela."
+          note="Cards com espessura: inclinam em perspectiva e revelam placas neon atrás. No toque, só se erguem ao passar pelo meio da tela."
         >
           <div className="grid items-start gap-8 sm:grid-cols-5">
             <div className="sm:col-span-3">

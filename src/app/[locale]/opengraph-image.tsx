@@ -5,7 +5,7 @@ import { isLocale, locales } from "@/lib/i18n";
 import { palette } from "@/lib/palette";
 
 // Imagem que aparece quando o link é compartilhado (LinkedIn, WhatsApp, X...):
-// o nome com o ponto cobalto, como na abertura do site.
+// o nome com o ponto neon, como na abertura do site.
 
 export const alt = `${profile.firstName} ${profile.lastName}`;
 export const size = { width: 1200, height: 630 };
@@ -16,7 +16,7 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-const { paper: PAPER, ink: INK, cobalt: COBALT } = palette.light;
+const { paper: PAPER, ink: INK, neon: NEON } = palette.dark;
 
 // O gerador de imagem não lê woff2, então pede ao Google Fonts só as letras usadas, em TTF.
 // Se a rede falhar no build, a imagem sai com a fonte padrão em vez de quebrar.
@@ -63,10 +63,10 @@ export default async function OpenGraphImage({ params }: { params: Promise<{ loc
           <span>{name[0]}</span>
           <div style={{ display: "flex", alignItems: "flex-end" }}>
             <span>{name[1]}</span>
-            <div style={{ width: 30, height: 30, marginLeft: 8, marginBottom: 6, borderRadius: 999, background: COBALT }} />
+            <div style={{ width: 30, height: 30, marginLeft: 8, marginBottom: 6, borderRadius: 999, background: NEON }} />
           </div>
         </div>
-        <span style={{ color: COBALT, fontSize: 40, fontWeight: 600 }}>{role}</span>
+        <span style={{ color: NEON, fontSize: 40, fontWeight: 600 }}>{role}</span>
       </div>
     ),
     { ...size, fonts },

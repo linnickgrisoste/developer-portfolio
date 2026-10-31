@@ -44,7 +44,7 @@ export function RewardDemo() {
               animate={{ scale: 1, rotate: 0 }}
               exit={{ scale: 0, transition: { duration: 0.15 } }}
               transition={spring.reward}
-              className="grid size-6 place-items-center rounded-full bg-cobalt text-paper"
+              className="grid size-6 place-items-center rounded-full bg-neon text-paper"
             >
               <Check className="size-3.5" strokeWidth={3} aria-hidden />
             </motion.span>

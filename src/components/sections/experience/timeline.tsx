@@ -12,7 +12,7 @@ export type TimelineEntryData = { company: string; role: string; period: string;
 
 export type TimelineLabels = { current: string; done: string };
 
-// Linha do tempo como um diário de missões: a linha cobalto se preenche conforme a rolagem
+// Linha do tempo como um diário de missões: a linha neon se preenche conforme a rolagem
 // e cada marco acende quando ela chega até ele. A linha só avança: o que já foi percorrido fica marcado.
 export function Timeline({ entries, labels }: { entries: TimelineEntryData[]; labels: TimelineLabels }) {
   const reduceMotion = useReducedMotion();
@@ -34,7 +34,7 @@ export function Timeline({ entries, labels }: { entries: TimelineEntryData[]; la
       <span aria-hidden className={`absolute top-5 bottom-0 left-[7px] w-px bg-rule ${axisFade}`} />
       <motion.span
         aria-hidden
-        className={`absolute top-5 bottom-0 left-[7px] w-px origin-top bg-cobalt ${axisFade}`}
+        className={`absolute top-5 bottom-0 left-[7px] w-px origin-top bg-neon ${axisFade}`}
         style={{ scaleY: reduceMotion ? 1 : travelled }}
       />
       {entries.map((entry) => (
@@ -59,13 +59,13 @@ function TimelineEntry({ entry, labels }: { entry: TimelineEntryData; labels: Ti
         <motion.span
           aria-hidden
           className={`absolute top-1/2 -left-10 grid size-[15px] -translate-y-1/2 place-items-center rounded-full border-2 transition-colors duration-500 ${
-            reached ? "border-cobalt bg-cobalt" : "border-rule bg-paper"
+            reached ? "border-neon bg-neon" : "border-rule bg-paper"
           }`}
           animate={reached && !reduceMotion && !skipEntrance ? { scale: [1, 1.45, 1] } : undefined}
           transition={{ duration: 0.5, ease: ease.out }}
         >
           {current && reached && (
-            <span className="milestone-ping absolute inset-0 rounded-full bg-cobalt opacity-50 motion-reduce:hidden" />
+            <span className="milestone-ping absolute inset-0 rounded-full bg-neon opacity-50 motion-reduce:hidden" />
           )}
         </motion.span>
 
@@ -75,7 +75,7 @@ function TimelineEntry({ entry, labels }: { entry: TimelineEntryData; labels: Ti
             {entry.period}
           </Extrude>
         </p>
-        <p className={`inline-flex items-center gap-1.5 text-[13px] font-semibold ${current ? "text-cobalt" : "text-graphite"}`}>
+        <p className={`inline-flex items-center gap-1.5 text-[13px] font-semibold ${current ? "text-neon" : "text-graphite"}`}>
           {!current && <Check className="size-3.5" strokeWidth={2.5} aria-hidden />}
           {current ? labels.current : labels.done}
         </p>

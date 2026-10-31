@@ -6,7 +6,7 @@ import { spring } from "@/lib/motion";
 import { anchor, type SectionId } from "@/lib/sections";
 
 // Menu das seções. Ao passar o mouse, as letras dão uma saltadinha em onda (CSS, ver .nav-hop),
-// e um ponto cobalto, o mesmo do fim do nome, desliza até o link. Sem mouse no menu,
+// e um ponto neon, o mesmo do fim do nome, desliza até o link. Sem mouse no menu,
 // o ponto pousa sob a seção que está na tela.
 export function SectionNav({ label, links }: { label: string; links: { id: SectionId; label: string }[] }) {
   const reduceMotion = useReducedMotion();
@@ -44,7 +44,7 @@ export function SectionNav({ label, links }: { label: string; links: { id: Secti
                 <motion.span
                   layoutId="nav-dot"
                   aria-hidden
-                  className="absolute -bottom-2.5 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-cobalt"
+                  className="absolute -bottom-2.5 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-neon"
                   transition={reduceMotion ? { duration: 0 } : spring.ui}
                 />
               )}
