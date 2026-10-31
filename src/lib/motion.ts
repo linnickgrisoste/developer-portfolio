@@ -55,13 +55,14 @@ export const reveal = {
  * - detalhe: cards, links, botões, números.
  * `amplitude` escala deslocamentos, giros e variação de fonte; `depth` é a lateral cobalto
  * quando engajado (em `em`, para acompanhar o tamanho do texto); `layers` é quantas camadas a formam.
+ * Camadas são cópias do texto no DOM: poucas bastam para a lateral parecer sólida, e cada uma a mais pesa.
  */
 export type Level = "signature" | "title" | "detail";
 
 export const levels = {
-  signature: { amplitude: 1, depth: 0.12, layers: 12 },
-  title: { amplitude: 0.55, depth: 0.07, layers: 6 },
-  detail: { amplitude: 0.3, depth: 0.04, layers: 4 },
+  signature: { amplitude: 1, depth: 0.12, layers: 8 },
+  title: { amplitude: 0.55, depth: 0.07, layers: 4 },
+  detail: { amplitude: 0.3, depth: 0.04, layers: 3 },
 } satisfies Record<Level, { amplitude: number; depth: number; layers: number }>;
 
 /** Cascatas: entre itens de uma lista, entre letras, e o teto da cascata inteira (segundos). */

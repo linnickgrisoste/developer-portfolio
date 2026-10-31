@@ -117,7 +117,9 @@ export function KineticText({
     return () => window.clearTimeout(timer);
   }, [playsOnLoad, inView, entranceMs, reducedMotion]);
 
-  // Proximidade: só enquanto engajado com mouse. Lê todas as posições, depois escreve todos os pesos.
+  // Proximidade: só enquanto engajado com mouse. Os centros das letras são medidos uma vez ao engajar
+  // (e de novo só se a página rolar ou mudar de tamanho); a cada quadro só se escrevem pesos. Medir a cada
+  // quadro, logo depois de mudar a largura das letras, obrigava o navegador a refazer o layout toda hora.
   useEffect(() => {
     const element = ref.current;
     if (!element || !proximity || !engaged || !finePointer || reducedMotion) return;
@@ -128,19 +130,29 @@ export function KineticText({
     const addWeight = NEAR_WEIGHT * amplitude;
     const addWidth = NEAR_WIDTH * amplitude;
 
-    const stop = subscribePointer(({ x, y }) => {
-      const pulls = letters.map((letter) => {
+    let centers: [number, number][] = [];
+    const measure = () => {
+      centers = letters.map((letter) => {
         const rect = letter.getBoundingClientRect();
-        const d = Math.hypot(rect.left + rect.width / 2 - x, rect.top + rect.height / 2 - y);
-        return Math.exp(-(d * d) / (2 * sigma * sigma));
+        return [rect.left + rect.width / 2, rect.top + rect.height / 2];
       });
+    };
+    measure();
+    window.addEventListener("scroll", measure, { passive: true });
+    window.addEventListener("resize", measure);
+
+    const stop = subscribePointer(({ x, y }) => {
       letters.forEach((letter, index) => {
-        const pull = pulls[index];
+        const [cx, cy] = centers[index];
+        const d2 = (cx - x) ** 2 + (cy - y) ** 2;
+        const pull = Math.exp(-d2 / (2 * sigma * sigma));
         letter.style.fontVariationSettings = `"wght" ${Math.min(weight + addWeight * pull, 900).toFixed(0)}, "wdth" ${Math.min(width + addWidth * pull, 125).toFixed(1)}`;
       });
     });
     return () => {
       stop();
+      window.removeEventListener("scroll", measure);
+      window.removeEventListener("resize", measure);
       letters.forEach((letter) => (letter.style.fontVariationSettings = ""));
     };
   }, [proximity, engaged, finePointer, reducedMotion, amplitude, weight, width]);
