@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, type RefObject } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { FontLoader, type Font } from "three/addons/loaders/FontLoader.js";
 import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
@@ -9,6 +9,7 @@ import type { MotionValue } from "motion/react";
 import { subscribePointer } from "@/components/motion/drivers/pointer";
 import { EM_PER_SIZE, FONT_EXTRUDED } from "../fonts";
 import { useSceneColors } from "../materials";
+import { screenRect } from "../screen-rect";
 import { Stage } from "../stage";
 import { World } from "../world";
 import type { HeroLayout } from "./layout";
@@ -49,6 +50,24 @@ const springStep = (value: number, velocity: number, target: number, k: number, 
   return [value + v * dt, v] as const;
 };
 const settled = (value: number, velocity: number, target = 0) => Math.abs(value - target) < 1e-3 && Math.abs(velocity) < 1e-3;
+
+/**
+ * Cursor de clique sobre uma peça da cena. Vai no elemento que recebe os eventos (a seção do hero), não no
+ * body: trocar o cursor do body invalida o estilo herdado da página inteira (~1300 elementos) a cada entrada
+ * e saída, e o próximo quadro pagava esse recálculo.
+ */
+function usePointerCursor() {
+  const get = useThree((state) => state.get);
+  const set = useCallback(
+    (on: boolean) => {
+      const target = get().events.connected as HTMLElement | undefined;
+      if (target) target.style.cursor = on ? "pointer" : "";
+    },
+    [get],
+  );
+  useEffect(() => () => set(false), [set]);
+  return set;
+}
 
 type Glyph = {
   key: string;
@@ -150,7 +169,7 @@ function Name({ layout, intro }: { layout: HeroLayout; intro: boolean }) {
   useEffect(() => () => glyphs.forEach((glyph) => glyph.geometry.dispose()), [glyphs]);
 
   return glyphs.map((glyph) => (
-    <Letter key={glyph.key} glyph={glyph} gravity={layout.fontSize * LETTER_GRAVITY_EM} intro={intro} ink={colors.ink} side={colors.cobalt} />
+    <Letter key={glyph.key} glyph={glyph} gravity={layout.fontSize * LETTER_GRAVITY_EM} intro={intro} ink={colors.ink} side={colors.neon} />
   ));
 }
 
@@ -172,6 +191,7 @@ function Letter({
   const ref = useRef<Mesh>(null);
   const invalidate = useThree((state) => state.invalidate);
   const hovered = useRef(false);
+  const setCursor = usePointerCursor();
   const delay = intro ? glyph.index * 0.07 + 0.05 : 0;
   const state = useRef({
     y: intro ? glyph.dropFrom : 0,
@@ -236,12 +256,12 @@ function Letter({
       onPointerOver={(event) => {
         event.stopPropagation();
         hovered.current = true;
-        document.body.style.cursor = "pointer";
+        setCursor(true);
         invalidate();
       }}
       onPointerOut={() => {
         hovered.current = false;
-        document.body.style.cursor = "";
+        setCursor(false);
         invalidate();
       }}
       onClick={(event) => {
@@ -250,9 +270,9 @@ function Letter({
         invalidate();
       }}
     >
-      {/* Frente (grupo 0) sem luz e sem tone mapping: a cor exata da tinta, como o impresso. Laterais (grupo 1) em cobalto:
+      {/* Frente (grupo 0) sem luz e sem tone mapping: a cor exata da tinta, como o impresso. Laterais (grupo 1) em neon:
           com a câmera ortográfica, todas as laterais ficam no mesmo ângulo e fora da luz principal, então
-          o próprio cobalto brilha um pouco (emissive) e a luz só acrescenta o sombreado. */}
+          o próprio neon brilha um pouco (emissive) e a luz só acrescenta o sombreado. */}
       <meshBasicMaterial attach="material-0" color={ink} toneMapped={false} />
       <meshStandardMaterial attach="material-1" color={side} emissive={side} emissiveIntensity={0.55} roughness={0.5} metalness={0} />
     </mesh>
@@ -280,6 +300,7 @@ function Dot({
   const ref = useRef<Mesh>(null);
   const material = useRef<MeshStandardMaterial>(null);
   const invalidate = useThree((state) => state.invalidate);
+  const setCursor = usePointerCursor();
   const radius = dot.size / 2;
   const home = { x: dot.x + radius - layout.width / 2, y: layout.height / 2 - dot.y - radius };
   // O lugar do ponto no nome muda se a janela mudar de tamanho; o quadro lê sempre o mais recente.
@@ -444,12 +465,8 @@ function Dot({
     <mesh
       ref={ref}
       visible={!intro}
-      onPointerOver={() => {
-        document.body.style.cursor = "pointer";
-      }}
-      onPointerOut={() => {
-        document.body.style.cursor = "";
-      }}
+      onPointerOver={() => setCursor(true)}
+      onPointerOut={() => setCursor(false)}
       onClick={(event) => {
         event.stopPropagation();
         controlRef.current?.pokeDot();
@@ -471,7 +488,7 @@ function Rig({ progress }: { progress: MotionValue<number> }) {
 
   useEffect(() => {
     const stopPointer = subscribePointer(({ x, y }) => {
-      const rect = canvas.getBoundingClientRect();
+      const rect = screenRect(canvas);
       const inside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
       target.current.yaw = inside ? (((x - rect.left) / rect.width) * 2 - 1) * YAW_MAX : 0;
       target.current.pitch = inside ? -(((y - rect.top) / rect.height) * 2 - 1) * PITCH_MAX : 0;

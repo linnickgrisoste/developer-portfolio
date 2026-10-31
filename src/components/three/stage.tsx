@@ -3,6 +3,7 @@
 import type { RefObject } from "react";
 import { Canvas, events, type CanvasProps } from "@react-three/fiber";
 import { useCapabilities } from "@/components/motion/drivers/capabilities";
+import { screenRect } from "./screen-rect";
 
 // O único jeito de pôr um <Canvas> no site. Cuida do que toda cena precisa:
 // - só é montado onde `useStageAllowed` (gate.ts) deixa;
@@ -34,13 +35,16 @@ export function Stage({ eventSource, active = true, onDemand = false, children, 
       dpr={[1, finePointer ? 2 : 1.5]}
       frameloop={!active ? "never" : onDemand ? "demand" : "always"}
       gl={{ antialias: true, alpha: true }}
+      // Só o tamanho importa: a posição na tela vem de `screenRect` (no `compute` abaixo). Acompanhar a
+      // rolagem fazia o R3F medir o canvas a cada evento de scroll da página.
+      resize={{ scroll: false }}
       style={eventSource ? { pointerEvents: "none" } : undefined}
       eventSource={eventSource as RefObject<HTMLElement>}
       events={(store) => ({
         ...events(store),
         // Os eventos podem chegar de outro elemento: a posição vem da tela (clientX/Y), descontado o canvas.
         compute(event, state) {
-          const rect = state.gl.domElement.getBoundingClientRect();
+          const rect = screenRect(state.gl.domElement);
           state.pointer.set(
             ((event.clientX - rect.left) / rect.width) * 2 - 1,
             -((event.clientY - rect.top) / rect.height) * 2 + 1,
