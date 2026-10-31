@@ -169,6 +169,12 @@ Regras:
 - Toda entrada acontece uma vez por visita: trocar de idioma não a repete (`useSkipEntrance`). Toda resposta ao cursor começa em menos de 100ms.
 - Propriedades animadas: `transform` e `opacity`. Cor e `clip-path` com moderação. Nunca `box-shadow`, `filter` ou `text-shadow`.
 
+Orçamento de desempenho (desempenho é a prioridade do projeto):
+- **Camadas da lateral cobalto:** 8 na assinatura, 4 no título, 3 no detalhe. Cada camada é uma cópia do texto no DOM.
+- **Nada contínuo e caro:** o que já se mexe sozinho (a faixa da stack) não ganha lateral cobalto; cenas 3D que ficam paradas desenham sob demanda.
+- **Nada de medir a cada quadro:** proximidade e afins medem posições ao engajar (e de novo só em rolagem ou redimensionamento), nunca dentro do laço de quadros.
+- **Teste de desempenho só em build de produção** (`npm run build && npm start`): o modo de desenvolvimento é muito mais pesado e engana.
+
 ### 6.6 Onde vive cada coisa
 
 | O quê | Onde | Por quê |
@@ -196,14 +202,17 @@ As variáveis `--depth`, `--dx` e `--dy` são registradas com `@property`: é o 
 - **`fonts`:** a Archivo convertida, servida de `public/three/`.
 - Toda cena é importada com `next/dynamic` (`ssr: false`) por quem a mostra. Verificado no build: nenhum script da carga inicial contém three.js.
 
-### 7.2 Hero 3D (progressivo)
+### 7.2 Hero 3D (boas-vindas no desktop)
 
-1. O servidor entrega o nome em CSS (texto cinético, entrada só em CSS desde a primeira pintura). É o que aparece primeiro (LCP), o que buscadores leem e a versão de quem não tem 3D.
-2. Em aparelho capaz, quando o navegador fica ocioso, o nome em CSS é **medido** (posição de cada letra, linha de base, ponto final) e a cena é baixada.
-3. **Câmera ortográfica:** de frente, a face das letras 3D é o mesmo desenho do CSS, no mesmo lugar e com a cor exata da tinta (material sem luz). A troca é um cruzamento de opacidade que não aparece. O volume só surge quando a câmera gira: é o "em repouso, impresso; ao interagir, objeto" em 3D de verdade.
-4. A câmera gira com o cursor sobre o hero (sozinha e devagar no toque) e sobe com o scroll, mostrando o topo das letras enquanto o nome some. As letras respiram como no CSS, inclinam com o cursor em cima e giram no clique. O render pausa fora da tela.
-5. **Ponto final:** o botão em DOM continua no lugar, invisível, e recebe o clique; solto, ele quica pela página como sempre (`LooseDot`) e a esfera 3D some até ele voltar. A conquista é a mesma nos dois modos. A esfera acompanha a cor do ponto em CSS, que muda devagar.
-6. Se o aparelho deixar de permitir o 3D (ex.: movimento reduzido ligado), o CSS volta na hora.
+No desktop capaz, o nome **é** a cena 3D: a entrada é a queda das letras com física. A entrada em CSS nunca aparece ali.
+
+1. **Decisão antes da primeira pintura:** um script mínimo no `<head>` (`hero-intro-script.ts`) testa mouse, WebGL 2, movimento reduzido e economia de dados, e marca `<html data-hero3d="pending">`. Com a marca, o CSS já pinta o nome em CSS oculto: ele só guarda o lugar, o texto para leitores de tela e buscadores, e o ponto que recebe o teclado.
+2. **Carga imediata, em paralelo:** a cena começa a baixar na montagem do hero (não espera o navegador ocioso), e a fonte das letras 3D é pré-carregada pelo `<head>` só nesses aparelhos (`preload` com `media`).
+3. **Encaixe exato:** o nome oculto é medido (posição de cada letra, linha de base, ponto final). As letras caem de cima do hero, quicam e assentam nesse lugar; o ponto cai por último, como o carimbo. Com a cena desenhada, a marca vira `"on"` e ela aparece.
+4. **Câmera ortográfica:** de frente, a face das letras é o desenho impresso (cor exata da tinta, sem luz); o volume aparece quando a câmera gira com o cursor ou sobe com a rolagem.
+5. **Ponto final com física 3D:** clicado, a esfera salta e quica pelo hero (gravidade, chão, paredes, teto); pega no ar, desbloqueia a conquista e volta voando. Parada ou depois de 9 s, volta sozinha. O ponto em DOM, invisível e sem mouse, encaminha o teclado para a cena (`setFullStopCommand`).
+6. **Fallback:** se a cena não desenhar em 5 s, a marca sai e o nome em CSS aparece. Celular, movimento reduzido e aparelhos sem WebGL ficam sempre com o CSS, que tem a própria entrada.
+7. **Desenho sob demanda:** a cena só desenha enquanto algo se mexe (queda, cursor, rolagem, ponto). Parada, não gasta a placa de vídeo. Por isso o nome em 3D não "respira" como o CSS.
 
 ### 7.3 Sala de troféus
 
