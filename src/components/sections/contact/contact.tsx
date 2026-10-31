@@ -55,17 +55,19 @@ export function Contact({ locale }: { locale: Locale }) {
         </RevealItem>
 
         <div className="mt-20 flex flex-col gap-10 border-t border-(--footer-fg)/15 pt-8 md:flex-row md:items-end md:justify-between">
+          {/* Os links do rodapé falam a mesma língua do resto, no nível detalhe: com o cursor (ou o foco),
+              as letras ganham peso e a lateral cobalto, discretas. */}
           <ul className="flex flex-wrap gap-x-8 gap-y-3 text-[15px]">
             {profile.socials.map((social) => (
               <li key={social.label}>
                 <a href={social.href} className="text-(--footer-fg)/70 transition-colors hover:text-(--footer-fg)">
-                  {social.label}
+                  <LinkLabel text={social.label} />
                 </a>
               </li>
             ))}
             <li>
               <a href={profile.resumeHref} className="text-(--footer-fg)/70 transition-colors hover:text-(--footer-fg)">
-                {text.resume[locale]}
+                <LinkLabel text={text.resume[locale]} />
               </a>
             </li>
           </ul>
@@ -73,7 +75,7 @@ export function Contact({ locale }: { locale: Locale }) {
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-(--footer-fg)/65">
             {/* A entrada principal da sala de troféus: o progresso do visitante vira a porta. */}
             <TrophyRoomLink className="group inline-flex items-center gap-2 transition-colors hover:text-(--footer-fg)">
-              {gameCopy.trophyRoom[locale]}
+              <LinkLabel text={gameCopy.trophyRoom[locale]} />
               <ProgressBadge />
               <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </TrophyRoomLink>
@@ -81,11 +83,16 @@ export function Contact({ locale }: { locale: Locale }) {
               © {year} {profile.firstName} {profile.lastName}. {copy.footer.rights[locale]}
             </p>
             <a href={anchor(sections.top)} className="transition-colors hover:text-(--footer-fg)">
-              {copy.footer.top[locale]}
+              <LinkLabel text={copy.footer.top[locale]} />
             </a>
           </div>
         </div>
       </RevealGroup>
     </footer>
   );
+}
+
+/** Rótulo de link do rodapé: texto cinético no nível detalhe, engajado pelo link inteiro, sem entrada própria. */
+function LinkLabel({ text }: { text: string }) {
+  return <KineticText text={text} level="detail" weight={500} extrude entrance={false} engageWith="a" />;
 }
