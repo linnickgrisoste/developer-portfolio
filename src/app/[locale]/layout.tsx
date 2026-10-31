@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Archivo, Silkscreen } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { HERO_INTRO_SCRIPT } from "@/components/sections/hero/hero-intro-script";
 import { copy } from "@/content/copy";
 import { htmlLang, isLocale, locales } from "@/lib/i18n";
 import "../globals.css";
@@ -61,6 +62,10 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
+      <head>
+        {/* Decide antes da primeira pintura se o nome do hero entra em 3D (ver hero-intro-script.ts). */}
+        <script dangerouslySetInnerHTML={{ __html: HERO_INTRO_SCRIPT }} />
+      </head>
       <body className="antialiased">
         <Providers locale={locale}>{children}</Providers>
       </body>

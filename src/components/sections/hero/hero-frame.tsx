@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { containerClass } from "@/components/layout/section";
+import { useCapabilities } from "@/components/motion/drivers/capabilities";
 import { KineticText } from "@/components/motion/kinetic-text";
 import { useSkipEntrance } from "@/components/motion/entrance";
 import { useStageAllowed } from "@/components/three/gate";
@@ -10,13 +11,15 @@ import { HERO_NAME_ID, sections } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import { FullStop } from "./full-stop";
 import { Hero3D } from "./hero-3d";
+import { useHeroIntro } from "./hero-intro";
 
 const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
 
-// A parte viva do hero. O nome nasce em CSS (texto cinético no nível assinatura): é o que aparece
-// primeiro, o que leitores de tela e buscadores leem, e a versão de quem não tem 3D. Em aparelho
-// capaz, a cena 3D é baixada quando o navegador fica ocioso e assume o lugar do CSS sem emenda
-// (ver hero-3d.tsx). O resto do hero (texto, links) chega pronto do servidor como `children`.
+// A parte viva do hero. No desktop capaz, o nome é a cena 3D: as letras caem e assentam como boas-vindas,
+// e o nome em CSS fica oculto desde a primeira pintura (decisão do script no <head>, ver hero-intro.ts),
+// só guardando o lugar, o texto para leitores de tela e o ponto que recebe o teclado. No celular, com
+// movimento reduzido ou sem WebGL, o nome em CSS é o hero, com a própria entrada.
+// O resto do hero (texto, links) chega pronto do servidor como `children`.
 export function HeroFrame({
   firstName,
   lastName,
@@ -30,11 +33,11 @@ export function HeroFrame({
   const reduceMotion = useReducedMotion() ?? false;
   // Logo depois de trocar de idioma, o texto de apoio e o ponto já estão no lugar (ver .no-intro).
   const skipEntrance = useSkipEntrance();
+  const intro = useHeroIntro();
   const stageAllowed = useStageAllowed();
-  const [sceneReady, setSceneReady] = useState(false);
-  const onSceneReady = useCallback(() => setSceneReady(true), []);
-  // Se o aparelho deixar de permitir o 3D (ex.: ligou movimento reduzido), o CSS volta na hora.
-  const in3d = stageAllowed && sceneReady;
+  const { finePointer } = useCapabilities();
+  const in3d = intro !== null;
+  const showScene = in3d && stageAllowed && finePointer;
 
   // Ao rolar, o nome é prensado (achata mais do que estreita) e some, enquanto o do cabeçalho aparece.
   // Em 3D, o mesmo progresso faz a câmera subir sobre as letras.
@@ -46,7 +49,7 @@ export function HeroFrame({
   const nameOpacity = useTransform(scrollYProgress, (progress) => 1 - clamp01((progress - 0.15) / 0.3));
 
   // As duas linhas do nome são um texto só: o sobrenome continua a cascata do nome (`offset`)
-  // e qualquer ponto do título engaja as duas. Com o 3D por cima, o CSS só guarda o lugar.
+  // e qualquer ponto do título engaja as duas. Com o 3D no lugar, o CSS só guarda o lugar (sem camadas).
   const name = {
     level: "signature",
     weight: 800,
@@ -60,21 +63,14 @@ export function HeroFrame({
     <section
       id={sections.top}
       ref={containerRef}
-      data-hero-3d={in3d ? "" : undefined}
       className={cn(
         containerClass,
         "relative flex flex-col justify-between gap-12 overflow-x-clip pt-16 pb-12 md:min-h-[calc(100svh-4rem)] md:gap-16 md:pt-[12vh]",
         skipEntrance && "no-intro",
       )}
     >
-      {stageAllowed && (
-        <Hero3D
-          sectionRef={containerRef}
-          progress={scrollYProgress}
-          opacity={nameOpacity}
-          ready={in3d}
-          onReady={onSceneReady}
-        />
+      {showScene && (
+        <Hero3D sectionRef={containerRef} progress={scrollYProgress} opacity={nameOpacity} intro={!skipEntrance} />
       )}
 
       <motion.h1

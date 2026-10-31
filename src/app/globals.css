@@ -134,29 +134,39 @@
 }
 
 /*
- * Hero em 3D: a cena e o nome em CSS trocam de lugar num cruzamento de opacidade. De frente, as letras
- * 3D são o mesmo desenho do CSS, então a troca não aparece; o volume surge quando a câmera gira.
- * O ponto em DOM continua no lugar, invisível: é ele que recebe o clique e se solta pela página.
+ * Hero em 3D (desktop capaz): o atributo data-hero3d no <html> é posto por um script no <head>, antes
+ * da primeira pintura. Com ele, o nome em CSS nunca aparece: fica oculto, guardando o lugar e o texto,
+ * e as letras 3D caem como boas-vindas. A cena só aparece quando desenhou ("on"). Se ela não chegar
+ * a tempo, o atributo sai e o nome em CSS aparece com a própria entrada.
  */
-.hero-3d {
-  opacity: 0;
-  transition: opacity 600ms var(--ease-brand);
-}
-.hero-3d[data-ready] {
-  opacity: 1;
-}
-.hero-print,
-.hero-name .full-stop-dot {
-  transition:
-    opacity 600ms var(--ease-brand),
-    scale 200ms;
-}
-[data-hero-3d] .hero-print {
+html[data-hero3d] .hero-print {
   opacity: 0;
 }
-/* !important vence o estilo inline do ponto (ele some enquanto está solto) e as animações de entrada. */
-[data-hero-3d] .hero-name .full-stop-dot {
+/* !important vence o estilo inline do ponto e as animações de entrada (o carimbo). */
+html[data-hero3d] .hero-name .full-stop-dot {
   opacity: 0 !important;
+}
+/* O mouse passa direto para a cena (a esfera); o ponto em DOM fica só para o foco e o Enter do teclado. */
+html[data-hero3d="on"] .hero-name .full-stop-dot {
+  pointer-events: none;
+}
+.hero-3d {
+  visibility: hidden;
+}
+html[data-hero3d="on"] .hero-3d {
+  visibility: visible;
+}
+/* Quem liga movimento reduzido no meio da visita volta para o nome em CSS, que respeita a preferência. */
+@media (prefers-reduced-motion: reduce) {
+  html[data-hero3d] .hero-print {
+    opacity: 1;
+  }
+  html[data-hero3d] .hero-name .full-stop-dot {
+    opacity: 1 !important;
+  }
+  .hero-3d {
+    display: none;
+  }
 }
 
 /*

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { animate, useReducedMotion } from "motion/react";
 import { useLocale } from "@/components/providers";
@@ -18,22 +18,13 @@ const ROLLING_FRICTION = 3; // quanto o rolar no chão freia por segundo
 const REST_BEFORE_RETURN_MS = 1500; // parado no chão por esse tempo, ele volta para casa
 const MAX_LOOSE_MS = 9000; // limite total solto, mesmo se ainda estiver quicando
 
-// Se o ponto está solto pela página. O nome em 3D lê para esconder a esfera dele enquanto isso.
-let looseNow = false;
-const looseListeners = new Set<() => void>();
+// Com o nome em 3D, o ponto de verdade é a esfera da cena. Este botão continua no lugar (invisível),
+// porque é ele que recebe o foco e o Enter do teclado: com um comando registrado, ele encaminha para a cena.
+let command3d: (() => void) | null = null;
 
-function subscribeLoose(listener: () => void) {
-  looseListeners.add(listener);
-  return () => looseListeners.delete(listener);
-}
-
-function publishLoose(value: boolean) {
-  looseNow = value;
-  looseListeners.forEach((listener) => listener());
-}
-
-export function useFullStopLoose() {
-  return useSyncExternalStore(subscribeLoose, () => looseNow, () => false);
+/** O hero em 3D registra aqui o comando do ponto (soltar ou, se já está solto, pegar). `null` desfaz. */
+export function setFullStopCommand(command: (() => void) | null) {
+  command3d = command;
 }
 
 /** De onde o ponto saiu: o botão no nome (para onde ele volta), a posição, o tamanho e a cor. */
@@ -45,6 +36,10 @@ export function FullStop() {
   const [origin, setOrigin] = useState<Origin | null>(null);
 
   const release = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (command3d) {
+      command3d();
+      return;
+    }
     if (origin) return; // já está solto
     // Com movimento reduzido não há perseguição: encontrar o segredo já basta.
     if (reduceMotion) {
@@ -61,10 +56,6 @@ export function FullStop() {
   const returnHome = useCallback(() => setOrigin(null), []);
 
   const loose = origin !== null;
-
-  useEffect(() => {
-    publishLoose(loose);
-  }, [loose]);
 
   return (
     <>
