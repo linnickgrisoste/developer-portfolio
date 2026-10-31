@@ -7,7 +7,7 @@ import { useCapabilities } from "@/components/motion/drivers/capabilities";
 // O único jeito de pôr um <Canvas> no site. Cuida do que toda cena precisa:
 // - só é montado onde `useStageAllowed` (gate.ts) deixa;
 // - resolução limitada (2× com mouse, 1,5× no toque);
-// - render pausado fora da tela (`active`);
+// - render pausado fora da tela (`active`) e, em cenas que ficam paradas, só quando algo pede (`onDemand`);
 // - eventos vindos do próprio canvas ou de outro elemento (`eventSource`), sempre medidos contra o canvas.
 
 type StageProps = Pick<CanvasProps, "camera" | "orthographic" | "className" | "children" | "onPointerMissed"> & {
@@ -16,18 +16,23 @@ type StageProps = Pick<CanvasProps, "camera" | "orthographic" | "className" | "c
    * Sem ele, o próprio canvas recebe o mouse (cenas que ocupam a tela, como a sala de troféus).
    */
   eventSource?: RefObject<HTMLElement | null>;
+  /**
+   * Desenha só quando a cena pede (`invalidate()`), em vez de 60 vezes por segundo. Para cenas que passam a
+   * maior parte do tempo paradas, como o hero: parado, não gasta nada da placa de vídeo.
+   */
+  onDemand?: boolean;
   /** Falso pausa o render (ex.: a cena saiu da tela). */
   active?: boolean;
 };
 
-export function Stage({ eventSource, active = true, children, ...props }: StageProps) {
+export function Stage({ eventSource, active = true, onDemand = false, children, ...props }: StageProps) {
   const { finePointer } = useCapabilities();
 
   return (
     <Canvas
       {...props}
       dpr={[1, finePointer ? 2 : 1.5]}
-      frameloop={active ? "always" : "never"}
+      frameloop={!active ? "never" : onDemand ? "demand" : "always"}
       gl={{ antialias: true, alpha: true }}
       style={eventSource ? { pointerEvents: "none" } : undefined}
       eventSource={eventSource as RefObject<HTMLElement>}
