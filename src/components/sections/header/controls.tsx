@@ -21,7 +21,7 @@ export function LocaleToggle({ label }: { label: string }) {
         toggleLocale();
         unlock("polyglot");
       }}
-      aria-label={label}
+      // O nome acessível começa pelo texto visível ("PT EN"): quem usa comando de voz diz o que vê.
       className="flex h-9 items-center rounded-full px-1.5 text-[13px] font-semibold tabular-nums transition-colors hover:bg-muted"
     >
       {locales.map((code) => {
@@ -36,10 +36,11 @@ export function LocaleToggle({ label }: { label: string }) {
                 transition={reduceMotion ? { duration: 0 } : spring.ui}
               />
             )}
-            <span className={`relative ${current ? "text-ink" : "text-graphite/60"}`}>{code.toUpperCase()}</span>
+            <span className={`relative ${current ? "text-ink" : "text-graphite"}`}>{code.toUpperCase()}</span>
           </span>
         );
       })}
+      <span className="sr-only">{label}</span>
     </button>
   );
 }

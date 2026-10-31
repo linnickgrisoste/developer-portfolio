@@ -35,7 +35,7 @@ export function ExplorerHud() {
   return (
     <Popover>
       <PopoverTrigger
-        aria-label={t(gameCopy.hudLabel)}
+        // Sem aria-label: o nome acessível é o que está visível ("Nv1 0/8") seguido da ação, em texto só para leitores de tela.
         className="group flex h-9 items-center gap-2.5 rounded-full px-3 transition-colors hover:bg-muted data-[state=open]:bg-muted"
       >
         <motion.span
@@ -52,6 +52,7 @@ export function ExplorerHud() {
         <span className="hidden text-[13px] tabular-nums text-graphite sm:inline">
           {count}/{achievements.length}
         </span>
+        <span className="sr-only">{t(gameCopy.hudLabel)}</span>
       </PopoverTrigger>
 
       <PopoverContent align="end" sideOffset={10} className="w-[min(24rem,calc(100vw-2rem))] gap-0 p-0">

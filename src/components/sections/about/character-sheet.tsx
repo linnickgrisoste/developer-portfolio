@@ -84,44 +84,41 @@ export function CharacterSheet({ classes, labels }: { classes: CharacterClass[];
         })}
       </div>
 
-      <ul
-        id="class-panel"
-        role="tabpanel"
-        aria-labelledby={`class-tab-${selected}`}
-        className="mt-6 divide-y divide-rule border-y border-rule"
-      >
-        {current.items.map((item, row) => (
-          <li key={`${current.id}-${item.name}`} className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-2 py-4 sm:grid-cols-[12rem_1fr_auto]">
-            <span className="text-lg">{item.name}</span>
-            <span
-              className="col-span-2 flex gap-1 sm:col-span-1"
-              role="meter"
-              aria-valuemin={0}
-              aria-valuemax={MAX_LEVEL}
-              aria-valuenow={item.level}
-              aria-label={`${item.name}: ${labels.level} ${item.level}/${MAX_LEVEL}`}
-            >
-              {Array.from({ length: MAX_LEVEL }, (_, segment) => {
-                // Só os segmentos preenchidos crescem: o movimento conta o nível.
-                // Eles esperam a ficha entrar na tela, senão a animação roda sem ninguém ver.
-                const filled = segment < item.level;
-                return (
-                  <motion.span
-                    key={segment}
-                    className={`h-2.5 flex-1 origin-bottom rounded-[2px] ${filled ? "bg-cobalt" : "bg-rule"}`}
-                    initial={reduceMotion || skipEntrance || !filled ? false : { opacity: 0, scaleY: 0.2 }}
-                    animate={inView ? { opacity: 1, scaleY: 1 } : undefined}
-                    transition={{ ...spring.ui, delay: row * 0.06 + segment * 0.035 }}
-                  />
-                );
-              })}
-            </span>
-            <span className="font-pixel row-start-1 text-right text-[12px] text-graphite sm:col-start-3">
-              {labels.level} {item.level}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div id="class-panel" role="tabpanel" aria-labelledby={`class-tab-${selected}`}>
+        <ul className="mt-6 divide-y divide-rule border-y border-rule">
+          {current.items.map((item, row) => (
+            <li key={`${current.id}-${item.name}`} className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-2 py-4 sm:grid-cols-[12rem_1fr_auto]">
+              <span className="text-lg">{item.name}</span>
+              <span
+                className="col-span-2 flex gap-1 sm:col-span-1"
+                role="meter"
+                aria-valuemin={0}
+                aria-valuemax={MAX_LEVEL}
+                aria-valuenow={item.level}
+                aria-label={`${item.name}: ${labels.level} ${item.level}/${MAX_LEVEL}`}
+              >
+                {Array.from({ length: MAX_LEVEL }, (_, segment) => {
+                  // Só os segmentos preenchidos crescem: o movimento conta o nível.
+                  // Eles esperam a ficha entrar na tela, senão a animação roda sem ninguém ver.
+                  const filled = segment < item.level;
+                  return (
+                    <motion.span
+                      key={segment}
+                      className={`h-2.5 flex-1 origin-bottom rounded-[2px] ${filled ? "bg-cobalt" : "bg-rule"}`}
+                      initial={reduceMotion || skipEntrance || !filled ? false : { opacity: 0, scaleY: 0.2 }}
+                      animate={inView ? { opacity: 1, scaleY: 1 } : undefined}
+                      transition={{ ...spring.ui, delay: row * 0.06 + segment * 0.035 }}
+                    />
+                  );
+                })}
+              </span>
+              <span className="font-pixel row-start-1 text-right text-[12px] text-graphite sm:col-start-3">
+                {labels.level} {item.level}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

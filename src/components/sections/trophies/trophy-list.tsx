@@ -41,7 +41,7 @@ export function TrophyList({ cards, labels, className }: { cards: TrophyCard[]; 
               <span className="mt-1 block text-[13px] leading-snug text-night-fg/60">
                 {hidden && card.hint ? card.hint : card.description}
               </span>
-              <span className="mt-2 flex items-center gap-1.5 text-[12px] text-night-fg/50">
+              <span className="mt-2 flex items-center gap-1.5 text-[12px] text-night-fg/65">
                 {card.unlocked ? <Check className="size-3.5 shrink-0 text-cobalt" aria-hidden /> : null}
                 {card.unlocked ? labels.done : labels.locked}
                 {card.date && ` · ${card.date}`}

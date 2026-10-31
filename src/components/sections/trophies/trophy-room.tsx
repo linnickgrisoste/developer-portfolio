@@ -148,7 +148,7 @@ export function TrophyRoom({ entries, labels }: { entries: TrophyEntry[]; labels
       </div>
 
       {in3d && (
-        <p className={cn(containerClass, "w-full pt-2 pb-6 text-center text-[13px] text-night-fg/50")}>
+        <p className={cn(containerClass, "w-full pt-2 pb-6 text-center text-[13px] text-night-fg/65")}>
           {finePointer ? labels.hint : labels.hintTouch}
         </p>
       )}

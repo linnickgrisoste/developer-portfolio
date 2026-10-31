@@ -70,7 +70,7 @@ export function Contact({ locale }: { locale: Locale }) {
             </li>
           </ul>
 
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-(--footer-fg)/50">
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-(--footer-fg)/65">
             {/* A entrada principal da sala de troféus: o progresso do visitante vira a porta. */}
             <TrophyRoomLink className="group inline-flex items-center gap-2 transition-colors hover:text-(--footer-fg)">
               {gameCopy.trophyRoom[locale]}
