@@ -35,7 +35,7 @@ const easeOutBack = (t: number) => 1 + 2.2 * (t - 1) ** 3 + 1.2 * (t - 1) ** 2;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
 export type TrophyItem = { id: TrophyId; label: string; unlocked: boolean; placement: "shelf" | "center" };
 
-type Slot = { item: TrophyItem; index: number; x: number; y: number; scale: number };
+type Slot = { item: TrophyItem; index: number; x: number; y: number; scale: number; labelSize: number };
 
 type TrophySceneProps = {
   items: TrophyItem[];
@@ -65,20 +65,23 @@ export default function TrophyScene({ onDismiss, onReady, crownParty, reduceMoti
 function layoutShelf(items: TrophyItem[], aspect: number) {
   const shelf = items.filter((item) => item.placement === "shelf");
   const center = items.find((item) => item.placement === "center");
-  const columns = aspect < 0.9 ? 2 : 4;
+  const columns = aspect < 0.9 ? 3 : 4;
   const rows = Math.ceil(shelf.length / columns);
   const centered = Boolean(center) && columns === 4;
   const height = (rows + (center && !centered ? CENTER_SCALE : 0)) * SPACING;
   const top = height / 2 - SPACING / 2;
+  const labelSize = columns === 4 ? 0.13 : 0.19;
 
   const slots: Slot[] = shelf.map((item, index) => {
+    const row = Math.floor(index / columns);
     const column = index % columns;
-    const x = centered ? (column < 2 ? column - 2 : column - 1) : column - (columns - 1) / 2;
-    return { item, index, x: x * SPACING, y: top - Math.floor(index / columns) * SPACING, scale: 1 };
+    const inRow = Math.min(columns, shelf.length - row * columns);
+    const x = centered ? (column < 2 ? column - 2 : column - 1) : column - (inRow - 1) / 2;
+    return { item, index, x: x * SPACING, y: top - row * SPACING, scale: 1, labelSize };
   });
   if (center) {
     const y = centered ? CENTER_Y : top - (rows - 1 + CENTER_ROW_GAP) * SPACING;
-    slots.push({ item: center, index: shelf.length, x: 0, y, scale: CENTER_SCALE });
+    slots.push({ item: center, index: shelf.length, x: 0, y, scale: CENTER_SCALE, labelSize });
   }
 
   const halfHeight = height / 2 + 0.9;
@@ -248,7 +251,7 @@ function Trophy({
       <Text
         font={FONT_LABEL}
         position={[0, -1.12, 0.3]}
-        fontSize={0.13}
+        fontSize={slot.labelSize}
         anchorX="center"
         anchorY="middle"
         color={hovered ? (unlocked ? style.glow : palette.dark.reward) : palette.dark.ink}
