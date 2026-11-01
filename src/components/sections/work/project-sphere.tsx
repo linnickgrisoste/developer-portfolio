@@ -4,6 +4,7 @@ import { useCallback, useMemo } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { markProjectSeen } from "@/components/game/store";
 import { useDarkTheme, useThemeColors } from "@/components/motion/drivers/theme";
+import { useSkipEntrance } from "@/components/motion/entrance";
 import InfiniteMenu, { type InfiniteMenuItem } from "@/components/vendor/bits/InfiniteMenu";
 import { stagger } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -18,9 +19,12 @@ const SIDE_PANELS = "@max-[760px]:hidden";
 const pad2 = (value: number) => String(value).padStart(2, "0");
 const hasPage = (project: ProjectCard) => project.href !== "#";
 
+let lastIndex = 0;
+
 export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels: SphereLabels }) {
   const theme = useDarkTheme() ? "dark" : "light";
   const { neon } = useThemeColors();
+  const skipEntrance = useSkipEntrance();
   const menuItems = useMemo<InfiniteMenuItem[]>(
     () => items.map((project) => ({ image: project.image, title: project.title, description: project.summary, link: hasPage(project) ? project.href : (project.stores?.android ?? project.stores?.ios) })),
     [items],
@@ -28,6 +32,7 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
 
   const onActiveChange = useCallback(
     (_: InfiniteMenuItem, index: number, byUser: boolean) => {
+      lastIndex = index;
       if (byUser) markProjectSeen(items[index].title);
     },
     [items],
@@ -56,7 +61,15 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
 
   return (
     <div className="mt-12 h-[min(46rem,88svh)] min-h-[34rem]">
-      <InfiniteMenu items={menuItems} theme={theme} accentColor={neon} renderInfo={renderInfo} onActiveChange={onActiveChange} />
+      <InfiniteMenu
+        items={menuItems}
+        theme={theme}
+        accentColor={neon}
+        intro={!skipEntrance}
+        initialIndex={lastIndex}
+        renderInfo={renderInfo}
+        onActiveChange={onActiveChange}
+      />
     </div>
   );
 }

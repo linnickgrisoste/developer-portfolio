@@ -24,6 +24,7 @@ export interface InfiniteMenuProps {
   grayscale?: boolean;
   dim?: number;
   intro?: boolean;
+  initialIndex?: number;
   showInfo?: boolean;
   renderInfo?: (item: InfiniteMenuItem, index: number, moving: boolean) => React.ReactNode;
   theme?: 'dark' | 'light';
@@ -36,6 +37,8 @@ export interface InfiniteMenuProps {
 }
 
 type Engine = { loadItems: (list: InfiniteMenuItem[]) => void; wake: () => void };
+
+let atlasCache: { key: string; canvas: HTMLCanvasElement; cells: number; cell: number } | null = null;
 
 const VERTEX = `#version 300 es
 in vec2 aCorner;
@@ -221,6 +224,7 @@ const InfiniteMenu = ({
   grayscale = true,
   dim = 0.5,
   intro = true,
+  initialIndex = 0,
   showInfo = true,
   renderInfo,
   theme = 'dark',
@@ -234,8 +238,9 @@ const InfiniteMenu = ({
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | null>(null);
-  const [active, setActive] = useState(0);
-  const [moving, setMoving] = useState(true);
+  const [active, setActive] = useState(() => Math.max(0, Math.min(initialIndex, items.length - 1)));
+  const [moving, setMoving] = useState(intro);
+  const initialIndexRef = useRef(active);
   const [layout, setLayout] = useState('side');
   const settings = {
     count: clamp(Math.round(count), 6, 400),
@@ -356,12 +361,12 @@ const InfiniteMenu = ({
       target: -1,
       front: 0,
       shown: -1,
+      byUser: false,
       moving: true,
       reveal: 0,
       hovered: false,
       focused: false,
       idle: 0,
-      byUser: false,
       settle: 0,
       tilePx: 0,
       layout: 'side',
@@ -402,16 +407,26 @@ const InfiniteMenu = ({
       state.tiles.forEach((tile, i) => data.set([tile[0], tile[1], tile[2], state.assign[i]], i * 4));
       gl.bindBuffer(gl.ARRAY_BUFFER, tileBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+      const wanted = initialIndexRef.current < items ? initialIndexRef.current : 0;
       let first = -1;
       let firstZ = -2;
       state.tiles.forEach((tile, i) => {
         const z = rotate(state.orientation, tile)[2];
-        if (state.assign[i] === 0 && z > firstZ) {
+        if (state.assign[i] === wanted && z > firstZ) {
           firstZ = z;
           first = i;
         }
       });
       state.target = first;
+      if (!s.intro && first >= 0) {
+        const current = rotate(state.orientation, state.tiles[first]);
+        const axis = cross(current, FRONT);
+        const angle = Math.acos(clamp(dot(current, FRONT), -1, 1));
+        if (Math.hypot(axis[0], axis[1], axis[2]) > 1e-6) {
+          state.orientation = quatNormalize(quatMultiply(quatAxisAngle(normalize(axis), angle), state.orientation));
+        }
+        state.front = first;
+      }
     };
 
     const uploadAtlas = () => {
@@ -424,17 +439,29 @@ const InfiniteMenu = ({
 
     const loadItems = (list: InfiniteMenuItem[]) => {
       const request = ++atlas.request;
+      const key = list.map(item => item.image).join('\n');
+      state.count = 0;
+      if (atlasCache?.key === key) {
+        atlas.canvas = atlasCache.canvas;
+        atlas.cells = atlasCache.cells;
+        atlas.cell = atlasCache.cell;
+        uploadAtlas();
+        layout();
+        state.started = true;
+        wake();
+        return;
+      }
+      atlas.canvas = document.createElement('canvas');
       const total = Math.max(1, list.length);
       atlas.cells = Math.ceil(Math.sqrt(total));
       atlas.cell = clamp(Math.floor(4096 / atlas.cells), 64, 512);
       atlas.canvas.width = atlas.cells * atlas.cell;
       atlas.canvas.height = atlas.cells * atlas.cell;
       const ctx = atlas.canvas.getContext('2d');
-      ctx?.clearRect(0, 0, atlas.canvas.width, atlas.canvas.height);
       uploadAtlas();
-      state.count = 0;
       layout();
       let pending = list.length;
+      let failed = false;
       if (!pending) state.started = true;
       list.forEach((item, index) => {
         const image = new Image();
@@ -442,7 +469,10 @@ const InfiniteMenu = ({
         image.decoding = 'async';
         const done = () => {
           pending -= 1;
-          if (pending <= 0) state.started = true;
+          if (pending <= 0) {
+            state.started = true;
+            if (!failed) atlasCache = { key, canvas: atlas.canvas, cells: atlas.cells, cell: atlas.cell };
+          }
           wake();
         };
         image.onload = () => {
@@ -464,6 +494,7 @@ const InfiniteMenu = ({
         };
         image.onerror = () => {
           if (!alive || request !== atlas.request) return;
+          failed = true;
           done();
         };
         image.src = item?.image ?? '';
@@ -592,7 +623,7 @@ const InfiniteMenu = ({
       last = now;
       layout();
       if (atlas.dirty) uploadAtlas();
-      if (state.started) state.reveal = Math.min(1, state.reveal + dt / (reduce ? 0.01 : 0.7));
+      if (state.started) state.reveal = Math.min(1, state.reveal + dt / (reduce || !s.intro ? 0.01 : 0.7));
       const minSide = Math.min(state.width, state.height);
 
       if (drag.active) {
@@ -646,13 +677,14 @@ const InfiniteMenu = ({
       const rest = restDistance();
       const pullAmount = clamp(drag.active ? 1 : state.speed / 2.2, 0, 1);
       const target = rest + s.pullBack * pullAmount * RADIUS * 1.25 + (1 - state.reveal) * RADIUS * 1.5;
-      if (!state.camera) state.camera = target + RADIUS;
+      if (!state.camera) state.camera = s.intro ? target + RADIUS : target;
       state.camera += (target - state.camera) * (1 - Math.exp(-dt * 4.5));
 
       if (s.autoplay > 0 && !moving && !state.hovered && !state.focused && !reduce) {
         state.idle += dt;
         if (state.idle >= s.autoplay) {
           state.idle = 0;
+          state.byUser = false;
           goTo(neighbor(state.front, [1, 0]));
         }
       } else {
@@ -684,7 +716,6 @@ const InfiniteMenu = ({
 
     const render = () => {
       const s = settingsRef.current;
-          state.byUser = false;
       const aspect = state.width / state.height;
       const f = 1 / Math.tan(FOV / 2);
       const near = 0.05;
@@ -779,12 +810,22 @@ const InfiniteMenu = ({
     const onPointerUp = (event: PointerEvent) => {
       if (!drag.active || event.pointerId !== drag.id) return;
       drag.active = false;
+      state.byUser = true;
       canvas.releasePointerCapture?.(event.pointerId);
       if (drag.moved < 6 && performance.now() - drag.start < 450) {
         const index = pick(event.clientX, event.clientY);
         if (index >= 0 && index === state.front) activate(index);
         else if (index >= 0) goTo(index);
       }
+      wake();
+    };
+
+    const onPointerCancel = (event: PointerEvent) => {
+      if (!drag.active || event.pointerId !== drag.id) return;
+      drag.active = false;
+      drag.dx = 0;
+      drag.dy = 0;
+      state.speed = 0;
       wake();
     };
 
@@ -797,6 +838,7 @@ const InfiniteMenu = ({
       };
       if (directions[event.key]) {
         event.preventDefault();
+        state.byUser = true;
         goTo(neighbor(state.target >= 0 ? state.target : state.front, directions[event.key]));
       } else if (event.key === 'Enter' && event.target === root) {
         event.preventDefault();
@@ -810,7 +852,6 @@ const InfiniteMenu = ({
     const onLeave = () => {
       state.hovered = false;
       wake();
-      state.byUser = true;
     };
     const onFocusIn = () => {
       state.focused = true;
@@ -823,22 +864,12 @@ const InfiniteMenu = ({
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const onPointerCancel = (event: PointerEvent) => {
-      if (!drag.active || event.pointerId !== drag.id) return;
-      drag.active = false;
-      drag.dx = 0;
-      drag.dy = 0;
-      state.speed = 0;
-      wake();
-    };
-
       state.width = Math.max(1, root.clientWidth);
       state.height = Math.max(1, root.clientHeight);
       canvas.width = Math.round(state.width * dpr);
       canvas.height = Math.round(state.height * dpr);
       if (!raf) render();
       wake();
-        state.byUser = true;
     };
 
     engineRef.current = { loadItems, wake };

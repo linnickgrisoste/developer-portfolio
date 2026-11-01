@@ -1,17 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import { useCapabilities } from "@/components/motion/drivers/capabilities";
 import { useLocale } from "@/components/providers";
 import { unlock } from "@/components/game/store";
-import { htmlLang, localeNames, locales } from "@/lib/i18n";
+import { htmlLang, localeNames, locales, type Locale } from "@/lib/i18n";
 import { spring } from "@/lib/motion";
+
+function useLocalePrefetch(locale: Locale) {
+  const router = useRouter();
+  const { saveData } = useCapabilities();
+  const prefetch = useCallback((code: Locale) => router.prefetch(`/${code}`), [router]);
+
+  useEffect(() => {
+    if (saveData) return;
+    const run = () => locales.filter((code) => code !== locale).forEach(prefetch);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(run, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(run, 2000);
+    return () => window.clearTimeout(id);
+  }, [locale, prefetch, saveData]);
+
+  return prefetch;
+}
 
 export function LocaleToggle({ label }: { label: string }) {
   const { locale, setLocale } = useLocale();
   const reduceMotion = useReducedMotion();
+  const prefetch = useLocalePrefetch(locale);
 
   return (
     <div role="group" aria-label={label} className="flex h-9 items-center px-0.5 text-[13px] font-semibold tabular-nums">
@@ -22,6 +44,9 @@ export function LocaleToggle({ label }: { label: string }) {
             key={code}
             type="button"
             aria-pressed={current}
+            onPointerEnter={current ? undefined : () => prefetch(code)}
+            onPointerDown={current ? undefined : () => prefetch(code)}
+            onFocus={current ? undefined : () => prefetch(code)}
             onClick={() => {
               if (current) return;
               setLocale(code);
