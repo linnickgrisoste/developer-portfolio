@@ -26,6 +26,7 @@ export function WorkIndex({ locale }: { locale: Locale }) {
         labels={{
           open: text.sphere.open[locale],
           drag: text.sphere.drag[locale],
+          swipe: text.sphere.swipe[locale],
           stores: { android: text.sphere.android[locale], ios: text.sphere.ios[locale] },
         }}
       />

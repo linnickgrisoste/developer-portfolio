@@ -48,6 +48,11 @@ export const copy = {
         en: "Drag to spin the sphere · click a tile to bring it forward",
         es: "Arrastra para girar la esfera · haz clic en una pieza para traerla al frente",
       },
+      swipe: {
+        pt: "Deslize para os lados para ver outros projetos",
+        en: "Swipe sideways to see more projects",
+        es: "Desliza hacia los lados para ver más proyectos",
+      },
     },
     lede: {
       pt: "Experiências e soluções digitais em diferentes setores, construídas para resolver problemas reais.",

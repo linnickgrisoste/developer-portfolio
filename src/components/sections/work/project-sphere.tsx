@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { markProjectSeen } from "@/components/game/store";
+import { useCapabilities } from "@/components/motion/drivers/capabilities";
 import { useDarkTheme, useThemeColors } from "@/components/motion/drivers/theme";
 import { useSkipEntrance } from "@/components/motion/entrance";
 import InfiniteMenu, { type InfiniteMenuItem } from "@/components/vendor/bits/InfiniteMenu";
@@ -11,7 +12,7 @@ import { cn } from "@/lib/utils";
 import type { ProjectCard } from "./project-card";
 import { StoreBadges, type StoreLabels } from "./store-badges";
 
-export type SphereLabels = { open: string; drag: string; stores: StoreLabels };
+export type SphereLabels = { open: string; drag: string; swipe: string; stores: StoreLabels };
 
 type PanelProps = { project: ProjectCard; index: number; total: number; moving: boolean; labels: SphereLabels };
 
@@ -19,12 +20,25 @@ const SIDE_PANELS = "@max-[760px]:hidden";
 const pad2 = (value: number) => String(value).padStart(2, "0");
 const hasPage = (project: ProjectCard) => project.href !== "#";
 
+const NARROW = "(max-width: 639px)";
+const NARROW_ZOOM = 1.15;
+
+function subscribeNarrow(listener: () => void) {
+  const query = window.matchMedia(NARROW);
+  query.addEventListener("change", listener);
+  return () => query.removeEventListener("change", listener);
+}
+const isNarrow = () => window.matchMedia(NARROW).matches;
+const notNarrowOnServer = () => false;
+
 let lastIndex = 0;
 
 export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels: SphereLabels }) {
   const theme = useDarkTheme() ? "dark" : "light";
   const { neon } = useThemeColors();
   const skipEntrance = useSkipEntrance();
+  const { finePointer } = useCapabilities();
+  const narrow = useSyncExternalStore(subscribeNarrow, isNarrow, notNarrowOnServer);
   const menuItems = useMemo<InfiniteMenuItem[]>(
     () => items.map((project) => ({ image: project.image, title: project.title, description: project.summary, link: hasPage(project) ? project.href : (project.stores?.android ?? project.stores?.ios) })),
     [items],
@@ -51,12 +65,12 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
                 <li key={project.title} className={cn("h-1 rounded-full transition-all duration-300", i === index ? "w-6 bg-neon" : "w-2 bg-rule")} />
               ))}
             </ol>
-            <p className={cn("text-[12px] text-graphite", SIDE_PANELS)}>{labels.drag}</p>
+            <p className="px-5 text-center text-[12px] text-graphite">{finePointer ? labels.drag : labels.swipe}</p>
           </div>
         </>
       );
     },
-    [items, labels],
+    [items, labels, finePointer],
   );
 
   return (
@@ -65,6 +79,7 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
         items={menuItems}
         theme={theme}
         accentColor={neon}
+        zoom={narrow ? NARROW_ZOOM : undefined}
         intro={!skipEntrance}
         initialIndex={lastIndex}
         renderInfo={renderInfo}
