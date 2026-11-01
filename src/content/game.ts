@@ -89,10 +89,7 @@ export function levelFor(xp: number) {
   levelThresholds.forEach((threshold, index) => {
     if (xp >= threshold) level = index + 1;
   });
-  const floor = levelThresholds[level - 1];
-  const ceiling = levelThresholds[level] ?? totalXp;
-  const progress = level >= levelThresholds.length ? 1 : (xp - floor) / (ceiling - floor);
-  return { level, progress, maxed: xp >= totalXp };
+  return { level };
 }
 
 export const gameCopy = {

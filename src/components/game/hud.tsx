@@ -64,8 +64,8 @@ export function ExplorerHud() {
   const toastsEnabled = useGame((game) => game.toastsEnabled);
   const goldMode = useGame((game) => game.goldMode);
   const xp = xpOf(unlocked);
-  const { level, progress, maxed } = levelFor(xp);
-  const barProgress = maxed ? 1 : progress;
+  const { level } = levelFor(xp);
+  const barProgress = Math.min(xp / totalXp, 1);
   const counter = `${unlockedCount(unlocked)}/${achievements.length}`;
 
   return (
