@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import type { ProjectCard } from "./project-card";
 import { markProjectSeen, useGame } from "@/components/game/store";
+import { PROJECTS_TO_CURATE } from "@/content/game";
 import { SeenBadge } from "@/components/game/seen-badge";
 import { KineticText } from "@/components/motion/kinetic-text";
 import { reveal } from "@/lib/motion";
@@ -14,7 +15,7 @@ import { FloatingPreview, useFloatingPreview } from "./floating-preview";
 export type ProjectListLabels = { project: string; segment: string; stack: string; year: string; seen: string };
 
 // Fora de uso: a seção mostra a esfera (project-sphere.tsx). Mantido para voltar fácil.
-export function ProjectList({ items, total, labels }: { items: ProjectCard[]; total: number; labels: ProjectListLabels }) {
+export function ProjectList({ items, labels }: { items: ProjectCard[]; labels: ProjectListLabels }) {
   const seenProjects = useGame((game) => game.seenProjects);
   const [active, setActive] = useState<number | null>(null);
   const { follow, canHover, onPointerMove } = useFloatingPreview();
@@ -23,7 +24,7 @@ export function ProjectList({ items, total, labels }: { items: ProjectCard[]; to
 
   const preview = (index: number) => {
     setActive(index);
-    markProjectSeen(items[index].title, total);
+    markProjectSeen(items[index].title);
   };
 
   useEffect(() => {
@@ -32,13 +33,13 @@ export function ProjectList({ items, total, labels }: { items: ProjectCard[]; to
     const observer = new IntersectionObserver(
       (entries) =>
         entries.forEach((entry) => {
-          if (entry.isIntersecting) markProjectSeen(entry.target.getAttribute("data-project")!, total);
+          if (entry.isIntersecting) markProjectSeen(entry.target.getAttribute("data-project")!);
         }),
       { threshold: 0.8 },
     );
     rows.forEach((row) => observer.observe(row));
     return () => observer.disconnect();
-  }, [canHover, total]);
+  }, [canHover]);
 
   return (
     <>
@@ -46,7 +47,7 @@ export function ProjectList({ items, total, labels }: { items: ProjectCard[]; to
         <span className="col-span-6 flex items-center gap-3">
           {labels.project}
           <span className="font-pixel text-[11px] text-neon">
-            {seenProjects.length}/{total} {labels.seen}
+            {Math.min(seenProjects.length, PROJECTS_TO_CURATE)}/{PROJECTS_TO_CURATE} {labels.seen}
           </span>
         </span>
         <span className="col-span-2">{labels.segment}</span>

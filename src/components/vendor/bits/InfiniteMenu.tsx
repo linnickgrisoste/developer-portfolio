@@ -29,7 +29,7 @@ export interface InfiniteMenuProps {
   theme?: 'dark' | 'light';
   accentColor?: string;
   backgroundColor?: string;
-  onActiveChange?: (item: InfiniteMenuItem, index: number) => void;
+  onActiveChange?: (item: InfiniteMenuItem, index: number, byUser: boolean) => void;
   onItemClick?: (item: InfiniteMenuItem, index: number) => void;
   className?: string;
   style?: React.CSSProperties;
@@ -361,6 +361,7 @@ const InfiniteMenu = ({
       hovered: false,
       focused: false,
       idle: 0,
+      byUser: false,
       settle: 0,
       tilePx: 0,
       layout: 'side',
@@ -579,7 +580,7 @@ const InfiniteMenu = ({
       if (!state.moving && index !== state.shown) {
         state.shown = index;
         setActive(index);
-        callbacksRef.current.onActiveChange?.(list[index], index);
+        callbacksRef.current.onActiveChange?.(list[index], index, state.byUser);
       }
     };
 
@@ -683,6 +684,7 @@ const InfiniteMenu = ({
 
     const render = () => {
       const s = settingsRef.current;
+          state.byUser = false;
       const aspect = state.width / state.height;
       const f = 1 / Math.tan(FOV / 2);
       const near = 0.05;
@@ -808,6 +810,7 @@ const InfiniteMenu = ({
     const onLeave = () => {
       state.hovered = false;
       wake();
+      state.byUser = true;
     };
     const onFocusIn = () => {
       state.focused = true;
@@ -835,6 +838,7 @@ const InfiniteMenu = ({
       canvas.height = Math.round(state.height * dpr);
       if (!raf) render();
       wake();
+        state.byUser = true;
     };
 
     engineRef.current = { loadItems, wake };

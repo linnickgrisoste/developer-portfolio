@@ -27,7 +27,9 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
   );
 
   const onActiveChange = useCallback(
-    (_: InfiniteMenuItem, index: number) => markProjectSeen(items[index].title, items.length),
+    (_: InfiniteMenuItem, index: number, byUser: boolean) => {
+      if (byUser) markProjectSeen(items[index].title);
+    },
     [items],
   );
 

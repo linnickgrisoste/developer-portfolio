@@ -10,6 +10,8 @@ export type AchievementId =
   | "signal-sent"
   | "full-stop";
 
+export const PROJECTS_TO_CURATE = 3;
+
 export type TrophyId = AchievementId | "crown";
 
 export type Achievement = {
@@ -31,7 +33,7 @@ export const achievements: Achievement[] = [
   {
     id: "curator",
     name: { pt: "Curador", en: "Curator" },
-    description: { pt: "Viu a prévia de todos os projetos.", en: "Previewed every project." },
+    description: { pt: "Explorou três projetos.", en: "Explored three projects." },
     xp: 30,
   },
   {

@@ -26,7 +26,7 @@ const settle = (order: number): Variants => ({
 });
 
 // Fora de uso: a seção mostra a esfera (project-sphere.tsx). Mantido para voltar fácil.
-export function FeaturedProjects({ items, total }: { items: ProjectCard[]; total: number }) {
+export function FeaturedProjects({ items }: { items: ProjectCard[] }) {
   const seenProjects = useGame((game) => game.seenProjects);
 
   return (
@@ -38,7 +38,6 @@ export function FeaturedProjects({ items, total }: { items: ProjectCard[]; total
           order={index}
           tall={index === 0}
           seen={seenProjects.includes(project.title)}
-          total={total}
         />
       ))}
     </div>
@@ -50,13 +49,11 @@ function FeaturedProject({
   order,
   tall,
   seen,
-  total,
 }: {
   project: ProjectCard;
   order: number;
   tall: boolean;
   seen: boolean;
-  total: number;
 }) {
   const reduceMotion = useReducedMotion();
   const skipEntrance = useSkipEntrance();
@@ -65,8 +62,8 @@ function FeaturedProject({
   const featured = project.featured!;
 
   useEffect(() => {
-    if (inView) markProjectSeen(project.title, total);
-  }, [inView, project.title, total]);
+    if (inView) markProjectSeen(project.title);
+  }, [inView, project.title]);
 
   return (
     <motion.a

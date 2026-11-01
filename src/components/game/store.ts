@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { achievements, type AchievementId, type TrophyId } from "@/content/game";
+import { achievements, PROJECTS_TO_CURATE, type AchievementId, type TrophyId } from "@/content/game";
 import { fireConfetti } from "./confetti";
 import { STORAGE_KEY } from "./storage";
 
@@ -95,8 +95,8 @@ function markSeen(list: "seenProjects" | "seenClasses", item: string, total: num
   if (seen.length >= total) unlock(reward);
 }
 
-export function markProjectSeen(title: string, total: number) {
-  markSeen("seenProjects", title, total, "curator");
+export function markProjectSeen(title: string) {
+  markSeen("seenProjects", title, PROJECTS_TO_CURATE, "curator");
 }
 
 export function markClassSeen(name: string, total: number) {
