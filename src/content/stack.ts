@@ -1,7 +1,7 @@
 export const stack = [
   {
-    group: { pt: "Mobile", en: "Mobile" },
-    role: { pt: "Classe principal", en: "Main class" },
+    group: { pt: "Mobile", en: "Mobile", es: "Mobile" },
+    role: { pt: "Classe principal", en: "Main class", es: "Clase principal" },
     items: [
       { name: "Flutter", level: 9 },
       { name: "Dart", level: 9 },
@@ -10,8 +10,8 @@ export const stack = [
     ],
   },
   {
-    group: { pt: "Front-end", en: "Front-end" },
-    role: { pt: "Classe secundária", en: "Secondary class" },
+    group: { pt: "Front-end", en: "Front-end", es: "Front-end" },
+    role: { pt: "Classe secundária", en: "Secondary class", es: "Clase secundaria" },
     items: [
       { name: "React", level: 7 },
       { name: "Next.js", level: 7 },
@@ -21,8 +21,8 @@ export const stack = [
     ],
   },
   {
-    group: { pt: "Back-end", en: "Back-end" },
-    role: { pt: "Classe de suporte", en: "Support class" },
+    group: { pt: "Back-end", en: "Back-end", es: "Back-end" },
+    role: { pt: "Classe de suporte", en: "Support class", es: "Clase de apoyo" },
     items: [
       { name: "Ruby on Rails", level: 8 },
       { name: "PostgreSQL", level: 7 },

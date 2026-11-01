@@ -10,7 +10,7 @@ export const profile = {
 };
 
 export const stats = [
-  { value: 5, suffix: "+", label: { pt: "anos de experiência", en: "years of experience" } },
-  { value: 15, suffix: "+", label: { pt: "projetos entregues", en: "projects shipped" } },
-  { value: 100, suffix: "k+", label: { pt: "pessoas usando apps que construí", en: "people using apps I've built" } },
+  { value: 5, suffix: "+", label: { pt: "anos de experiência", en: "years of experience", es: "años de experiencia" } },
+  { value: 15, suffix: "+", label: { pt: "projetos entregues", en: "projects shipped", es: "proyectos entregados" } },
+  { value: 100, suffix: "k+", label: { pt: "pessoas usando apps que construí", en: "people using apps I've built", es: "personas usando apps que construí" } },
 ];

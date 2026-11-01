@@ -71,7 +71,7 @@ export function ExplorerHud() {
   return (
     <Popover>
       {/* Sem aria-label: o nome acessível começa pelo texto visível ("Nv1 0/8"), o que se diz no comando de voz. */}
-      <PopoverTrigger className="group flex h-9 items-center gap-2.5 rounded-full px-3 transition-colors hover:bg-muted data-[state=open]:bg-muted">
+      <PopoverTrigger className="group flex h-9 items-center gap-2 rounded-full px-2.5 transition-colors sm:gap-2.5 sm:px-3 hover:bg-muted data-[state=open]:bg-muted">
         <motion.span
           key={level}
           initial={{ scale: 1.6, color: "var(--reward)" }}
@@ -82,7 +82,7 @@ export function ExplorerHud() {
           {t(gameCopy.level)}
           {level}
         </motion.span>
-        <XpBar progress={barProgress} className="w-12 sm:w-16" />
+        <XpBar progress={barProgress} className="w-8 shrink-0 max-[379px]:hidden sm:w-16" />
         <span className="hidden text-[13px] tabular-nums text-graphite sm:inline">{counter}</span>
         <span className="sr-only">{t(gameCopy.hudLabel)}</span>
       </PopoverTrigger>

@@ -93,8 +93,8 @@ docs/             este documento
 ## 5. Renderização e idiomas
 
 - **Seções são Server Components.** Recebem `locale` da rota e leem o texto já no idioma certo: `copy.hero.intro[locale]`.
-- **Ilhas recebem só o que usam.** Uma primitiva cliente recebe a string pronta, não o objeto `copy` inteiro. Assim o texto dos dois idiomas não vai para o bundle.
-- **Trocar de idioma é navegar.** O botão leva a `/en` ou `/pt` com `router.replace(..., { scroll: false })`, mantendo a posição e a âncora. As duas páginas são estáticas e pré-carregadas, então a troca continua instantânea. *Muda em relação a hoje*, que troca o estado no cliente.
+- **Ilhas recebem só o que usam.** Uma primitiva cliente recebe a string pronta, não o objeto `copy` inteiro. Assim o texto dos outros idiomas não vai para o bundle.
+- **Trocar de idioma é navegar.** Cada sigla do seletor (PT, EN, ES) leva à sua rota com `router.replace(..., { scroll: false })`, mantendo a posição e a âncora. As páginas são estáticas e pré-carregadas, então a troca continua instantânea.
 - **Trocar de idioma remonta a página.** Por isso o seletor chama `markLocaleSwitch()` antes de navegar, e toda entrada consulta `useSkipEntrance()`: logo depois da troca, a página nasce com tudo no lugar, sem repetir a abertura do nome nem as revelações.
 - **`LocaleProvider` encolhe.** Só informa o idioma da rota para as poucas ilhas que mostram texto próprio (HUD, avisos e ponto final).
 

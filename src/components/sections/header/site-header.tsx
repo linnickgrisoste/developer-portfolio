@@ -20,7 +20,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-rule/70 bg-paper/85 backdrop-blur-md">
-      <div className={cn(containerClass, "flex h-16 items-center justify-between gap-6")}>
+      <div className={cn(containerClass, "flex h-16 items-center justify-between gap-3 sm:gap-6")}>
         <HeaderName name={`${profile.firstName} ${profile.lastName}`} />
         <SectionNav label={nav.label[locale]} links={links} />
         <div className="flex items-center gap-1">

@@ -6,26 +6,29 @@ import { motion, useReducedMotion } from "motion/react";
 import { useTheme } from "next-themes";
 import { useLocale } from "@/components/providers";
 import { unlock } from "@/components/game/store";
-import { locales } from "@/lib/i18n";
+import { htmlLang, localeNames, locales } from "@/lib/i18n";
 import { spring } from "@/lib/motion";
 
 export function LocaleToggle({ label }: { label: string }) {
-  const { locale, toggleLocale } = useLocale();
+  const { locale, setLocale } = useLocale();
   const reduceMotion = useReducedMotion();
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        toggleLocale();
-        unlock("polyglot");
-      }}
-      className="flex h-9 items-center rounded-full px-1.5 text-[13px] font-semibold tabular-nums transition-colors hover:bg-muted"
-    >
+    <div role="group" aria-label={label} className="flex h-9 items-center px-0.5 text-[13px] font-semibold tabular-nums">
       {locales.map((code) => {
         const current = locale === code;
         return (
-          <span key={code} className="relative px-2 py-1">
+          <button
+            key={code}
+            type="button"
+            aria-pressed={current}
+            onClick={() => {
+              if (current) return;
+              setLocale(code);
+              unlock("polyglot");
+            }}
+            className={`relative rounded-full px-1.5 py-1 transition-colors sm:px-2 ${current ? "text-ink" : "text-graphite hover:bg-muted hover:text-ink"}`}
+          >
             {current && (
               <motion.span
                 layoutId="locale-pill"
@@ -33,12 +36,16 @@ export function LocaleToggle({ label }: { label: string }) {
                 transition={reduceMotion ? { duration: 0 } : spring.ui}
               />
             )}
-            <span className={`relative ${current ? "text-ink" : "text-graphite"}`}>{code.toUpperCase()}</span>
-          </span>
+            {/* Sem aria-label: o nome acessível começa pela sigla visível, o que se diz no comando de voz. */}
+            <span className="relative">{code.toUpperCase()}</span>
+            <span className="sr-only" lang={htmlLang[code]}>
+              {" "}
+              {localeNames[code]}
+            </span>
+          </button>
         );
       })}
-      <span className="sr-only">{label}</span>
-    </button>
+    </div>
   );
 }
 

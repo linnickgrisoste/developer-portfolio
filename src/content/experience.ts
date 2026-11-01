@@ -12,21 +12,23 @@ export type Role = {
 export const experience: Role[] = [
   {
     company: "Yandeh",
-    role: { pt: "Desenvolvedor Full Stack Pleno", en: "Mid-level Full Stack Developer" },
+    role: { pt: "Desenvolvedor Full Stack Pleno", en: "Mid-level Full Stack Developer", es: "Desarrollador Full Stack Semi Senior" },
     start: "2026",
     note: {
       pt: "Atuo no SmartSales Pro, plataforma usada por vendedores de grandes contas no varejo. Trabalho nas interfaces e nas APIs, com foco em pedidos de alto volume, funcionamento offline e um CRM apoiado por IA.",
       en: "I work on SmartSales Pro, a platform used by key account sales reps in retail. I build both the interfaces and the APIs, focusing on high-volume orders, offline support and an AI-assisted CRM.",
+      es: "Trabajo en SmartSales Pro, una plataforma que usan los vendedores de grandes cuentas en el retail. Desarrollo tanto las interfaces como las APIs, con foco en pedidos de alto volumen, funcionamiento offline y un CRM apoyado por IA.",
     },
   },
   {
     company: "Jera Software",
-    role: { pt: "Desenvolvedor Mobile", en: "Mobile Developer" },
+    role: { pt: "Desenvolvedor Mobile", en: "Mobile Developer", es: "Desarrollador Mobile" },
     start: "2021",
     end: "2025",
     note: {
       pt: "Desenvolvi apps para clientes de setores bem diferentes, como grandes festivais de música, pagamentos, agronegócio, saúde e setor marítimo. Cada projeto pedia entender um negócio novo antes da primeira linha de código, e vários deles me levaram além do mobile, para APIs e painéis web.",
       en: "I built apps for clients across very different industries, such as major music festivals, payments, agribusiness, healthcare and the maritime sector. Each project meant understanding a new business before the first line of code, and several of them took me beyond mobile, into APIs and web dashboards.",
+      es: "Desarrollé apps para clientes de sectores muy distintos, como grandes festivales de música, pagos, agronegocio, salud y el sector marítimo. Cada proyecto exigía entender un negocio nuevo antes de la primera línea de código, y varios me llevaron más allá del mobile, hacia APIs y paneles web.",
     },
   },
 ];

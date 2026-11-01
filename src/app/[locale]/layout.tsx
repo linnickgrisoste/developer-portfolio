@@ -5,7 +5,7 @@ import { Providers } from "@/components/providers";
 import { GOLD_SCRIPT } from "@/components/game/gold-script";
 import { STAGE_SCRIPT } from "@/components/three/gate-script";
 import { copy } from "@/content/copy";
-import { htmlLang, isLocale, locales } from "@/lib/i18n";
+import { htmlLang, isLocale, locales, ogLocale } from "@/lib/i18n";
 import "../globals.css";
 
 const archivo = Archivo({
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Omit<LayoutProps, "children">
     metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
     title,
     description,
-    openGraph: { title, description, type: "website", locale: locale === "pt" ? "pt_BR" : "en_US" },
+    openGraph: { title, description, type: "website", locale: ogLocale[locale] },
     twitter: { card: "summary_large_image", title, description },
   };
 }

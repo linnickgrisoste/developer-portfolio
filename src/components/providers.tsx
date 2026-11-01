@@ -3,13 +3,13 @@
 import { createContext, useCallback, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeProvider } from "next-themes";
-import { htmlLang, otherLocale, rememberLocale, type Locale, type Localized } from "@/lib/i18n";
+import { htmlLang, rememberLocale, type Locale, type Localized } from "@/lib/i18n";
 import { AnchorLinks } from "@/components/layout/anchor-links";
 import { markLocaleSwitch } from "@/components/motion/entrance";
 
 type LocaleContextValue = {
   locale: Locale;
-  toggleLocale: () => void;
+  setLocale: (next: Locale) => void;
   t: (value: Localized) => string;
 };
 
@@ -22,16 +22,19 @@ function LocaleProvider({ locale, children }: { locale: Locale; children: React.
     document.documentElement.lang = htmlLang[locale];
   }, [locale]);
 
-  const toggleLocale = useCallback(() => {
-    const next = otherLocale(locale);
-    rememberLocale(next);
-    markLocaleSwitch();
-    router.replace(`/${next}${window.location.hash}`, { scroll: false });
-  }, [locale, router]);
+  const setLocale = useCallback(
+    (next: Locale) => {
+      if (next === locale) return;
+      rememberLocale(next);
+      markLocaleSwitch();
+      router.replace(`/${next}${window.location.hash}`, { scroll: false });
+    },
+    [locale, router],
+  );
 
   const t = useCallback((value: Localized) => value[locale], [locale]);
 
-  return <LocaleContext.Provider value={{ locale, toggleLocale, t }}>{children}</LocaleContext.Provider>;
+  return <LocaleContext.Provider value={{ locale, setLocale, t }}>{children}</LocaleContext.Provider>;
 }
 
 export function useLocale() {
