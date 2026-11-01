@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Archivo, Silkscreen } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { GOLD_SCRIPT } from "@/components/game/gold-script";
+import { InlineScript } from "@/components/layout/inline-script";
 import { STAGE_SCRIPT } from "@/components/three/gate-script";
 import { copy } from "@/content/copy";
 import { htmlLang, isLocale, locales, ogLocale } from "@/lib/i18n";
@@ -59,7 +60,7 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: STAGE_SCRIPT + GOLD_SCRIPT }} />
+        <InlineScript code={STAGE_SCRIPT + GOLD_SCRIPT} />
       </head>
       <body className="antialiased">
         <Providers locale={locale}>{children}</Providers>
