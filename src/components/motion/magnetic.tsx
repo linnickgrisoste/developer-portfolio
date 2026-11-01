@@ -8,14 +8,12 @@ import { useEngaged } from "./engaged";
 
 const MAGNET_SPRING = { stiffness: 260, damping: 18, mass: 0.4 };
 
-/** Puxado pelo cursor enquanto engajado. Só com mouse. */
 export function Magnetic({
   children,
   intensity = 0.3,
   className,
 }: {
   children: React.ReactNode;
-  /** Fração da distância ao centro que o elemento acompanha (0 a 1). */
   intensity?: number;
   className?: string;
 }) {

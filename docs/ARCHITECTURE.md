@@ -51,7 +51,7 @@ Regras de importação (uma camada só importa as de baixo):
 - `three/` usa `lib/` (`palette`, `trophy-styles`, `motion`) e `motion/` (drivers), nunca `sections/` nem `game/`. Cores que dependem do modo dourado vêm do driver de tema, não do store.
 - `game/` expõe uma API pública: `unlock`, `useGame`, `useAchievementOnView` e os componentes. Seções não mexem no store diretamente.
 - Uma seção nunca importa outra seção. O que for compartilhado desce para `layout/` ou `motion/`.
-- `vendor/` (React Bits) só é importado por primitivas de `motion/` e por quem embrulha um componente inteiro: `layout/site-background` (o fundo), `game/game-layer` (as faíscas de clique) e, enquanto está em teste, `sections/work/project-sphere`. Código de `vendor/` é copiado como veio; adaptações levam o comentário "Adaptação do portfolio".
+- `vendor/` (React Bits) só é importado por primitivas de `motion/` e por quem embrulha um componente inteiro: `layout/site-background` (o fundo), `game/game-layer` (as faíscas de clique) e, enquanto está em teste, `sections/work/project-sphere`. Código de `vendor/` fica perto do original, para facilitar comparar com a versão do React Bits.
 
 ---
 

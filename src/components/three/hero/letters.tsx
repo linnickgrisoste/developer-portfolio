@@ -11,8 +11,6 @@ import { usePointerCursor } from "../pointer-cursor";
 import type { HeroLayout } from "./layout";
 import { MAX_STEP, createSpring, isSettled, seeded, stepSpring, type Spring } from "./physics";
 
-// As letras do nome: caem, quicam e assentam exatamente sobre o nome em CSS (oculto).
-
 const DEPTH_EM = 0.28;
 const LETTER_GRAVITY_EM = 23;
 export const LETTER_STAGGER = 0.07;
@@ -23,7 +21,6 @@ type Glyph = {
   position: [number, number, number];
   depth: number;
   index: number;
-  /** Altura acima do lugar final de onde a letra começa a cair. */
   dropFrom: number;
 };
 
@@ -31,13 +28,11 @@ function buildGlyphs(font: Font, layout: HeroLayout): Glyph[] {
   const size = layout.fontSize / EM_PER_SIZE;
   const depth = layout.fontSize * DEPTH_EM;
   return layout.letters.map((letter, index) => {
-    // Sem chanfro: ele deixaria um fio de lateral visível de frente, e em repouso a letra é só impressão.
     const geometry = new TextGeometry(letter.char, { font, size, depth, curveSegments: 10, bevelEnabled: false });
     geometry.computeBoundingBox();
     const box = geometry.boundingBox!;
     const centerX = (box.min.x + box.max.x) / 2;
     const centerY = (box.min.y + box.max.y) / 2;
-    // Gira em torno do próprio centro, com a face da frente no plano da página (z = 0).
     geometry.translate(-centerX, -centerY, -depth);
     const y = layout.height / 2 - letter.baseline + centerY;
     return {
@@ -72,7 +67,6 @@ export function Name({ layout, intro }: { layout: HeroLayout; intro: boolean }) 
 
 type LetterMotion = {
   startedAt: number;
-  /** Altura acima do lugar final e velocidade da queda. */
   y: number;
   vy: number;
   squash: number;
@@ -106,7 +100,6 @@ const isLetterMoving = (letter: LetterMotion, liftTarget: number) =>
   !isSettled(letter.lift, liftTarget) ||
   !isSettled(letter.spin, letter.spinTarget);
 
-// Cai, quica e assenta; com o cursor em cima inclina para trás (mostra a lateral) e no clique dá uma volta.
 function Letter({
   glyph,
   gravity,
@@ -175,8 +168,6 @@ function Letter({
         invalidate();
       }}
     >
-      {/* Frente sem luz nem tone mapping: a cor exata da tinta. Na ortográfica as laterais ficam fora da
-          luz principal, então o neon tem brilho próprio (emissive). */}
       <meshBasicMaterial attach="material-0" color={ink} toneMapped={false} />
       <meshStandardMaterial attach="material-1" color={side} emissive={side} emissiveIntensity={0.55} roughness={0.5} metalness={0} />
     </mesh>

@@ -15,8 +15,6 @@ import { palette } from "@/lib/palette";
 
 export const metadata: Metadata = { title: "Lab · Projetos", robots: { index: false } };
 
-// Protótipo isolado do site: a forma escolhida será adaptada depois (lint, desempenho, cores).
-
 const INK = palette.dark.ink;
 const PAPER = palette.dark.paper;
 const NEON = palette.dark.neon;

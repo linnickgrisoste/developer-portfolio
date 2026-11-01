@@ -11,18 +11,14 @@ import { useEngaged, useLevel } from "./engaged";
 
 export type DepthDriver = "engaged" | "velocity" | "proximity";
 
-/** Velocidade (px/s) que leva a lateral à profundidade máxima. */
 const FULL_VELOCITY = 1800;
-/** Alcance da proximidade, em múltiplos da maior dimensão do elemento, medido a partir da borda. */
 const PROXIMITY_REACH = 1.5;
-// Abaixo destes limites as camadas se escondem, para não deixar halo em volta do texto.
 const RAISED_VELOCITY = 40;
 const RAISED_CLOSENESS = 0.02;
 
 type DepthOptions = {
   level: Level;
   driver?: DepthDriver;
-  /** A lateral se afasta do cursor, como a sombra de uma luz que o acompanha. */
   follow?: boolean;
   engageWith?: string;
   raised?: boolean;
@@ -38,7 +34,6 @@ function closenessTo(rect: DOMRect, dx: number, dy: number) {
   return Math.max(1 - outside / reach, 0) ** 2;
 }
 
-/** As props vão para um `motion.*`: o driver "velocity" passa MotionValues no estilo. */
 export function useDepth(
   ref: RefObject<HTMLElement | null>,
   { level, driver = "engaged", follow = false, engageWith, raised = false }: DepthOptions,
@@ -58,7 +53,6 @@ export function useDepth(
     if (byVelocity && ref.current) setRaised(ref.current, Math.abs(v) > RAISED_VELOCITY);
   });
 
-  // Escreve direto no estilo do elemento, sem re-render a cada quadro.
   useEffect(() => {
     const element = ref.current;
     if (!element || !byPointer) return;
@@ -94,7 +88,6 @@ export function useDepth(
     props: {
       "data-depth-driver": animated ? driver : undefined,
       "data-engaged": animated && engaged ? "" : undefined,
-      // Só no driver "engaged" o React decide `data-raised`; nos outros, o próprio driver liga e desliga.
       ...(driver === "engaged" ? { "data-raised": animated && engaged ? "" : undefined } : {}),
       style,
     },

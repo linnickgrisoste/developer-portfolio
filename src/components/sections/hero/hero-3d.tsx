@@ -9,14 +9,11 @@ import type { HeroLayout } from "@/components/three/hero/layout";
 import { setFullStopCommand } from "./full-stop";
 import { setHeroIntro } from "./hero-intro";
 
-// Importada só quando este componente monta (desktop capaz): three.js nunca entra no pacote inicial.
 const loadScene = () => import("@/components/three/hero/hero-scene");
 const HeroScene = dynamic(loadScene, { ssr: false });
 
-// Se a cena não desenhar até aqui, o nome em CSS aparece: ninguém fica sem nome por conexão lenta.
 const FALLBACK_AFTER_MS = 5000;
 
-// Soma de offsets, que ignora `transform` (o nome é prensado ao rolar).
 function offsetWithin(element: HTMLElement, ancestor: HTMLElement) {
   let x = 0;
   let y = 0;
@@ -29,7 +26,7 @@ function offsetWithin(element: HTMLElement, ancestor: HTMLElement) {
   return { x, y };
 }
 
-// Sonda de altura zero alinhada à linha de base: precisão de subpixel (somar `offsetTop` arredonda e desalinhava até 2 px).
+// Sonda na linha de base: somar offsetTop arredonda e desalinhava as letras 3D em até 2 px.
 function measureBaseline(line: HTMLElement, sectionTop: number) {
   const probe = document.createElement("span");
   probe.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
@@ -39,11 +36,9 @@ function measureBaseline(line: HTMLElement, sectionTop: number) {
   return baseline;
 }
 
-// Mede o nome em CSS oculto (que segue ocupando o lugar) para as letras 3D assentarem exatamente ali.
 function measureName(section: HTMLElement): HeroLayout | null {
   const heading = section.querySelector("h1");
   if (!heading) return null;
-  // Prensa do scroll neutralizada só durante a medição: nada é pintado no meio.
   const pressed = heading.style.transform;
   heading.style.transform = "none";
   const sectionTop = section.getBoundingClientRect().top + section.clientTop;
@@ -78,7 +73,6 @@ export function Hero3D({
   sectionRef: RefObject<HTMLElement | null>;
   progress: MotionValue<number>;
   opacity: MotionValue<number>;
-  // Falso logo após trocar de idioma: o nome já nasce no lugar, sem a queda das letras.
   intro: boolean;
 }) {
   const inView = useInView(sectionRef);
@@ -86,7 +80,6 @@ export function Hero3D({
   const control = useRef<HeroSceneControl | null>(null);
   const ready = useRef(false);
 
-  // Baixa a cena já na montagem, em paralelo com a medição; "pending" a mantém oculta até desenhar.
   useLayoutEffect(() => {
     void loadScene();
     setHeroIntro("pending");
@@ -127,7 +120,6 @@ export function Hero3D({
   if (!layout) return null;
 
   return (
-    // Oculto até a cena desenhar (ver .hero-3d em globals.css).
     <div aria-hidden className="hero-3d pointer-events-none absolute inset-0 -z-10">
       <motion.div className="absolute inset-0" style={{ opacity }}>
         <HeroScene

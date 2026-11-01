@@ -11,16 +11,13 @@ export type TimelineEntryData = { company: string; role: string; period: string;
 
 export type TimelineLabels = { current: string; done: string };
 
-// Fade no fim do eixo: a linha do tempo continua para trás, antes do primeiro emprego.
 const axisFade = "[mask-image:linear-gradient(to_bottom,black_80%,transparent)]";
 
-// A linha neon se preenche com a rolagem e só avança: o que já foi percorrido fica marcado.
 export function Timeline({ entries, labels }: { entries: TimelineEntryData[]; labels: TimelineLabels }) {
   const reduceMotion = useReducedMotion();
   const revealGroup = useRevealGroup();
   const timelineRef = useRef<HTMLOListElement>(null);
 
-  // 0 quando o topo da lista chega ao meio da tela; 1 quando o fim dela chega lá.
   const { scrollYProgress } = useScroll({ target: timelineRef, offset: ["start center", "end center"] });
   const travelled = useMotionValue(0);
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
@@ -46,7 +43,6 @@ function TimelineEntry({ entry, labels }: { entry: TimelineEntryData; labels: Ti
   const reduceMotion = useReducedMotion();
   const skipEntrance = useSkipEntrance();
   const ref = useRef<HTMLLIElement>(null);
-  // Topo do item no meio da tela: o mesmo ponto em que a linha o alcança.
   const reached = useInView(ref, { once: true, margin: "0px 0px -50% 0px" }) || Boolean(reduceMotion);
   const { current } = entry;
 

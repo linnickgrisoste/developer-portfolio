@@ -4,13 +4,11 @@ import { useSyncExternalStore } from "react";
 
 export type Capabilities = {
   reducedMotion: boolean;
-  /** Hover de verdade (mouse ou caneta). */
   finePointer: boolean;
   saveData: boolean;
   webgl: boolean;
 };
 
-// No servidor e na hidratação assume o caso mais comum, sem 3D; o cliente corrige em seguida.
 const serverSnapshot: Capabilities = { reducedMotion: false, finePointer: true, saveData: false, webgl: false };
 
 let snapshot = serverSnapshot;
@@ -40,7 +38,6 @@ function getSnapshot(): Capabilities {
     saveData: prefersSaveData(),
     webgl: detectWebgl(),
   };
-  // Mesmo valor, mesmo objeto: o React só re-renderiza quando algo muda de fato.
   const unchanged = (Object.keys(next) as (keyof Capabilities)[]).every((key) => next[key] === snapshot[key]);
   if (!unchanged) snapshot = next;
   return snapshot;

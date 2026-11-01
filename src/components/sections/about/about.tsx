@@ -34,7 +34,6 @@ export function About({ locale }: { locale: Locale }) {
           {stats.map((stat) => (
             <div key={stat.label.en}>
               <dt className="sr-only">{stat.label[locale]}</dt>
-              {/* No celular, três números dividem 390 px: o menor corpo faz "100k+" caber na coluna. */}
               <dd className="text-[1.875rem] leading-none font-bold tracking-[-0.03em] [font-variation-settings:'wdth'_125] sm:text-[clamp(2.25rem,5vw,4rem)]">
                 <Odometer value={stat.value} suffix={stat.suffix} />
               </dd>

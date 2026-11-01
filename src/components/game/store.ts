@@ -12,7 +12,6 @@ type GameState = {
   seenProjects: string[];
   seenClasses: string[];
   toastsEnabled: boolean;
-  /** Prêmio de quem zera: o neon vira ouro. */
   goldMode: boolean;
   crownCelebrated: boolean;
   queue: ToastItem[];
@@ -64,7 +63,6 @@ function getSnapshot() {
   return state;
 }
 
-/** O seletor deve devolver parte do estado ou um primitivo; um objeto novo re-renderiza sempre. */
 export function useGame<T>(select: (game: GameState) => T): T {
   return useSyncExternalStore(
     subscribe,
@@ -135,7 +133,6 @@ export function unlockedCount(unlocked: Unlocked) {
   return achievements.filter((achievement) => unlocked[achievement.id]).length;
 }
 
-/** A coroa conta como conquistada quando o portfólio está zerado. */
 export function isTrophyUnlocked(id: TrophyId, unlocked: Unlocked) {
   return id === "crown" ? isComplete(unlocked) : Boolean(unlocked[id]);
 }

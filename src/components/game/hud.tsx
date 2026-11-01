@@ -70,7 +70,7 @@ export function ExplorerHud() {
 
   return (
     <Popover>
-      {/* Sem aria-label: o nome acessível é o texto visível ("Nv1 0/8") seguido da ação, só para leitores de tela. */}
+      {/* Sem aria-label: o nome acessível começa pelo texto visível ("Nv1 0/8"), o que se diz no comando de voz. */}
       <PopoverTrigger className="group flex h-9 items-center gap-2.5 rounded-full px-3 transition-colors hover:bg-muted data-[state=open]:bg-muted">
         <motion.span
           key={level}

@@ -1,6 +1,6 @@
 'use client';
 
-/* eslint-disable -- Protótipo do /lab/projetos, como veio do React Bits. Se for adotado no site, este arquivo é limpo e adaptado (lint, desempenho, cores). */
+/* eslint-disable -- código do React Bits, mantido perto do original */
 
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';

@@ -2,13 +2,9 @@ import type { CSSProperties } from "react";
 import type { AchievementId, TrophyId } from "@/content/game";
 import { palette } from "@/lib/palette";
 
-// Material e cores de cada troféu, lidos pelo aviso, pela vitrine e pela sala 3D.
-
 export type AchievementStyle = {
   main: string;
-  /** Frisos, selos, pinturas. */
   accent: string;
-  /** Luz projetada no pedestal e tom do aviso. */
   glow: string;
   finish: "metal" | "gem" | "matte";
 };
@@ -32,10 +28,8 @@ export const trophyStyles: Record<TrophyId, AchievementStyle> = {
   crown: { main: TROPHY_GOLD, accent: "#fff3c4", glow: GOLD_GLOW, finish: "metal" },
 };
 
-/** O aviso de "zerou tudo" anuncia a coroa, então usa as cores dela. */
 export const completeStyle = trophyStyles.crown;
 
-/** Variáveis --a-main/--a-accent/--a-glow, lidas pelos utilitários `medal` e `trophy-bar`. */
 export function styleVars(style: AchievementStyle): CSSProperties {
   return { "--a-main": style.main, "--a-accent": style.accent, "--a-glow": style.glow } as CSSProperties;
 }

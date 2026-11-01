@@ -20,7 +20,6 @@ export function LocaleToggle({ label }: { label: string }) {
         toggleLocale();
         unlock("polyglot");
       }}
-      // Sem aria-label: o nome acessível começa pelo texto visível ("PT EN"), que é o que se diz no comando de voz.
       className="flex h-9 items-center rounded-full px-1.5 text-[13px] font-semibold tabular-nums transition-colors hover:bg-muted"
     >
       {locales.map((code) => {
@@ -46,7 +45,6 @@ export function LocaleToggle({ label }: { label: string }) {
 export function ThemeToggle({ label }: { label: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   const reduceMotion = useReducedMotion();
-  // A key remonta o ícone a cada troca para ele girar ao entrar; em 0 (carregamento) não gira.
   const [themeSwitches, setThemeSwitches] = useState(0);
 
   return (

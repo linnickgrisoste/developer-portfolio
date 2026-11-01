@@ -13,9 +13,7 @@ const PLATES = [1, 2, 3];
 const TILT_SPRING = { stiffness: 220, damping: 22, mass: 0.6 };
 const TILT_DEG = { base: 6, perAmplitude: 10 };
 const PLATE_GAP_PX = { base: 6, perAmplitude: 8 };
-/** Inclinação fixa no toque, em fração da máxima. */
 const TOUCH_TILT = 0.45;
-// A câmera se afasta em cards grandes: com a mesma perspectiva, um pôster largo distorceria demais.
 const MIN_PERSPECTIVE = 900;
 const PERSPECTIVE_PER_WIDTH = 2.5;
 
@@ -38,7 +36,6 @@ export function Tilt({
   children: React.ReactNode;
   level?: "title" | "detail";
   className?: string;
-  /** O mesmo arredondamento do conteúdo, para a espessura acompanhar o formato. */
   plateClassName?: string;
   engageWith?: string;
 }) {

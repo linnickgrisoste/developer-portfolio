@@ -14,7 +14,6 @@ import {
 } from "motion/react";
 import { duration, ease, exit } from "@/lib/motion";
 
-// Inclinação máxima da prévia (em graus) e a velocidade do cursor (px/s) que a atinge.
 const MAX_TILT = 6;
 const TILT_VELOCITY = 1500;
 
@@ -25,7 +24,6 @@ export function useFloatingPreview() {
   const y = useMotionValue(0);
   const springX = useSpring(x, { stiffness: 260, damping: 28, mass: 0.6 });
   const springY = useSpring(y, { stiffness: 260, damping: 28, mass: 0.6 });
-  // Follow-through: inclina na direção em que o cursor corre.
   const velocityX = useVelocity(springX);
   const tilt = useTransform(velocityX, [-TILT_VELOCITY, TILT_VELOCITY], [-MAX_TILT, MAX_TILT]);
   const [canHover, setCanHover] = useState(false);
@@ -46,7 +44,6 @@ export function useFloatingPreview() {
   return { follow: { springX, springY, tilt } satisfies Follow, canHover, onPointerMove };
 }
 
-/** O cartão em si. `image` nulo esconde a prévia. */
 export function FloatingPreview({ image, follow }: { image: string | null; follow: Follow }) {
   const reduceMotion = useReducedMotion();
 
@@ -56,7 +53,6 @@ export function FloatingPreview({ image, follow }: { image: string | null; follo
       className="pointer-events-none fixed top-0 left-0 z-30 hidden md:block"
       style={{ x: follow.springX, y: follow.springY }}
     >
-      {/* O cartão entra e sai uma vez por visita à lista; ao trocar de projeto, só a imagem muda. */}
       <AnimatePresence>
         {image !== null && (
           <motion.div

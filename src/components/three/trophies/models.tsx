@@ -6,13 +6,10 @@ import { DoubleSide, Shape, type Side } from "three";
 import { achievementStyles, TROPHY_GOLD, type AchievementStyle } from "@/lib/trophy-styles";
 import type { TrophyId } from "@/content/game";
 
-// Um troféu por conquista, só com formas básicas, cabendo num cubo de ~1 unidade centrado na origem.
-
 type ModelProps = { style: AchievementStyle; locked: boolean };
 
 const SILHOUETTE = "#2a2e35";
 
-/** Acabamento da peça, ou silhueta enquanto bloqueada. `glow` acende a peça na própria cor. */
 function Mat({
   color,
   finish,
@@ -35,7 +32,6 @@ function Mat({
     return <meshPhysicalMaterial color={color} roughness={0.1} metalness={0.1} clearcoat={1} clearcoatRoughness={0.06} {...light} />;
   }
   if (finish === "matte") return <meshStandardMaterial color={color} roughness={0.85} metalness={0} {...light} />;
-  // Metal com cor própria: menos espelhado que um cromo, para o ouro e o bronze não tomarem a cor do ambiente.
   return <meshStandardMaterial color={color} roughness={0.3} metalness={0.7} {...light} />;
 }
 
@@ -224,7 +220,6 @@ function Envelope({ style, locked }: ModelProps) {
         <boxGeometry args={[0.95, 0.62, 0.1]} />
         <Mat color={style.main} finish="gem" locked={locked} />
       </mesh>
-      {/* Aba e selo nas duas faces, porque o troféu gira. */}
       {[0.052, -0.052].map((z) => (
         <group key={z}>
           <mesh position={[0, 0, z]}>
@@ -256,7 +251,6 @@ function FullStop({ style, locked }: ModelProps) {
   );
 }
 
-// Uma pedra por conquista, uma em cada ponta da coroa.
 const gems = Object.values(achievementStyles).map((gem) => gem.glow);
 
 function Crown({ style, locked }: ModelProps) {

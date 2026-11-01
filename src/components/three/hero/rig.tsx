@@ -7,19 +7,15 @@ import { subscribePointer } from "@/components/motion/drivers/pointer";
 import { screenRect } from "@/components/motion/drivers/screen-rect";
 import { MAX_STEP } from "./physics";
 
-// Ângulos da câmera em graus. `RISE` é quanto ela sobe quando o hero termina de sair da tela.
 const YAW_MAX = 11;
 const PITCH_MAX = 7;
 const RISE = 38;
 const CAMERA_FOLLOW = 4;
-// Na ortográfica a distância não muda o tamanho; só precisa deixar a câmera fora das letras.
 export const CAMERA_DISTANCE = 4000;
 
 const toRad = (degrees: number) => (degrees * Math.PI) / 180;
-/** De -1 a 1 ao longo de um trecho da tela. */
 const toUnit = (value: number, start: number, length: number) => ((value - start) / length) * 2 - 1;
 
-// Gira com o cursor sobre o hero (volta ao centro quando ele sai) e sobe conforme o hero sai da tela.
 export function Rig({ progress }: { progress: MotionValue<number> }) {
   const canvas = useThree((state) => state.gl.domElement);
   const invalidate = useThree((state) => state.invalidate);

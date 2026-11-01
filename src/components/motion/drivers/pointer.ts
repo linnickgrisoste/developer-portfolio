@@ -1,7 +1,5 @@
 "use client";
 
-// Um `pointermove` passivo e compartilhado, entregue no máximo uma vez por quadro. Toque não conta.
-
 export type PointerPosition = { readonly x: number; readonly y: number };
 
 const FAR_AWAY = -1e4;

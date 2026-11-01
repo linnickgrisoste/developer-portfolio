@@ -1,5 +1,3 @@
-// Textos e links "#" ainda são provisórios.
-
 export const profile = {
   firstName: "Linnick",
   lastName: "Grisoste",

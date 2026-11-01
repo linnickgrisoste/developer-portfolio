@@ -14,8 +14,6 @@ import { FullStop } from "./full-stop";
 import { Hero3D } from "./hero-3d";
 import { useHeroIntro } from "./hero-intro";
 
-// A parte viva do hero; o resto chega pronto do servidor como `children`. No desktop capaz o nome é a cena 3D
-// e o nome em CSS só guarda o lugar, o texto acessível e o ponto que recebe o teclado.
 export function HeroFrame({
   firstName,
   lastName,
@@ -34,15 +32,12 @@ export function HeroFrame({
   const in3d = intro !== null;
   const showScene = in3d && stageAllowed && finePointer;
 
-  // Ao rolar, o nome é prensado (achata mais do que estreita) e some; em 3D, o mesmo progresso sobe a câmera.
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const nameScaleX = useTransform(scrollYProgress, [0, 0.5], [1, 0.86]);
   const nameScaleY = useTransform(scrollYProgress, [0, 0.5], [1, 0.62]);
-  // Função (e não faixas) de propósito: com faixas, o Motion entrega a opacidade ao navegador (ViewTimeline),
-  // que não respeitava o limite e fazia o nome reaparecer ao continuar rolando.
+  // Função, e não faixas: com faixas o Motion usa ViewTimeline, que ignora o clamp e o nome reaparecia.
   const nameOpacity = useTransform(scrollYProgress, (progress) => 1 - clamp((progress - 0.15) / 0.3, 0, 1));
 
-  // As duas linhas são um texto só: o sobrenome continua a cascata (`offset`) e qualquer ponto do título engaja as duas.
   const nameTextProps = {
     level: "signature",
     weight: 800,
@@ -69,7 +64,6 @@ export function HeroFrame({
       <motion.h1
         id={HERO_NAME_ID}
         aria-label={`${firstName} ${lastName}`}
-        // Camada própria: a prensa da rolagem só redimensiona a camada na placa de vídeo, sem repintar a página.
         className={cn(
           "hero-name origin-top-left text-[clamp(4rem,15.25vw,15rem)] leading-[0.84] tracking-[-0.025em] uppercase",
           !reduceMotion && "will-change-transform",
@@ -80,7 +74,6 @@ export function HeroFrame({
           <KineticText text={firstName} {...nameTextProps} />
         </span>
         <br />
-        {/* nowrap: o ponto final não pode quebrar para a linha de baixo. */}
         <span className="whitespace-nowrap">
           <span className="hero-print">
             <KineticText text={lastName} offset={firstName.length} {...nameTextProps} />

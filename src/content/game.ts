@@ -1,7 +1,5 @@
 import type { Localized } from "@/lib/i18n";
 
-// Textos e XP são livres; os ids são usados no código para desbloquear.
-
 export type AchievementId =
   | "first-step"
   | "curator"
@@ -12,7 +10,6 @@ export type AchievementId =
   | "signal-sent"
   | "full-stop";
 
-/** A coroa é o nono troféu, de quem zera. */
 export type TrophyId = AchievementId | "crown";
 
 export type Achievement = {
@@ -82,7 +79,6 @@ export const achievements: Achievement[] = [
 
 export const totalXp = achievements.reduce((sum, achievement) => sum + achievement.xp, 0);
 
-/** XP mínimo de cada nível (índice + 1), proporcional ao total. */
 export const levelThresholds = [0, 0.2, 0.45, 0.75, 1].map((share) => Math.round(share * totalXp));
 
 export function levelFor(xp: number) {
@@ -104,7 +100,6 @@ export const gameCopy = {
     pt: "Este portfólio esconde algumas conquistas. Nada obrigatório: é só para quem gosta de fuçar.",
     en: "This portfolio hides a few achievements. Nothing required, just for the curious.",
   },
-  // {count} é trocado pelo número de conquistas ativas.
   hint: {
     pt: "Este portfólio esconde {count} conquistas. Explore à vontade.",
     en: "This portfolio hides {count} achievements. Explore freely.",

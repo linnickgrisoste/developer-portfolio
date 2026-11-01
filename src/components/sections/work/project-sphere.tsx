@@ -10,17 +10,12 @@ import { cn } from "@/lib/utils";
 import type { ProjectCard } from "./project-card";
 import { StoreBadges, type StoreLabels } from "./store-badges";
 
-// Em teste: os projetos numa esfera arrastável (InfiniteMenu). O projeto que para na frente ganha o painel
-// de foco, que some enquanto a esfera gira, e conta como visto (conquista "Curador").
-
 export type SphereLabels = { open: string; drag: string; stores: StoreLabels };
 
 type PanelProps = { project: ProjectCard; index: number; total: number; moving: boolean; labels: SphereLabels };
 
-// Abaixo desta largura (da esfera, não da tela), o painel desce para baixo da peça.
 const SIDE_PANELS = "@max-[760px]:hidden";
 const pad2 = (value: number) => String(value).padStart(2, "0");
-// "#" é projeto sem página pública: sem "Ver projeto", e a peça da esfera leva à loja, se houver.
 const hasPage = (project: ProjectCard) => project.href !== "#";
 
 export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels: SphereLabels }) {
@@ -172,7 +167,6 @@ function OpenLink({ project, label, variant }: { project: ProjectCard; label: st
       target="_blank"
       rel="noreferrer"
       className={cn(
-        // O painel não pega o mouse (a esfera embaixo é arrastável); só o link, e só com a esfera parada.
         "group pointer-events-auto inline-flex items-center font-semibold group-data-[moving=true]/cascade:pointer-events-none",
         variant === "pill"
           ? "gap-2 rounded-full bg-neon px-5 py-2.5 text-[14px] text-night transition-[filter] hover:brightness-110"

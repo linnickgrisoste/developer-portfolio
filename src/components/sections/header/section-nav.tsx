@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from "motion/react";
 import { spring } from "@/lib/motion";
 import { anchor, type SectionId } from "@/lib/sections";
 
-// O ponto neon segue o link sob o mouse ou, sem hover, pousa na seção que está na tela.
 export function SectionNav({ label, links }: { label: string; links: { id: SectionId; label: string }[] }) {
   const reduceMotion = useReducedMotion();
   const [hovered, setHovered] = useState<SectionId | null>(null);
@@ -46,7 +45,6 @@ export function SectionNav({ label, links }: { label: string; links: { id: Secti
   );
 }
 
-// Letras soltas para o salto em onda do .nav-hop; o leitor de tela ouve a palavra inteira.
 function HoppingLabel({ text }: { text: string }) {
   return (
     <>
@@ -62,13 +60,11 @@ function HoppingLabel({ text }: { text: string }) {
   );
 }
 
-// null no topo, sobre o hero.
 function useActiveSection(ids: SectionId[]) {
   const [active, setActive] = useState<SectionId | null>(null);
 
   useEffect(() => {
     const elements = ids.map((id) => document.getElementById(id)).filter((section) => section !== null);
-    // Faixa fina logo acima do meio da tela.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

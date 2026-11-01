@@ -19,7 +19,6 @@ export function Contact({ locale }: { locale: Locale }) {
   const year = new Date().getFullYear();
 
   return (
-    // No fundo noturno, o neon do rodapé é o neon suave.
     <footer
       id={sections.contact}
       className="scroll-mt-16 bg-night text-(--footer-fg) [--neon:var(--neon-soft)] [--footer-fg:var(--night-fg)]"

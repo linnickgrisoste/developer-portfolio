@@ -9,7 +9,6 @@ import { useSkipEntrance } from "@/components/motion/entrance";
 
 const MAX_LEVEL = 10;
 
-// `id` é estável entre idiomas: é ele que conta para a conquista.
 export type CharacterClass = { id: string; name: string; role: string; items: { name: string; level: number }[] };
 
 export type CharacterSheetLabels = { title: string; hint: string; level: string };
@@ -128,7 +127,6 @@ function LevelMeter({
       aria-label={`${item.name}: ${levelLabel} ${item.level}/${MAX_LEVEL}`}
     >
       {Array.from({ length: MAX_LEVEL }, (_, segment) => {
-        // Só os preenchidos crescem (o movimento conta o nível), e só com a ficha na tela, senão ninguém vê.
         const filled = segment < item.level;
         return (
           <motion.span

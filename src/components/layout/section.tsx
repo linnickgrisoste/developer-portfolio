@@ -2,7 +2,6 @@ import type { Ref } from "react";
 import { cn } from "@/lib/utils";
 import type { SectionId } from "@/lib/sections";
 
-/** Para elementos que não podem ser um `<Container>`. */
 export const containerClass = "mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12";
 
 export function Container({ className, children }: { className?: string; children: React.ReactNode }) {
@@ -12,7 +11,6 @@ export function Container({ className, children }: { className?: string; childre
 type SectionProps = {
   id: SectionId;
   ref?: Ref<HTMLElement>;
-  /** Vai para o contêiner interno, não para o `<section>`. */
   className?: string;
   children: React.ReactNode;
 };

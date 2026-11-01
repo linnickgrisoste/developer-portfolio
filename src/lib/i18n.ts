@@ -1,5 +1,3 @@
-// Cada idioma tem a própria rota estática (/pt e /en); a raiz "/" só redireciona (src/proxy.ts).
-
 export type Locale = "pt" | "en";
 
 export type Localized = Record<Locale, string>;
@@ -19,7 +17,6 @@ export function isLocale(value: string | undefined): value is Locale {
 
 export const otherLocale = (locale: Locale): Locale => (locale === "pt" ? "en" : "pt");
 
-/** Idioma escolhido no seletor; o proxy usa para redirecionar "/" nas próximas visitas. */
 export const LOCALE_COOKIE = "locale";
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;

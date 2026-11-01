@@ -2,11 +2,9 @@
 
 import { Environment, Lightformer } from "@react-three/drei";
 
-// Luz de estúdio comum às cenas, feita de Lightformers: reflexo nas laterais sem baixar arquivo de ambiente.
 export function World({
   accent,
 }: {
-  /** Anel de luz colorida que dá aos reflexos o tom da cena. */
   accent?: string;
 }) {
   return (

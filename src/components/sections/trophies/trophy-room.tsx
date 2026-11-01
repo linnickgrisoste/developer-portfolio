@@ -15,11 +15,10 @@ import { htmlLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { TrophyList, type TrophyCard, type TrophyEntry } from "./trophy-list";
 
-// Limite para falha (GPU fraca, rede muito lenta), não para carga lenta: em dev a primeira compilação do 3D já passa de 5 s.
+// Limite para falha (GPU fraca, rede muito lenta), não para carga lenta: em dev a primeira compilação já passa de 5 s.
 const FALLBACK_AFTER_MS = 12000;
 const subscribeNever = () => () => {};
 
-// Baixada só aqui ou antes, no hover de um link para a sala (three/trophies/preload.ts).
 const TrophyScene = dynamic(() => import("@/components/three/trophies/trophy-scene"), { ssr: false });
 
 export type TrophyRoomLabels = {
@@ -35,7 +34,6 @@ export type TrophyRoomLabels = {
 
 const visibleName = (card: TrophyCard) => (card.unlocked || !card.secret ? card.name : "???");
 
-// Cena 3D em aparelho capaz, vitrine em DOM nos demais (ver .trophy-fallback em globals.css).
 export function TrophyRoom({ entries, labels }: { entries: TrophyEntry[]; labels: TrophyRoomLabels }) {
   const { locale } = useLocale();
   const unlocked = useGame((game) => game.unlocked);
@@ -46,10 +44,8 @@ export function TrophyRoom({ entries, labels }: { entries: TrophyEntry[]; labels
   const [hovered, setHovered] = useState<TrophyId | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
   const [failed, setFailed] = useState(false);
-  // No servidor e na hidratação não se sabe o que o aparelho suporta.
   const hydrated = useSyncExternalStore(subscribeNever, () => true, () => false);
 
-  // Se a vitrine assumiu, fica até o fim da visita (a abertura não toca duas vezes).
   const stage = failed || (hydrated && !allowed) ? "list" : sceneReady ? "3d" : "pending";
 
   const { start: startCrownParty } = crownParty;

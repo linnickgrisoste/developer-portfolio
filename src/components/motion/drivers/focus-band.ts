@@ -1,8 +1,5 @@
 "use client";
 
-// No toque, engajar é atravessar a faixa central da tela. Um único observer serve a página toda.
-
-// 42% de margem em cima e embaixo: a faixa tem 16% da altura da tela.
 const BAND_MARGIN = "-42% 0px -42% 0px";
 
 const callbacks = new Map<Element, (inBand: boolean) => void>();

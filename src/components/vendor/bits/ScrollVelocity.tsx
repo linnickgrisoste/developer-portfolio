@@ -66,14 +66,12 @@ function useElementWidth<T extends HTMLElement>(ref: React.RefObject<T | null>):
   return width;
 }
 
-// Mantém v dentro de [min, max), dando a volta como um relógio.
 function wrap(min: number, max: number, v: number): number {
   const range = max - min;
   const mod = (((v - min) % range) + range) % range;
   return mod + min;
 }
 
-// Uma faixa que corre sozinha e acelera (ou inverte) conforme a velocidade do scroll.
 function VelocityText({
   children,
   baseVelocity,
@@ -108,8 +106,7 @@ function VelocityText({
   });
 
   const directionFactor = useRef<number>(1);
-  // Fora da tela ninguém vê a faixa: ela sai do laço de quadros (com useAnimationFrame, o laço do
-  // Motion continuava rodando a cada quadro mesmo com o callback voltando cedo).
+  // Laço próprio e não useAnimationFrame: o do Motion seguia rodando todo quadro mesmo fora da tela.
   useEffect(() => {
     if (!inView) return;
     const step = ({ delta }: FrameData) => {
@@ -129,7 +126,6 @@ function VelocityText({
 
   return (
     <div ref={rootRef} className={`${parallaxClassName} relative overflow-hidden`} style={parallaxStyle}>
-      {/* Camada própria: o deslocamento de todo quadro só move a camada na placa de vídeo, sem repintar a página. */}
       <motion.div
         className={`${scrollerClassName} flex whitespace-nowrap will-change-transform`}
         style={{ x, ...scrollerStyle }}
@@ -164,7 +160,6 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
         <VelocityText
           key={index}
           className={className}
-          // Linhas alternam o sentido.
           baseVelocity={index % 2 !== 0 ? -velocity : velocity}
           scrollContainerRef={scrollContainerRef}
           damping={damping}

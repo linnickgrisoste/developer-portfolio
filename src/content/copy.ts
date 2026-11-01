@@ -1,5 +1,3 @@
-// Textos da interface (rótulos, títulos, botões). O conteúdo em si fica nos outros arquivos desta pasta.
-
 export const copy = {
   meta: {
     title: {

@@ -6,7 +6,6 @@ import { GOLD_ATTRIBUTE, rewardPair } from "@/lib/palette";
 import { useGame } from "./store";
 import { AchievementToasts } from "./toasts";
 
-// O script do <head> aplica o modo dourado antes da primeira pintura; daqui em diante ele segue o store.
 function useGoldAttribute() {
   const goldMode = useGame((game) => game.goldMode);
   useEffect(() => {

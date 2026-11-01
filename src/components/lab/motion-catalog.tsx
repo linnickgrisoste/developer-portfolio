@@ -5,7 +5,6 @@ import { Check, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { spring } from "@/lib/motion";
 
-/** Remonta o conteúdo para a entrada tocar de novo. */
 export function Replay({ children }: { children: React.ReactNode }) {
   const [take, setTake] = useState(0);
 

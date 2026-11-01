@@ -84,7 +84,6 @@ function Toast({ toast }: { toast: ToastItem }) {
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
           </TrophyRoomLink>
         )}
-        {/* A barra é o relógio do aviso; é CSS para pausar no hover (ver .toast-countdown em globals.css). */}
         <span
           aria-hidden
           className="toast-countdown absolute bottom-0 left-0 h-[3px] w-full trophy-bar"

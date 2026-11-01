@@ -1,4 +1,3 @@
-// Cada grupo é uma "classe" da ficha de personagem; nível de 1 a 10.
 export const stack = [
   {
     group: { pt: "Mobile", en: "Mobile" },

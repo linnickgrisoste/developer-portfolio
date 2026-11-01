@@ -6,8 +6,6 @@ import { cn } from "@/lib/utils";
 import { useCapabilities } from "./drivers/capabilities";
 import { useSkipEntrance } from "./entrance";
 
-// Cada dígito é uma fita 0–9 repetida: dá uma volta inteira antes de parar, e as casas da esquerda
-// param depois das da direita. O servidor entrega a fita já no valor final, que é o que buscadores leem.
 const STRIP = Array.from("01234567890123456789");
 
 export function Odometer({ value, suffix = "", className }: { value: number; suffix?: string; className?: string }) {
@@ -17,7 +15,6 @@ export function Odometer({ value, suffix = "", className }: { value: number; suf
   const inView = useInView(ref, { once: true, margin: "-15% 0px" });
   const digits = String(value).split("");
 
-  // Arma antes da pintura: as fitas voltam ao zero sem transição, para depois girar.
   useLayoutEffect(() => {
     ref.current?.toggleAttribute("data-armed", !reducedMotion && !skipEntrance);
   }, [reducedMotion, skipEntrance]);

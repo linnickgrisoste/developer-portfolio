@@ -10,16 +10,13 @@ import { dotCycle, spring } from "@/lib/motion";
 import { clamp } from "@/lib/math";
 import { rewardPair } from "@/lib/palette";
 
-// O ponto final do nome é uma conquista escondida: clicado, quica pela tela; pegá-lo desbloqueia "Ponto final".
-
-const GRAVITY = 2600; // px/s²
-const BOUNCE = 0.72; // fração da velocidade que sobra a cada quique
-const ROLLING_FRICTION = 3; // por segundo
+const GRAVITY = 2600;
+const BOUNCE = 0.72;
+const ROLLING_FRICTION = 3;
 const REST_BEFORE_RETURN_MS = 1500;
 const MAX_LOOSE_MS = 9000;
 
-// Com o nome em 3D, o ponto de verdade é a esfera da cena. Este botão continua no lugar, invisível,
-// porque é ele que recebe o foco e o Enter: com um comando registrado, encaminha para a cena.
+// Com o nome em 3D, o botão do ponto fica invisível no lugar: ele recebe o foco e o Enter e encaminha para a cena.
 let command3d: (() => void) | null = null;
 
 export function setFullStopCommand(command: (() => void) | null) {
@@ -28,7 +25,6 @@ export function setFullStopCommand(command: (() => void) | null) {
 
 type Origin = { home: HTMLButtonElement; left: number; top: number; size: number; cycleDelay: number };
 
-// O ponto solto continua o ciclo de cor de onde o do nome estava.
 function remainingCycleDelay(dot: HTMLElement) {
   const cycle = dot.getAnimations({ subtree: true }).find((animation) => (animation as CSSAnimation).animationName === "dot-second");
   const elapsed = typeof cycle?.currentTime === "number" ? cycle.currentTime : 0;
@@ -47,7 +43,6 @@ export function FullStop() {
       return;
     }
     if (loose) return;
-    // Com movimento reduzido não há perseguição: encontrar o segredo já basta.
     if (reduceMotion) {
       unlock("full-stop");
       return;
@@ -65,7 +60,6 @@ export function FullStop() {
         type="button"
         onClick={release}
         aria-label={t(gameCopy.fullStop)}
-        // Opacidade (e não desmontar) para o lugar do ponto não mexer no layout do nome.
         style={{ opacity: loose ? 0 : 1 }}
         className="full-stop-dot ml-[0.04em] inline-block size-[0.17em] cursor-pointer rounded-full bg-neon align-baseline transition-[scale] duration-200 hover:scale-125"
       />
@@ -87,10 +81,9 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
     const { size } = origin;
     let x = origin.left;
     let y = origin.top;
-    // Salta para cima e na direção do centro da tela, para não sumir pela borda mais próxima.
     let vx = (x < window.innerWidth / 2 ? 1 : -1) * (500 + Math.random() * 400);
     let vy = -1200;
-    let squash = 0; // 0 a 1, achatamento do último impacto
+    let squash = 0;
     let restingSince = 0;
     let last = performance.now();
     const releasedAt = last;
@@ -102,7 +95,6 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
       dot.style.transform = `translate(${x}px, ${y}px) scale(${scale * (1 + stretch)}, ${scale * (1 - stretch)})`;
     };
 
-    // Pego, ele incha no caminho de volta como recompensa.
     const flyHome = (caught: boolean) => {
       stopped = true;
       cancelAnimationFrame(frame);
@@ -118,7 +110,6 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
           draw(caught ? 1 + 0.6 * Math.sin(Math.PI * Math.min(progress, 1)) : 1);
         },
         onComplete: () => {
-          // O foco estava no ponto solto: devolve ao do nome para o teclado não se perder.
           origin.home.focus({ preventScroll: true });
           onHome();
         },
@@ -133,7 +124,6 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
     };
 
     const step = (now: number) => {
-      // Passo limitado para a física não "teleportar" depois de uma aba em segundo plano.
       const dt = Math.min((now - last) / 1000, 1 / 30);
       last = now;
 
@@ -201,7 +191,6 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
   );
 }
 
-// A biblioteca de confete só é baixada na hora da captura.
 async function burst(x: number, y: number) {
   const { default: confetti } = await import("canvas-confetti");
   void confetti({

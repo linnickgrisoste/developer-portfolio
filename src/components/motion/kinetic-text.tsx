@@ -11,21 +11,15 @@ import { useLevel } from "./engaged";
 import { useSkipEntrance } from "./entrance";
 import { ExtrudeLayers } from "./extrude";
 
-// O desenho (entrada, onda, proximidade) vive em globals.css, bloco "Texto cinético".
-
 type Tag = "span" | "h1" | "h2" | "h3" | "p";
 
-/** "load" toca desde a primeira pintura, só com CSS (o hero); false quando outra coisa já anima o bloco. */
 export type Entrance = "view" | "load" | false;
 
-/** Tempo entre letras; textos longos aceleram para caber no teto da cascata. */
 const LETTER_MS = 35;
 const ENTRANCE_BASE_MS = 700;
 const ENTRANCE_AMPLITUDE_MS = 500;
-/** Quanto a proximidade soma aos eixos no nível assinatura; os outros níveis escalam por baixo. */
 const NEAR_WEIGHT = 200;
 const NEAR_WIDTH = 25;
-/** Raio da proximidade em `em`: cerca de duas letras para cada lado no nível assinatura. */
 const NEAR_RADIUS_BASE = 0.45;
 const NEAR_RADIUS_AMPLITUDE = 0.3;
 const MAX_WEIGHT = 900;
@@ -51,16 +45,12 @@ export function KineticText({
   as?: Tag;
   weight?: number;
   width?: number;
-  /** Lateral neon por letra: `true` usa o driver "engaged". */
   extrude?: boolean | DepthDriver;
   entrance?: Entrance;
-  /** "anywhere" quebra em qualquer letra (e-mails, URLs). */
   wrap?: "word" | "anywhere";
   engageWith?: string;
-  /** Posição da primeira letra na cascata, para um texto continuar outro. */
   offset?: number;
   raised?: boolean;
-  /** Desligue quando o texto só ocupa lugar (ex.: o 3D por cima dele). */
   proximity?: boolean;
   className?: string;
 }) {
@@ -138,7 +128,6 @@ function Letters({
 
   if (wrap === "anywhere") return Array.from(text).map(letter);
 
-  // As letras são inline-block e quebrariam em qualquer ponto; a palavra as mantém juntas.
   return text.split(" ").map((word, wordIndex, words) => (
     <Fragment key={wordIndex}>
       <span className="kinetic-word">{Array.from(word).map(letter)}</span>
@@ -147,15 +136,12 @@ function Letters({
   ));
 }
 
-/** Arma e solta a entrada por atributos no DOM, sem re-renderizar o texto a cada fase. Devolve se toca no load. */
 function useLetterEntrance(ref: RefObject<HTMLElement | null>, entrance: Entrance, entranceMs: number) {
   const { reducedMotion } = useCapabilities();
   const skipEntrance = useSkipEntrance();
   const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  // "load" já sai do servidor armado; logo após trocar de idioma, nasce assentado.
   const playsOnLoad = entrance === "load" && !skipEntrance;
 
-  // Arma antes da primeira pintura, para as letras esperarem escondidas.
   useLayoutEffect(() => {
     const element = ref.current;
     if (!element || entrance !== "view") return;
@@ -197,7 +183,6 @@ function useLetterProximity(
     const addWeight = NEAR_WEIGHT * amplitude;
     const addWidth = NEAR_WIDTH * amplitude;
 
-    // Mede só ao ligar e em scroll/resize: medir a cada quadro, logo após mudar a largura, força layout.
     let centers: [number, number][] = [];
     const measure = () => {
       centers = letters.map((letter) => {
@@ -209,7 +194,6 @@ function useLetterProximity(
     window.addEventListener("scroll", measure, { passive: true });
     window.addEventListener("resize", measure);
 
-    // Só os deltas: o CSS arredonda em degraus (ver "Texto cinético" em globals.css).
     const stop = subscribePointer(({ x, y }) => {
       letters.forEach((letter, index) => {
         const [cx, cy] = centers[index];

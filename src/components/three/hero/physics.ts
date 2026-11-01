@@ -1,9 +1,5 @@
-// Peças de física em comum das letras e do ponto. Tudo muda no lugar: o laço de quadros não aloca nada.
-
-/** Passo máximo: depois de uma aba parada, a física não dá um salto. */
 export const MAX_STEP = 1 / 30;
 
-// Pseudoaleatório estável pelo índice, como as posições de partida da entrada em CSS.
 export const seeded = (n: number, salt: number) => Math.sin(n * 12.9898 + salt * 78.233) * 0.5 + 0.5;
 
 export type Spring = { value: number; velocity: number };

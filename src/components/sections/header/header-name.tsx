@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from "motion/react";
 import { spring } from "@/lib/motion";
 import { anchor, HERO_NAME_ID, sections } from "@/lib/sections";
 
-// Só aparece depois que o nome grande do hero sai de baixo do cabeçalho: um passa a vez para o outro.
 export function HeaderName({ name }: { name: string }) {
   const reduceMotion = useReducedMotion();
   const visible = useHeroNameScrolledAway();
@@ -31,7 +30,6 @@ function useHeroNameScrolledAway() {
   useEffect(() => {
     const heroName = document.getElementById(HERO_NAME_ID);
     if (!heroName) return;
-    // -64px desconta a altura do cabeçalho, que cobre o topo da tela.
     const observer = new IntersectionObserver(([entry]) => setScrolledAway(entry.intersectionRatio < 0.5), {
       rootMargin: "-64px 0px 0px 0px",
       threshold: [0, 0.5, 1],

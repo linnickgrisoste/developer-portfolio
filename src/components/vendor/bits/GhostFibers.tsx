@@ -714,7 +714,6 @@ const GhostFibers = ({
     dpr
   };
   const settingsRef = useRef(settings);
-  // Adaptação do portfolio: a ref acompanha as props num efeito (gravar durante o render quebra o React Compiler).
   useEffect(() => {
     settingsRef.current = settings;
   });

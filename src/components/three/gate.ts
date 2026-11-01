@@ -2,9 +2,7 @@
 
 import { useCapabilities } from "@/components/motion/drivers/capabilities";
 
-// Sem three.js aqui: quem decide se baixa a cena não pode puxá-la para o pacote inicial.
-
-/** WebGL 2, sem movimento reduzido e sem economia de dados. Fora disso, fica o CSS. */
+// Não importar three.js aqui nem em preload.ts: puxaria a cena para o pacote inicial.
 export function useStageAllowed() {
   const { webgl, reducedMotion, saveData } = useCapabilities();
   return webgl && !reducedMotion && !saveData;

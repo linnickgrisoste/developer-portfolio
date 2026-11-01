@@ -3,8 +3,6 @@
 import { useSyncExternalStore } from "react";
 import { HERO_INTRO_ATTRIBUTE } from "@/components/three/gate-script";
 
-// Atributo no <html>, decidido antes da primeira pintura pelo script do <head> (three/gate-script.ts):
-// "pending" = vai entrar em 3D (nome em CSS oculto, cena carregando); "on" = cena à mostra; ausente = fica o CSS.
 export type HeroIntroState = "pending" | "on" | null;
 
 function subscribe(listener: () => void) {
@@ -13,7 +11,6 @@ function subscribe(listener: () => void) {
   return () => observer.disconnect();
 }
 
-// No servidor e na hidratação é sempre null: o servidor não sabe o aparelho.
 export function useHeroIntro(): HeroIntroState {
   return useSyncExternalStore(
     subscribe,

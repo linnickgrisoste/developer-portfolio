@@ -11,15 +11,11 @@ import { ease, reveal } from "@/lib/motion";
 import { useSkipEntrance } from "@/components/motion/entrance";
 import type { ProjectCard } from "./project-card";
 
-// Fora de uso: a seção mostra a esfera (project-sphere.tsx). Mantido para voltar fácil.
-
 const curtain = (order: number): Variants => ({
   hidden: { clipPath: "inset(100% 0% 0% 0%)" },
   shown: { clipPath: "inset(0% 0% 0% 0%)", transition: { duration: 1, ease: ease.out, delay: order * 0.12 } },
 });
 
-// `transform` inteiro (e não `scale`) para rodar na placa de vídeo; o zoom do hover usa a propriedade
-// `scale` do CSS, separada, então os dois não se atropelam.
 const settle = (order: number): Variants => ({
   hidden: { transform: "scale(1.15)" },
   shown: {
@@ -29,6 +25,7 @@ const settle = (order: number): Variants => ({
   },
 });
 
+// Fora de uso: a seção mostra a esfera (project-sphere.tsx). Mantido para voltar fácil.
 export function FeaturedProjects({ items, total }: { items: ProjectCard[]; total: number }) {
   const seenProjects = useGame((game) => game.seenProjects);
 
@@ -95,7 +92,6 @@ function FeaturedProject({
             {featured.fit === "cover" ? (
               <Image src={project.image} alt="" fill sizes="(min-width: 768px) 42vw, 100vw" className="object-cover" />
             ) : (
-              // Logos pequenos perto do tamanho original (sem borrar), bordas dissolvidas no painel da mesma cor.
               <div className="relative aspect-square h-[78%] [mask-image:radial-gradient(closest-side,black_72%,transparent)]">
                 <Image src={project.image} alt="" fill sizes="400px" className="object-contain" />
               </div>

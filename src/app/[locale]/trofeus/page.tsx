@@ -52,7 +52,6 @@ function roomLabels(locale: Locale) {
   };
 }
 
-// Sempre noturna, como o rodapé de onde se chega a ela.
 export default async function TrophiesPage({ params }: PageProps) {
   const locale = (await params).locale as Locale;
 

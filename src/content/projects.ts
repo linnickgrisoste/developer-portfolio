@@ -8,12 +8,7 @@ export type Project = {
   year: string;
   image: string;
   href: string;
-  /** Páginas do app nas lojas; cada uma vira um botão próprio ao lado do link do projeto. */
   stores?: { android?: string; ios?: string };
-  /**
-   * Vira pôster no topo de Trabalhos. "contain" é para logos e capas pequenas, que borrariam ampliadas:
-   * use em `background` a cor do fundo da própria imagem.
-   */
   featured?: { fit: "cover" } | { fit: "contain"; background: string };
 };
 

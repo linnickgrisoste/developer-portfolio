@@ -14,15 +14,11 @@ import { Stage } from "../stage";
 import { World } from "../world";
 import { trophyModels } from "./models";
 
-// A estante de troféus, com a coroa em destaque no centro. A sala é sempre noturna, nos dois temas.
-
 const SPACING = 2.3;
 const FOV = 35;
 const CENTER_SCALE = 1.3;
-/** Tela larga: o centro ocupa o meio de cinco colunas, um pouco abaixo da linha do meio. */
 const CENTERED_COLUMNS = 5;
 const CENTER_Y = -0.2;
-/** Tela estreita: o centro vai numa fileira abaixo da estante, afastado por esta fração do espaçamento. */
 const CENTER_ROW_GAP = 1.15;
 
 const APPEAR_DELAY = 0.45;
@@ -35,10 +31,8 @@ const WAVE_STEP = 0.07;
 const PULSE = 0.7;
 const SPIN = 1;
 
-/** Passa um pouco do ponto e assenta, como uma peça posta no pedestal. */
 const easeOutBack = (t: number) => 1 + 2.2 * (t - 1) ** 3 + 1.2 * (t - 1) ** 2;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
-/** Um troféu pronto para a cena: o nome (ou "???") no idioma da página, se foi conquistado e onde fica. */
 export type TrophyItem = { id: TrophyId; label: string; unlocked: boolean; placement: "shelf" | "center" };
 
 type Slot = { item: TrophyItem; index: number; x: number; y: number; scale: number };
@@ -47,28 +41,22 @@ type TrophySceneProps = {
   items: TrophyItem[];
   focused: TrophyId | null;
   hovered: TrophyId | null;
-  /** Primeira visita depois de zerar: o troféu do centro desce do alto e a sala faz festa. */
   crownParty: boolean;
   reduceMotion: boolean;
   onHover: (id: TrophyId | null) => void;
   onSelect: (id: TrophyId) => void;
-  /** Clique fora dos troféus. */
   onDismiss: () => void;
-  /** A cena já desenhou: hora de trocar a vitrine em DOM por ela. */
   onReady: () => void;
-  /** Na festa, quando o troféu do centro pousa. */
   onCrownLanded: () => void;
 };
 
 export default function TrophyScene({ onDismiss, onReady, crownParty, reduceMotion, ...shelf }: TrophySceneProps) {
   return (
     <Stage camera={{ position: [0, 0, 14], fov: FOV }} onPointerMissed={onDismiss}>
-      {/* Ambiente quente, para o ouro e o bronze não puxarem verde. */}
       <World accent="#ffd9a0" />
       <spotLight position={[0, 8, 8]} angle={0.6} penumbra={0.8} intensity={60} />
       <pointLight position={[0, -3, 4]} intensity={8} color={palette.dark.reward} />
       <Shelf {...shelf} crownParty={crownParty && !reduceMotion} reduceMotion={reduceMotion} />
-      {/* Alguns quadros a mais: as plaquinhas precisam da fonte antes de a cena substituir a vitrine. */}
       <ReadySignal afterFrames={7} onReady={onReady} />
     </Stage>
   );
@@ -85,7 +73,6 @@ function layoutShelf(items: TrophyItem[], aspect: number) {
 
   const slots: Slot[] = shelf.map((item, index) => {
     const column = index % columns;
-    // Com o centro no meio, as colunas abrem espaço para ele: duas de cada lado.
     const x = centered ? (column < 2 ? column - 2 : column - 1) : column - (columns - 1) / 2;
     return { item, index, x: x * SPACING, y: top - Math.floor(index / columns) * SPACING, scale: 1 };
   });
@@ -94,12 +81,10 @@ function layoutShelf(items: TrophyItem[], aspect: number) {
     slots.push({ item: center, index: shelf.length, x: 0, y, scale: CENTER_SCALE });
   }
 
-  // Distância em que a estante inteira cabe na largura e na altura, com folga para as plaquinhas.
   const halfHeight = height / 2 + 0.9;
   const halfWidth = ((centered ? CENTERED_COLUMNS : columns) * SPACING) / 2 + 0.2;
   const tan = Math.tan(((FOV / 2) * Math.PI) / 180);
   const distance = Math.max(halfHeight / tan, halfWidth / (tan * aspect));
-  // A festa começa logo depois que a última peça da estante assentou.
   const partyStart = APPEAR_DELAY + (shelf.length - 1) * APPEAR_STAGGER + APPEAR_DURATION + 0.15;
   return { slots, distance, partyStart };
 }
@@ -141,7 +126,6 @@ function Shelf({
   );
 }
 
-// Enquadra a estante inteira; com um troféu em foco, desliza até a frente dele.
 function CameraRig({ focus, distance, instant }: { focus: Slot | null; distance: number; instant: boolean }) {
   const position = useMemo(() => new Vector3(), []);
   const look = useRef(new Vector3());
@@ -150,11 +134,9 @@ function CameraRig({ focus, distance, instant }: { focus: Slot | null; distance:
   useFrame(({ camera }, delta) => {
     const follow = instant ? 1 : 1 - Math.exp(-4 * delta);
     if (focus) {
-      // Mira um pouco abaixo do troféu para a plaquinha caber no quadro.
       position.set(focus.x, focus.y, 5.4 * focus.scale);
       lookTarget.set(focus.x, focus.y - 0.3 * focus.scale, 0);
     } else {
-      // Um pouco acima, como quem olha uma vitrine: aparecem o topo dos pedestais e a luz das peças.
       position.set(0, distance * 0.16, distance);
       lookTarget.set(0, 0, 0);
     }
@@ -179,9 +161,7 @@ function Trophy({
   slot: Slot;
   focused: boolean;
   hovered: boolean;
-  /** Outro troféu está em foco. */
   dimmed: boolean;
-  /** Quando a festa começa (relógio da cena), ou `null` sem festa. */
   partyStart: number | null;
   reduceMotion: boolean;
   onHover: (id: TrophyId | null) => void;
@@ -211,7 +191,6 @@ function Trophy({
     const lift = appearRef.current;
     if (lift && appear.current < 1) {
       if (placement === "center" && partyStart !== null) {
-        // Na festa, o centro espera a estante e desce do alto.
         const t = clamp((now - partyStart) / DROP_DURATION, 0, 1);
         appear.current = t;
         lift.scale.setScalar(t === 0 ? 0.001 : 1);
@@ -226,7 +205,6 @@ function Trophy({
       }
     }
 
-    // Depois que o centro pousa, uma onda de luz passa pelos anéis e cada peça dá uma volta.
     if (partyStart !== null) {
       const wave = partyStart + DROP_DURATION + (placement === "center" ? 0 : 0.15 + slot.index * WAVE_STEP);
       const pulse = Math.sin(Math.PI * clamp((now - wave) / PULSE, 0, 1));
@@ -254,13 +232,11 @@ function Trophy({
               onSelect(id);
             }}
           >
-            {/* Dois giros somados: a volta da festa por fora e o giro contínuo por dentro. */}
             <group ref={partyRef}>
               <group ref={spinRef}>
                 <Model style={style} locked={!unlocked} />
               </group>
             </group>
-            {/* Área de toque invisível: facilita acertar peças finas, como a lua e o envelope. */}
             <mesh>
               <sphereGeometry args={[0.62, 16, 16]} />
               <meshBasicMaterial transparent opacity={0} depthWrite={false} />
@@ -284,7 +260,6 @@ function Trophy({
   );
 }
 
-/** Pedestal de mármore escuro com anel e poça de luz na cor da peça; sem `glow` (bloqueada), o anel fica apagado. */
 function Pedestal({
   glow,
   ringRef,

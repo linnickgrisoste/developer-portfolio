@@ -10,7 +10,6 @@ export type TrophyEntry = {
   description: string;
   hint?: string;
   secret: boolean;
-  // A coroa não vale XP: ela é o prêmio de já ter todos.
   xp?: number;
   placement: "shelf" | "center";
 };
@@ -19,7 +18,6 @@ export type TrophyCard = TrophyEntry & { unlocked: boolean; date: string | null 
 
 type TrophyListLabels = { done: string; locked: string };
 
-// Vitrine em DOM, com os mesmos dados e cores de cada peça da cena 3D.
 export function TrophyList({ cards, labels, className }: { cards: TrophyCard[]; labels: TrophyListLabels; className?: string }) {
   return (
     <ol className={cn("grid gap-3 sm:grid-cols-2 lg:grid-cols-4", className)}>

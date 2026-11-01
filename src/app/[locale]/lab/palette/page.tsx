@@ -3,8 +3,6 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Lab · Paleta", robots: { index: false } };
 
-// Cada painel define as próprias cores; o tema do site não muda.
-
 type Palette = {
   paper: string;
   ink: string;
@@ -65,7 +63,6 @@ const palettes: { name: string; light: Palette; dark: Palette }[] = [
 ];
 
 function Panel({ label, colors }: { label: string; colors: Palette }) {
-  // Aproximação estática da Extrude; aqui text-shadow serve porque nada anima.
   const extrude: CSSProperties = { textShadow: [1, 2, 3, 4].map((k) => `${k * 0.012}em ${k * 0.02}em 0 ${colors.neon}`).join(", ") };
   return (
     <div className="overflow-hidden rounded-xl border" style={{ background: colors.paper, color: colors.ink, borderColor: colors.rule }}>
@@ -124,7 +121,6 @@ export default function PaletteLab() {
     <main className="mx-auto max-w-7xl px-6 py-12">
       <h1 className="text-2xl font-bold">Paleta: atual × proposta</h1>
       <div className="mt-8 grid gap-6 md:grid-cols-2">
-        {/* Uma paleta por linha: escuro à esquerda, claro à direita. */}
         {palettes.flatMap(({ name, light, dark }) => [
           <Panel key={`${name}-d`} label={`${name} · escuro`} colors={dark} />,
           <Panel key={`${name}-l`} label={`${name} · claro`} colors={light} />,

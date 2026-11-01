@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import { useDepth, type DepthDriver } from "./depth";
 import { useLevel } from "./engaged";
 
-/** As cópias do conteúdo são `aria-hidden`: só para texto, nunca links ou botões dentro. */
 export function Extrude({
   children,
   level = "title",
@@ -37,7 +36,6 @@ export function Extrude({
   );
 }
 
-/** As camadas, da mais funda para a mais rasa. O `KineticText` usa letra a letra. */
 export function ExtrudeLayers({ count, children }: { count: number; children: React.ReactNode }) {
   return Array.from({ length: count }, (_, index) => (
     <span key={index} aria-hidden className="extrude-layer" style={{ "--k": (count - index) / count } as CSSProperties}>

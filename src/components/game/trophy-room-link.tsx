@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useLocale } from "@/components/providers";
 import { preloadTrophyScene } from "@/components/three/trophies/preload";
 
-/** No hover ou foco já começa a baixar a cena 3D, para o clique encontrá-la a caminho. */
 export function TrophyRoomLink({
   className,
   children,

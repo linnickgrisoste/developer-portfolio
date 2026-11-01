@@ -8,8 +8,6 @@ import { sections } from "@/lib/sections";
 import { toCard } from "./project-card";
 import { ProjectSphere } from "./project-sphere";
 
-// A versão anterior (pôsteres + lista com prévia) segue em featured-project.tsx e project-list.tsx, para voltar fácil.
-
 export function WorkIndex({ locale }: { locale: Locale }) {
   const text = copy.work;
 

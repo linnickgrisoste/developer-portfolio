@@ -5,7 +5,7 @@ import { useReducedMotion } from "motion/react";
 import ScrollVelocity from "@/components/vendor/bits/ScrollVelocity";
 import { Container } from "@/components/layout/section";
 
-// Sem lateral neon de propósito: a faixa já se mexe sempre, e recalcular 8 cópias do texto a cada quadro pesava demais.
+// Sem lateral neon de propósito: recalcular 8 cópias do texto a cada quadro da faixa pesava demais.
 export function Marquee({ tools }: { tools: string[] }) {
   const reduceMotion = useReducedMotion();
   const half = Math.ceil(tools.length / 2);
@@ -37,7 +37,6 @@ export function Marquee({ tools }: { tools: string[] }) {
 
 function ToolRow({ tools }: { tools: string[] }) {
   return (
-    // Na versão parada (movimento reduzido) a lista quebra só entre tecnologias.
     <span className="inline-flex flex-wrap items-center">
       {tools.map((tool) => (
         <Fragment key={tool}>

@@ -12,9 +12,6 @@ import { CAMERA_DISTANCE, Rig } from "./rig";
 
 export type { HeroSceneControl };
 
-// O nome do hero em 3D: as letras caem e assentam sobre o nome em CSS (oculto), e o ponto final tem física.
-// A cena desenha sob demanda: cada peça chama `invalidate` só enquanto se mexe; parada, não gasta a placa de vídeo.
-
 export default function HeroScene({
   layout,
   progress,
@@ -26,16 +23,12 @@ export default function HeroScene({
   onReady,
 }: {
   layout: HeroLayout;
-  /** Saída do hero ao rolar (0 a 1): a câmera sobe com ela. */
   progress: MotionValue<number>;
   eventSource: RefObject<HTMLElement | null>;
   active: boolean;
-  /** Tocar a queda das letras; falso já nasce assentado. */
   intro: boolean;
   controlRef: RefObject<HeroSceneControl | null>;
-  /** O ponto foi pego no ar. */
   onCatch: () => void;
-  /** A cena já desenhou: hora de mostrá-la. */
   onReady: () => void;
 }) {
   return (

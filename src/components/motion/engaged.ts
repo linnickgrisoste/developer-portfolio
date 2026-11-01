@@ -6,15 +6,12 @@ import { useCapabilities } from "./drivers/capabilities";
 import { observeBand } from "./drivers/focus-band";
 import { useDarkTheme } from "./drivers/theme";
 
-// Luz sobre fundo escuro pesa mais: no tema escuro a amplitude cai 15%.
 const DARK_AMPLITUDE = 0.85;
 
 type EngagedOptions = {
-  /** Engaja pelo ancestral mais próximo que casa com o seletor (ex.: "a" para o card inteiro). */
   closest?: string;
 };
 
-/** Hover (mouse), foco visível (teclado) ou passagem pela faixa central (toque). */
 export function useEngaged(ref: RefObject<HTMLElement | null>, { closest }: EngagedOptions = {}) {
   const { finePointer } = useCapabilities();
   const [engaged, setEngaged] = useState(false);

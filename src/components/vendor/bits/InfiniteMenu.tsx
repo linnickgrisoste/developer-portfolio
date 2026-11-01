@@ -1,6 +1,6 @@
 'use client';
 
-/* eslint-disable -- Protótipo do /lab/projetos, como veio do React Bits. Se for adotado no site, este arquivo é limpo e adaptado (lint, desempenho, cores). */
+/* eslint-disable -- código do React Bits, mantido perto do original */
 
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -252,7 +252,6 @@ const InfiniteMenu = ({
     theme: theme === 'light' ? 'light' : 'dark'
   };
   const settingsRef = useRef(settings);
-  // Adaptação do portfolio: a ref acompanha as props num efeito (gravar durante o render quebra o React Compiler).
   useEffect(() => {
     settingsRef.current = settings;
   });

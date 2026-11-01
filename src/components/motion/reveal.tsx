@@ -4,8 +4,6 @@ import { motion } from "motion/react";
 import { reveal } from "@/lib/motion";
 import { useRevealGroup } from "./entrance";
 
-// Revelação em componentes, para seções do servidor usarem: o grupo dispara uma vez e os itens sobem em cascata.
-
 type GroupTag = "div" | "ol" | "ul";
 type ItemTag = "div" | "p" | "dl" | "li" | "h2";
 

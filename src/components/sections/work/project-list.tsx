@@ -26,7 +26,6 @@ export function ProjectList({ items, total, labels }: { items: ProjectCard[]; to
     markProjectSeen(items[index].title, total);
   };
 
-  // Sem mouse não há prévia: o projeto conta como visto quando a linha aparece na tela.
   useEffect(() => {
     if (canHover || !listRef.current) return;
     const rows = Array.from(listRef.current.querySelectorAll<HTMLElement>("[data-project]"));
