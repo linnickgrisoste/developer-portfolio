@@ -42,14 +42,13 @@
   --radius-xl: calc(var(--radius) * 1.4);
 }
 
-/* Curva de assinatura do movimento (a mesma de `ease.out` em src/lib/motion.ts). Gera a classe `ease-brand`. */
+/* Espelha `ease.out` em src/lib/motion.ts. */
 @theme {
   --ease-brand: cubic-bezier(0.2, 0.7, 0.1, 1);
 }
 
-/* Papel frio, tinta azul-marinho e um único acento neon. */
+/* Espelha `palette` em src/lib/palette.ts. */
 :root {
-  /* Superfície escura fixa (rodapé e avisos) e as duas versões do neon. */
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
@@ -69,7 +68,7 @@
   --muted-foreground: #5f636b;
   --border: #d5d6cf;
   --neon: #806500;
-  /* Cor da camada de jogo (XP, conquistas, troféus), separada do acento editorial. */
+  /* Cor da camada de jogo, separada do acento editorial. */
   --reward: #0089a8;
   --neon-deep: #0d0f12;
   --neon-soft: #fcee0a;
@@ -114,11 +113,9 @@
   }
 }
 
-/*
- * Nome do hero: a abertura é a do texto cinético (nível assinatura, ver "Sistema de movimento").
- * Assentado, o nome "respira": uma onda lenta e sutil passa pelas letras. É o único laço
- * contínuo do site. Usa a propriedade `translate` (e não `transform`) para não brigar com a entrada.
- */
+/* ---------------------------------------------------------------- Hero */
+
+/* Único laço contínuo do site. Usa `translate` (e não `transform`) para não brigar com a entrada. */
 @media (prefers-reduced-motion: no-preference) {
   .hero-name .kinetic[data-settled] [data-k] {
     animation: breathe 6s ease-in-out infinite;
@@ -136,28 +133,19 @@
   }
 }
 
-/*
- * Hero em 3D (desktop capaz): o atributo data-hero3d no <html> é posto por um script no <head>, antes
- * da primeira pintura. Com ele, o nome em CSS nunca aparece: fica oculto, guardando o lugar e o texto,
- * e as letras 3D caem como boas-vindas. A cena só aparece quando desenhou ("on"). Se ela não chegar
- * a tempo, o atributo sai e o nome em CSS aparece com a própria entrada.
- */
+/* data-hero3d é posto no <head> antes da primeira pintura (three/gate-script.ts); o nome em CSS só guarda o lugar. */
 html[data-hero3d] .hero-print {
   opacity: 0;
 }
-/*
- * Oculto, o nome em CSS também não anima: a entrada mexe no peso e na largura das letras, e é dele que
- * a cena mede onde cada letra 3D pousa. Medido no meio da animação, o nome 3D saía mais estreito que o
- * lugar real (e o ponto, deslocado do botão que recebe o teclado).
- */
+/* A cena mede as letras do nome oculto: animado, o nome 3D saía mais estreito que o lugar real. */
 html[data-hero3d] .hero-name .kinetic [data-k] {
   animation: none;
 }
-/* !important vence o estilo inline do ponto e as animações de entrada (o carimbo). */
+/* !important vence o estilo inline do ponto e o carimbo. */
 html[data-hero3d] .hero-name .full-stop-dot {
   opacity: 0 !important;
 }
-/* O mouse passa direto para a cena (a esfera); o ponto em DOM fica só para o foco e o Enter do teclado. */
+/* O mouse vai para a esfera 3D; o ponto em DOM fica só para o teclado. */
 html[data-hero3d="on"] .hero-name .full-stop-dot {
   pointer-events: none;
 }
@@ -167,7 +155,7 @@ html[data-hero3d="on"] .hero-name .full-stop-dot {
 html[data-hero3d="on"] .hero-3d {
   visibility: visible;
 }
-/* Quem liga movimento reduzido no meio da visita volta para o nome em CSS, que respeita a preferência. */
+/* Movimento reduzido ligado no meio da visita volta para o nome em CSS. */
 @media (prefers-reduced-motion: reduce) {
   html[data-hero3d] .hero-print {
     opacity: 1;
@@ -181,22 +169,22 @@ html[data-hero3d="on"] .hero-3d {
 }
 
 /*
- * O ponto final cai por último e carimba o nome: acelera na queda e achata no impacto.
- * Depois, parado, ele troca de cor devagar entre vizinhos do neon (violeta e azul-piscina).
- *
- * A troca de cor é feita com duas camadas por cima do neon (violeta em ::before, azul-piscina em
- * ::after) que acendem e apagam só com opacidade. Animar `background-color` direto rodava na thread
- * principal a cada quadro, para sempre, e não deixava a página ficar parada. Opacidade roda na placa
- * de vídeo. A cor visível num instante é lida por `currentDotColor` (full-stop.tsx).
+ * Ciclo de cor do ponto: só opacidade das camadas ::before/::after, para rodar na placa de vídeo.
+ * Tempo (9 s, 2 s de espera) espelhado em `dotCycle` (lib/motion.ts).
  */
-.full-stop-dot {
-  --dot-violet: #ff9f1a;
-  --dot-teal: #00f0ff;
+.full-stop-dot,
+.dot-cycle {
+  --dot-second: #ff9f1a;
+  --dot-third: #00f0ff;
   position: relative;
+}
+.full-stop-dot {
   animation: stamp 480ms 1.3s backwards;
 }
 .full-stop-dot::before,
-.full-stop-dot::after {
+.full-stop-dot::after,
+.dot-cycle::before,
+.dot-cycle::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -204,17 +192,19 @@ html[data-hero3d="on"] .hero-3d {
   opacity: 0;
   pointer-events: none;
 }
-.full-stop-dot::before {
-  background-color: var(--dot-violet);
-  animation: dot-violet 9s ease-in-out 2s infinite;
+.full-stop-dot::before,
+.dot-cycle::before {
+  background-color: var(--dot-second);
+  animation: dot-second 9s ease-in-out var(--cycle-delay, 2s) infinite;
 }
-.full-stop-dot::after {
-  background-color: var(--dot-teal);
-  animation: dot-teal 9s ease-in-out 2s infinite;
+.full-stop-dot::after,
+.dot-cycle::after {
+  background-color: var(--dot-third);
+  animation: dot-third 9s ease-in-out var(--cycle-delay, 2s) infinite;
 }
 
-/* Neon → violeta → azul-piscina → neon. O azul-piscina acende por cima do violeta aceso, e o violeta só apaga escondido sob ele. */
-@keyframes dot-violet {
+/* A terceira acende por cima da segunda, e a segunda só apaga escondida sob ela. */
+@keyframes dot-second {
   0% {
     opacity: 0;
   }
@@ -227,7 +217,7 @@ html[data-hero3d="on"] .hero-3d {
     opacity: 0;
   }
 }
-@keyframes dot-teal {
+@keyframes dot-third {
   0%,
   33% {
     opacity: 0;
@@ -256,10 +246,44 @@ html[data-hero3d="on"] .hero-3d {
   }
 }
 
-/*
- * Menu: ao passar o mouse (ou focar pelo teclado), as letras sobem uma depois da outra e voltam
- * com um leve quique. 20ms entre letras mantém a onda inteira abaixo de meio segundo.
- */
+/* Parte de 30%, e não de zero: conteúdo invisível não conta para o LCP, e este é o maior texto no celular. */
+.rise-in {
+  animation: rise-in 700ms var(--ease-brand) backwards;
+  animation-delay: var(--delay, 600ms);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0.3;
+    transform: translateY(12px);
+  }
+}
+
+.scroll-cue {
+  animation: scroll-cue 1.8s ease-in-out 2.2s 3;
+}
+
+@keyframes scroll-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 0.4;
+  }
+}
+
+/* Logo depois de trocar de idioma a abertura já foi vista. */
+.no-intro .rise-in,
+.no-intro .scroll-cue,
+.no-intro .full-stop-dot {
+  animation: none;
+}
+
+/* ---------------------------------------------------------------- Menu, linha do tempo, avisos */
+
 .nav-hop [data-hop] {
   display: inline-block;
   white-space: pre;
@@ -280,44 +304,6 @@ html[data-hero3d="on"] .hero-3d {
   }
 }
 
-/*
- * Texto de apoio do hero: sobe e ganha força enquanto o nome ainda assenta. Parte de 30% (e não de zero):
- * é o maior texto do hero no celular, e conteúdo com opacidade zero não conta como pintado para o
- * Largest Contentful Paint. Nascendo visível, o LCP não espera a animação.
- */
-.rise-in {
-  animation: rise-in 700ms var(--ease-brand) backwards;
-  animation-delay: var(--delay, 600ms);
-}
-
-@keyframes rise-in {
-  from {
-    opacity: 0.3;
-    transform: translateY(12px);
-  }
-}
-
-/*
- * Indicador "role para começar": a seta desce e volta, como um prompt de jogo.
- * Três vezes e para: fora do nome do hero, nada no site fica em laço infinito.
- */
-.scroll-cue {
-  animation: scroll-cue 1.8s ease-in-out 2.2s 3;
-}
-
-@keyframes scroll-cue {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  50% {
-    transform: translateY(5px);
-    opacity: 0.4;
-  }
-}
-
-/* Marco da experiência atual: três pulsos quando a linha do tempo chega até ele, e para. */
 .milestone-ping {
   animation: milestone-ping 1s cubic-bezier(0, 0, 0.2, 1) 3 forwards;
 }
@@ -330,7 +316,6 @@ html[data-hero3d="on"] .hero-3d {
   }
 }
 
-/* Tempo restante do aviso de conquista. Pausa enquanto o aviso está sob o cursor ou em foco. */
 .toast-countdown {
   transform-origin: left;
   animation: countdown linear forwards;
@@ -347,24 +332,10 @@ html[data-hero3d="on"] .hero-3d {
   }
 }
 
-/*
- * Logo depois de trocar de idioma (a página monta de novo), a abertura já foi vista: o texto de apoio
- * nasce no lugar e o ponto já carimbado. O nome cuida de si (o texto cinético pula a própria entrada).
- */
-.no-intro .rise-in,
-.no-intro .scroll-cue {
-  animation: none;
-}
-.no-intro .full-stop-dot {
-  animation: none;
-}
+/* ---------------------------------------------------------------- Sistema de movimento */
+/* As primitivas em src/components/motion só ligam atributos e variáveis; o desenho fica aqui. */
 
-/* =========================================================================================
- * Sistema de movimento: "em repouso, é impresso; ao interagir, vira objeto".
- * As primitivas em src/components/motion só ligam atributos e variáveis; o desenho fica aqui.
- * ========================================================================================= */
-
-/* Registradas para poderem ser animadas por `transition` (variáveis comuns trocam de valor de uma vez). */
+/* Registradas para poderem ser animadas por `transition`. */
 @property --depth {
   syntax: "<length>";
   inherits: true;
@@ -381,10 +352,7 @@ html[data-hero3d="on"] .hero-3d {
   initial-value: 0.85;
 }
 
-/*
- * Lateral neon (Extrude). As camadas são cópias do texto atrás dele, deslocadas na direção
- * (--dx, --dy) por uma fração (--k) da profundidade. As mais fundas escurecem, para dar volume.
- */
+/* Extrude: cópias do texto deslocadas em (--dx, --dy) por uma fração --k da profundidade. */
 .extrude {
   position: relative;
   --depth: 0em;
@@ -396,7 +364,7 @@ html[data-hero3d="on"] .hero-3d {
 .extrude[data-depth-driver="engaged"][data-engaged] {
   --depth: var(--depth-max);
 }
-/* No rastro do scroll quem suaviza é o driver; uma transição por cima só atrasaria. */
+/* O driver de velocidade já suaviza; uma transição por cima só atrasaria. */
 .extrude[data-depth-driver="velocity"] {
   transition: none;
 }
@@ -414,11 +382,7 @@ html[data-hero3d="on"] .hero-3d {
     calc(var(--dy) * var(--depth) * var(--k))
   );
 }
-/*
- * Recolhida, a lateral some: senão a borda suavizada das letras deixaria um halo neon em volta.
- * `visibility` (e não só opacidade) tira as centenas de camadas paradas do teste de cursor do navegador,
- * que antes as percorria a cada movimento do mouse.
- */
+/* `visibility` (não só opacidade) tira as camadas paradas do teste de cursor e evita o halo da borda. */
 .extrude:not([data-raised]) .extrude-layer {
   visibility: hidden;
   transition: visibility 0s linear 350ms;
@@ -427,21 +391,14 @@ html[data-hero3d="on"] .hero-3d {
   position: relative;
 }
 
-/*
- * Texto cinético (KineticText). --amp vem do nível (assinatura 1, título 0,55, detalhe 0,3)
- * e escala tudo: deslocamento, giro e peso da entrada, e a onda do toque.
- */
+/* KineticText: --amp vem do nível (assinatura 1, título 0,55, detalhe 0,3) e escala tudo. */
 .kinetic-word {
   display: inline-block;
   white-space: nowrap;
 }
 /*
- * Peso e largura de cada letra = repouso + um acréscimo (--kinetic-dw, --kinetic-dwd) que a entrada, a onda e
- * a proximidade animam. O acréscimo anda suave, com a curva de sempre; a fonte recebe o valor arredondado
- * (passos de 10 no peso, 1 na largura). Cada valor inédito de eixo obriga o navegador a montar outra
- * instância da fonte variável, e interpolando direto o `font-variation-settings` toda letra pedia um valor
- * inédito a cada quadro: era o maior custo da rolagem. Arredondado, os valores se repetem entre letras e
- * títulos e saem do cache. O passo é pequeno demais para se ver.
+ * Peso e largura arredondados com round(): cada valor inédito de eixo cria outra instância da fonte
+ * variável, e interpolar direto era o maior custo da rolagem. Anime --kinetic-dw/--kinetic-dwd, nunca o eixo.
  */
 @property --kinetic-dw {
   syntax: "<number>";
@@ -466,10 +423,7 @@ html[data-hero3d="on"] .hero-3d {
 .kinetic[data-armed]:not([data-set]) [data-k] {
   opacity: 0;
 }
-/*
- * Movimento e peso em duas animações com o mesmo tempo: juntas, a parte de peso (que não roda na placa
- * de vídeo) prendia também o deslocamento e o giro na thread principal.
- */
+/* Duas animações separadas: juntas, a de peso prendia também o transform na thread principal. */
 .kinetic[data-set] [data-k] {
   animation-name: kinetic-set, kinetic-set-weight;
   animation-duration: calc(700ms + 500ms * var(--amp));
@@ -477,7 +431,7 @@ html[data-hero3d="on"] .hero-3d {
   animation-fill-mode: backwards;
   animation-delay: calc(var(--i) * var(--kinetic-stagger));
 }
-/* No toque não há cursor: ao passar pela faixa central, uma onda de peso atravessa o texto. */
+/* No toque não há cursor: a onda de peso passa ao cruzar a faixa central. */
 .kinetic[data-touch][data-settled][data-engaged] [data-k] {
   animation: kinetic-wave 700ms var(--ease-brand);
   animation-delay: calc(var(--i) * 30ms);
@@ -495,7 +449,6 @@ html[data-hero3d="on"] .hero-3d {
   35% {
     opacity: 1;
   }
-  /* O impacto na prensa, como no nome: desce um fio, achata e engorda antes de assentar. */
   62% {
     transform: translate(0, calc(0.03em * var(--amp))) scale(calc(1 + 0.02 * var(--amp)), calc(1 - 0.06 * var(--amp)));
   }
@@ -504,7 +457,6 @@ html[data-hero3d="on"] .hero-3d {
   }
 }
 
-/* O peso da mesma entrada: chega leve, engorda no impacto e assenta no peso de repouso. */
 @keyframes kinetic-set-weight {
   0% {
     --kinetic-dw: calc(-300 * var(--amp));
@@ -524,11 +476,7 @@ html[data-hero3d="on"] .hero-3d {
   }
 }
 
-/*
- * Card com espessura (Tilt): placas neon atrás do card, afastadas em Z conforme --lift (0 a 1).
- * Mais fundas, elas encolheriam com a perspectiva e ficariam escondidas atrás do card; o `scale`
- * devolve o tamanho (--perspective-n é a distância da câmera, em px), e só sobra o deslocamento da inclinação: a espessura.
- */
+/* Tilt: o `scale` compensa o encolhimento da perspectiva (--perspective-n em px), sobrando só a espessura. */
 .tilt-plate {
   background: color-mix(in oklab, var(--neon), black calc(var(--z) * 14%));
   opacity: min(1, calc(var(--lift) * 4));
@@ -536,7 +484,7 @@ html[data-hero3d="on"] .hero-3d {
     scale(calc(1 + var(--lift) * var(--z) * var(--plate-gap-n) / var(--perspective-n, 900)));
 }
 
-/* Hodômetro (Odometer): cada casa mostra uma fita de 20 dígitos; parar em 10 + dígito dá uma volta inteira. */
+/* Odometer: fita de 20 dígitos; parar em 10 + dígito garante uma volta inteira. */
 .odometer-column {
   display: inline-block;
   height: 1lh;
@@ -569,15 +517,11 @@ html[data-hero3d="on"] .hero-3d {
     transition: none;
     transform: translateY(calc((10 + var(--digit)) * -1lh));
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .nav-hop [data-hop],
+  /* No ponto final sai só a queda; a troca de cor não é movimento e fica. */
+  .nav-hop:hover [data-hop],
+  .nav-hop:focus-visible [data-hop],
   .scroll-cue,
-  .rise-in {
-    animation: none;
-  }
-  /* Sem a queda; a troca de cor (as camadas ::before e ::after) fica, porque não é movimento. */
+  .rise-in,
   .full-stop-dot {
     animation: none;
   }
@@ -586,4 +530,60 @@ html[data-hero3d="on"] .hero-3d {
   }
 }
 
+/* ---------------------------------------------------------------- Jogo e troféus */
 
+/* data-stage3d vem do <head>; a vitrine em DOM fica para leitores de tela e volta com data-show. */
+html[data-stage3d] .trophy-stage {
+  min-height: 28rem;
+  flex: 1 1 0%;
+}
+html[data-stage3d] .trophy-fallback:not([data-show]) {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Cores de cada troféu vêm de --a-main/--a-accent/--a-glow (`styleVars` em lib/trophy-styles.ts). */
+@utility medal {
+  background: linear-gradient(145deg, var(--a-accent) -25%, var(--a-main) 45%, color-mix(in oklab, var(--a-main), black 45%));
+  box-shadow:
+    0 0 28px -6px var(--a-glow),
+    inset 0 0 0 1px rgb(255 255 255 / 0.25);
+}
+@utility trophy-bar {
+  background: linear-gradient(90deg, var(--a-main), var(--a-glow));
+}
+
+.toast-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.6) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: toast-shine 900ms var(--ease-brand) 350ms forwards;
+}
+@keyframes toast-shine {
+  to {
+    transform: translateX(120%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast-shine {
+    display: none;
+  }
+}
+
+/* Modo dourado (data-gold, posto por game/gold-script.ts). Espelha `gold` em lib/palette.ts. */
+html[data-gold] {
+  --neon: #9c5a00;
+  --neon-soft: #f0b429;
+}
+html.dark[data-gold] {
+  --neon: #f0b429;
+}
+html[data-gold] .full-stop-dot,
+html[data-gold] .dot-cycle {
+  --dot-second: #ffe08a;
+  --dot-third: #e08a2e;
+}

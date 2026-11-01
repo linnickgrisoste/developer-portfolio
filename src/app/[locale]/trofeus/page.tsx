@@ -18,8 +18,41 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-// A sala de troféus tem rota própria: pacote separado, o botão voltar funciona e o link pode ser compartilhado.
-// É sempre noturna, como o rodapé de onde se chega a ela.
+function trophyEntries(locale: Locale) {
+  const shelf = achievements.map((achievement) => ({
+    id: achievement.id,
+    name: achievement.name[locale],
+    description: achievement.description[locale],
+    hint: achievement.hint?.[locale],
+    secret: Boolean(achievement.secret),
+    xp: achievement.xp,
+    placement: "shelf" as const,
+  }));
+  const crown = {
+    id: "crown" as const,
+    name: gameCopy.completeTitle[locale],
+    description: gameCopy.crownDescription[locale],
+    hint: gameCopy.crownHint[locale],
+    secret: true,
+    placement: "center" as const,
+  };
+  return [...shelf, crown];
+}
+
+function roomLabels(locale: Locale) {
+  return {
+    title: gameCopy.trophyRoom[locale],
+    intro: gameCopy.roomIntro[locale],
+    hint: gameCopy.roomHint[locale],
+    hintTouch: gameCopy.roomHintTouch[locale],
+    done: gameCopy.done[locale],
+    locked: gameCopy.locked[locale],
+    level: gameCopy.level[locale],
+    close: gameCopy.close[locale],
+  };
+}
+
+// Sempre noturna, como o rodapé de onde se chega a ela.
 export default async function TrophiesPage({ params }: PageProps) {
   const locale = (await params).locale as Locale;
 
@@ -34,26 +67,7 @@ export default async function TrophiesPage({ params }: PageProps) {
           {gameCopy.backToSite[locale]}
         </Link>
       </header>
-      <TrophyRoom
-        entries={achievements.map((achievement) => ({
-          id: achievement.id,
-          name: achievement.name[locale],
-          description: achievement.description[locale],
-          hint: achievement.hint?.[locale],
-          secret: Boolean(achievement.secret),
-          xp: achievement.xp,
-        }))}
-        labels={{
-          title: gameCopy.trophyRoom[locale],
-          intro: gameCopy.roomIntro[locale],
-          hint: gameCopy.roomHint[locale],
-          hintTouch: gameCopy.roomHintTouch[locale],
-          done: gameCopy.done[locale],
-          locked: gameCopy.locked[locale],
-          level: gameCopy.level[locale],
-          close: gameCopy.close[locale],
-        }}
-      />
+      <TrophyRoom entries={trophyEntries(locale)} labels={roomLabels(locale)} />
     </div>
   );
 }

@@ -1,8 +1,6 @@
-// Camada de jogo do portfolio: conquistas, XP e níveis.
-// Edite textos, XP e ícones à vontade; os ids são usados no código para desbloquear.
-
 import type { Localized } from "@/lib/i18n";
 
+// Textos e XP são livres; os ids são usados no código para desbloquear.
 
 export type AchievementId =
   | "first-step"
@@ -13,6 +11,9 @@ export type AchievementId =
   | "quest-log"
   | "signal-sent"
   | "full-stop";
+
+/** A coroa é o nono troféu, de quem zera. */
+export type TrophyId = AchievementId | "crown";
 
 export type Achievement = {
   id: AchievementId;
@@ -81,7 +82,7 @@ export const achievements: Achievement[] = [
 
 export const totalXp = achievements.reduce((sum, achievement) => sum + achievement.xp, 0);
 
-// XP mínimo para alcançar cada nível (o índice + 1 é o nível), proporcional ao total.
+/** XP mínimo de cada nível (índice + 1), proporcional ao total. */
 export const levelThresholds = [0, 0.2, 0.45, 0.75, 1].map((share) => Math.round(share * totalXp));
 
 export function levelFor(xp: number) {
@@ -115,15 +116,23 @@ export const gameCopy = {
   reset: { pt: "Recomeçar", en: "Start over" },
   completeTitle: { pt: "Portfólio zerado", en: "Portfolio completed" },
   completeBody: {
-    pt: "Você encontrou tudo. Obrigado por explorar com calma.",
-    en: "You found everything. Thanks for exploring so carefully.",
+    pt: "Você encontrou tudo. A coroa está na sala de troféus, e o site ganhou o modo dourado.",
+    en: "You found everything. The crown is in the trophy room, and the site turned gold.",
   },
+  crownDescription: {
+    pt: "Reuniu as oito conquistas. O prêmio: o modo dourado, que liga e desliga no painel de progresso.",
+    en: "Collected all eight achievements. The prize: gold mode, which you can toggle in the progress panel.",
+  },
+  crownHint: {
+    pt: "Reúna as oito conquistas para coroar a estante.",
+    en: "Collect all eight achievements to crown the shelf.",
+  },
+  goldMode: { pt: "Modo dourado", en: "Gold mode" },
   fullStop: { pt: "Ponto final", en: "Full stop" },
   catchFullStop: { pt: "Pegar o ponto final", en: "Catch the full stop" },
   seen: { pt: "vistos", en: "seen" },
   seenLabel: { pt: "Prévia vista", en: "Preview seen" },
   progress: { pt: "conquistas", en: "achievements" },
-  // Sala de troféus: cada conquista vira um objeto numa estante.
   trophyRoom: { pt: "Sala de troféus", en: "Trophy room" },
   openTrophyRoom: { pt: "Abrir a sala de troféus", en: "Open the trophy room" },
   roomIntro: {

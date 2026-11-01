@@ -1,11 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
 import ClickSpark from "@/components/vendor/bits/ClickSpark";
-import { rewardPair } from "@/lib/palette";
+import { GOLD_ATTRIBUTE, rewardPair } from "@/lib/palette";
+import { useGame } from "./store";
 import { AchievementToasts } from "./toasts";
 
-// Envolve a página com as faíscas de clique e os avisos de conquista.
+// O script do <head> aplica o modo dourado antes da primeira pintura; daqui em diante ele segue o store.
+function useGoldAttribute() {
+  const goldMode = useGame((game) => game.goldMode);
+  useEffect(() => {
+    document.documentElement.toggleAttribute(GOLD_ATTRIBUTE, goldMode);
+  }, [goldMode]);
+}
+
 export function GameLayer({ children }: { children: React.ReactNode }) {
+  useGoldAttribute();
+
   return (
     <ClickSpark sparkColor={rewardPair} sparkCount={9} sparkRadius={22} sparkSize={10} duration={450} shape="line">
       {children}

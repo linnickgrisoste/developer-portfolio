@@ -1,5 +1,6 @@
 import {
   CircleDot,
+  Crown,
   Footprints,
   IdCard,
   Images,
@@ -9,9 +10,9 @@ import {
   Send,
   type LucideIcon,
 } from "lucide-react";
-import type { AchievementId } from "@/content/game";
+import type { TrophyId } from "@/content/game";
 
-const icons: Record<AchievementId, LucideIcon> = {
+const icons: Record<TrophyId, LucideIcon> = {
   "first-step": Footprints,
   curator: Images,
   polyglot: Languages,
@@ -20,9 +21,10 @@ const icons: Record<AchievementId, LucideIcon> = {
   "quest-log": ScrollText,
   "signal-sent": Send,
   "full-stop": CircleDot,
+  crown: Crown,
 };
 
-export function AchievementIcon({ id, className }: { id: AchievementId; className?: string }) {
+export function AchievementIcon({ id, className }: { id: TrophyId; className?: string }) {
   const Icon = icons[id];
   return <Icon className={className} strokeWidth={1.75} aria-hidden />;
 }

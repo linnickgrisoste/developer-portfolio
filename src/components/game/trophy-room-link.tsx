@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useLocale } from "@/components/providers";
 import { preloadTrophyScene } from "@/components/three/trophies/preload";
 
-// Link para a sala de troféus. Ao receber o mouse ou o foco, já começa a baixar a cena 3D:
-// quando o clique vier, ela está a caminho (ou pronta).
+/** No hover ou foco já começa a baixar a cena 3D, para o clique encontrá-la a caminho. */
 export function TrophyRoomLink({
   className,
   children,
@@ -13,7 +12,6 @@ export function TrophyRoomLink({
 }: {
   className?: string;
   children: React.ReactNode;
-  /** Chamado no clique (ex.: fechar o popover do HUD). */
   onNavigate?: () => void;
 }) {
   const { locale } = useLocale();

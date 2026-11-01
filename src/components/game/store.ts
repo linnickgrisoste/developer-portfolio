@@ -1,12 +1,9 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { achievements, type AchievementId } from "@/content/game";
-import { rewardPair, palette } from "@/lib/palette";
-
-// Estado do modo explorador, salvo no localStorage e compartilhado por toda a página.
-
-const STORAGE_KEY = "explorer-mode";
+import { achievements, type AchievementId, type TrophyId } from "@/content/game";
+import { fireConfetti } from "./confetti";
+import { STORAGE_KEY } from "./storage";
 
 export type ToastItem = { key: number; kind: "achievement"; id: AchievementId } | { key: number; kind: "complete" };
 
@@ -15,14 +12,21 @@ type GameState = {
   seenProjects: string[];
   seenClasses: string[];
   toastsEnabled: boolean;
+  /** Prêmio de quem zera: o neon vira ouro. */
+  goldMode: boolean;
+  crownCelebrated: boolean;
   queue: ToastItem[];
 };
+
+type Unlocked = GameState["unlocked"];
 
 const initialState: GameState = {
   unlocked: {},
   seenProjects: [],
   seenClasses: [],
   toastsEnabled: true,
+  goldMode: false,
+  crownCelebrated: false,
   queue: [],
 };
 
@@ -60,11 +64,7 @@ function getSnapshot() {
   return state;
 }
 
-/**
- * Lê uma parte do estado. O componente só re-renderiza quando essa parte muda,
- * então o seletor deve devolver um valor do próprio estado ou um primitivo
- * (ex.: `useGame((game) => game.queue)`), nunca um objeto novo a cada chamada.
- */
+/** O seletor deve devolver parte do estado ou um primitivo; um objeto novo re-renderiza sempre. */
 export function useGame<T>(select: (game: GameState) => T): T {
   return useSyncExternalStore(
     subscribe,
@@ -73,40 +73,36 @@ export function useGame<T>(select: (game: GameState) => T): T {
   );
 }
 
-// O confete só existe ao completar 100% das conquistas, então a biblioteca baixa só nessa hora.
-async function celebrate() {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const { default: confetti } = await import("canvas-confetti");
-  const colors = [...rewardPair, palette.light.ink, palette.light.paper];
-  confetti({ particleCount: 90, spread: 70, startVelocity: 45, origin: { x: 0.2, y: 0.9 }, colors });
-  confetti({ particleCount: 90, spread: 70, startVelocity: 45, origin: { x: 0.8, y: 0.9 }, colors });
-}
-
 export function unlock(id: AchievementId) {
   load();
   if (state.unlocked[id]) return;
   const unlocked = { ...state.unlocked, [id]: Date.now() };
   const queue: ToastItem[] = [...state.queue, { key: ++toastKey, kind: "achievement", id }];
-  const complete = achievements.every((achievement) => unlocked[achievement.id]);
+  const complete = isComplete(unlocked);
   if (complete) queue.push({ key: ++toastKey, kind: "complete" });
-  setState({ ...state, unlocked, queue: state.toastsEnabled ? queue : state.queue });
-  if (complete) void celebrate();
+  setState({
+    ...state,
+    unlocked,
+    goldMode: state.goldMode || complete,
+    queue: state.toastsEnabled ? queue : state.queue,
+  });
+  if (complete) void fireConfetti();
+}
+
+function markSeen(list: "seenProjects" | "seenClasses", item: string, total: number, reward: AchievementId) {
+  load();
+  if (state[list].includes(item)) return;
+  const seen = [...state[list], item];
+  setState({ ...state, [list]: seen });
+  if (seen.length >= total) unlock(reward);
 }
 
 export function markProjectSeen(title: string, total: number) {
-  load();
-  if (state.seenProjects.includes(title)) return;
-  const seenProjects = [...state.seenProjects, title];
-  setState({ ...state, seenProjects });
-  if (seenProjects.length >= total) unlock("curator");
+  markSeen("seenProjects", title, total, "curator");
 }
 
 export function markClassSeen(name: string, total: number) {
-  load();
-  if (state.seenClasses.includes(name)) return;
-  const seenClasses = [...state.seenClasses, name];
-  setState({ ...state, seenClasses });
-  if (seenClasses.length >= total) unlock("character-sheet");
+  markSeen("seenClasses", name, total, "character-sheet");
 }
 
 export function dismissToast(key: number) {
@@ -117,10 +113,33 @@ export function setToastsEnabled(toastsEnabled: boolean) {
   setState({ ...state, toastsEnabled, queue: toastsEnabled ? state.queue : [] });
 }
 
+export function setGoldMode(goldMode: boolean) {
+  load();
+  setState({ ...state, goldMode });
+}
+
+export function markCrownCelebrated() {
+  load();
+  if (!state.crownCelebrated) setState({ ...state, crownCelebrated: true });
+}
+
 export function resetGame() {
   setState({ ...initialState, toastsEnabled: state.toastsEnabled });
 }
 
-export function xpOf(unlocked: GameState["unlocked"]) {
+export function isComplete(unlocked: Unlocked) {
+  return achievements.every((achievement) => unlocked[achievement.id]);
+}
+
+export function unlockedCount(unlocked: Unlocked) {
+  return achievements.filter((achievement) => unlocked[achievement.id]).length;
+}
+
+/** A coroa conta como conquistada quando o portfólio está zerado. */
+export function isTrophyUnlocked(id: TrophyId, unlocked: Unlocked) {
+  return id === "crown" ? isComplete(unlocked) : Boolean(unlocked[id]);
+}
+
+export function xpOf(unlocked: Unlocked) {
   return achievements.reduce((sum, achievement) => sum + (unlocked[achievement.id] ? achievement.xp : 0), 0);
 }

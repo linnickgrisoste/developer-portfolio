@@ -1,22 +1,32 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
+import { GOLD_ATTRIBUTE, themeColors } from "@/lib/palette";
 
-// Se o tema escuro está ativo, lido da classe do <html> (o next-themes a põe antes da primeira pintura).
-// No servidor e durante a hidratação é sempre false: o HTML do servidor e o primeiro render do navegador
-// batem, e o ajuste de tema entra no render seguinte. (Ler o `useTheme` direto quebraria a hidratação:
-// no navegador ele já sabe o tema no primeiro render, no servidor não.)
+// No servidor e na hidratação o tema é sempre o claro, para o HTML bater; o ajuste vem no render seguinte.
+// O `useTheme` do next-themes já sabe o tema no primeiro render do navegador e quebraria a hidratação.
 
 function subscribe(listener: () => void) {
   const observer = new MutationObserver(listener);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class", GOLD_ATTRIBUTE] });
   return () => observer.disconnect();
 }
 
+const isDark = () => document.documentElement.classList.contains("dark");
+const isGold = () => document.documentElement.hasAttribute(GOLD_ATTRIBUTE);
+const onServer = () => false;
+
 export function useDarkTheme() {
-  return useSyncExternalStore(
-    subscribe,
-    () => document.documentElement.classList.contains("dark"),
-    () => false,
-  );
+  return useSyncExternalStore(subscribe, isDark, onServer);
+}
+
+export function useGoldMode() {
+  return useSyncExternalStore(subscribe, isGold, onServer);
+}
+
+/** As cores do tema atual em hex, para canvas e WebGL; no modo dourado o neon vira ouro. */
+export function useThemeColors() {
+  const theme = useDarkTheme() ? "dark" : "light";
+  const goldMode = useGoldMode();
+  return useMemo(() => themeColors(theme, goldMode), [theme, goldMode]);
 }

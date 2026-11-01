@@ -1,26 +1,60 @@
 "use client";
 
-import { ArrowRight, Check, Lock, RotateCcw, Trophy } from "lucide-react";
+import { ArrowRight, Check, Crown, Lock, RotateCcw, Trophy } from "lucide-react";
 import { motion } from "motion/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { useLocale } from "@/components/providers";
-import { achievements, gameCopy, levelFor, totalXp } from "@/content/game";
+import { achievements, gameCopy, levelFor, totalXp, type Achievement } from "@/content/game";
 import { spring } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 import { AchievementIcon } from "./achievement-icon";
-import { resetGame, setToastsEnabled, useGame, xpOf } from "./store";
+import { isComplete, resetGame, setGoldMode, setToastsEnabled, unlockedCount, useGame, xpOf } from "./store";
 import { TrophyRoomLink } from "./trophy-room-link";
+
+const MIN_BAR_PROGRESS = 0.04;
 
 function XpBar({ progress, className }: { progress: number; className?: string }) {
   return (
-    <span className={`relative block h-1.5 overflow-hidden rounded-full bg-rule ${className ?? ""}`}>
+    <span className={cn("relative block h-1.5 overflow-hidden rounded-full bg-rule", className)}>
       <motion.span
         className="absolute inset-y-0 left-0 rounded-full bg-reward"
         initial={false}
-        animate={{ width: `${Math.max(progress, 0.04) * 100}%` }}
+        animate={{ width: `${Math.max(progress, MIN_BAR_PROGRESS) * 100}%` }}
         transition={spring.soft}
       />
     </span>
+  );
+}
+
+function AchievementRow({ achievement, done }: { achievement: Achievement; done: boolean }) {
+  const { t } = useLocale();
+  const hidden = achievement.secret && !done;
+
+  return (
+    <li className="flex items-center gap-3 rounded-md p-3">
+      <span
+        className={cn(
+          "grid size-10 shrink-0 place-items-center rounded-md",
+          done ? "bg-reward text-paper" : "bg-muted text-graphite",
+        )}
+      >
+        {hidden ? <Lock className="size-4" aria-hidden /> : <AchievementIcon id={achievement.id} className="size-5" />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className={cn("block text-[15px] font-semibold", !done && "text-graphite")}>
+          {hidden ? "???" : t(achievement.name)}
+        </span>
+        <span className="block text-[13px] leading-snug text-graphite">
+          {hidden && achievement.hint ? t(achievement.hint) : t(achievement.description)}
+        </span>
+      </span>
+      {done ? (
+        <Check className="size-4 shrink-0 text-reward" aria-label={t(gameCopy.done)} />
+      ) : (
+        <span className="font-pixel shrink-0 text-[11px] text-graphite">{achievement.xp}</span>
+      )}
+    </li>
   );
 }
 
@@ -28,16 +62,16 @@ export function ExplorerHud() {
   const { t } = useLocale();
   const unlocked = useGame((game) => game.unlocked);
   const toastsEnabled = useGame((game) => game.toastsEnabled);
+  const goldMode = useGame((game) => game.goldMode);
   const xp = xpOf(unlocked);
   const { level, progress, maxed } = levelFor(xp);
-  const count = achievements.filter((a) => unlocked[a.id]).length;
+  const barProgress = maxed ? 1 : progress;
+  const counter = `${unlockedCount(unlocked)}/${achievements.length}`;
 
   return (
     <Popover>
-      <PopoverTrigger
-        // Sem aria-label: o nome acessível é o que está visível ("Nv1 0/8") seguido da ação, em texto só para leitores de tela.
-        className="group flex h-9 items-center gap-2.5 rounded-full px-3 transition-colors hover:bg-muted data-[state=open]:bg-muted"
-      >
+      {/* Sem aria-label: o nome acessível é o texto visível ("Nv1 0/8") seguido da ação, só para leitores de tela. */}
+      <PopoverTrigger className="group flex h-9 items-center gap-2.5 rounded-full px-3 transition-colors hover:bg-muted data-[state=open]:bg-muted">
         <motion.span
           key={level}
           initial={{ scale: 1.6, color: "var(--reward)" }}
@@ -48,10 +82,8 @@ export function ExplorerHud() {
           {t(gameCopy.level)}
           {level}
         </motion.span>
-        <XpBar progress={maxed ? 1 : progress} className="w-12 sm:w-16" />
-        <span className="hidden text-[13px] tabular-nums text-graphite sm:inline">
-          {count}/{achievements.length}
-        </span>
+        <XpBar progress={barProgress} className="w-12 sm:w-16" />
+        <span className="hidden text-[13px] tabular-nums text-graphite sm:inline">{counter}</span>
         <span className="sr-only">{t(gameCopy.hudLabel)}</span>
       </PopoverTrigger>
 
@@ -69,45 +101,17 @@ export function ExplorerHud() {
               {t(gameCopy.level)}
               {level}
             </span>
-            <XpBar progress={maxed ? 1 : progress} className="flex-1" />
-            <span className="text-[13px] tabular-nums text-graphite">
-              {count}/{achievements.length}
-            </span>
+            <XpBar progress={barProgress} className="flex-1" />
+            <span className="text-[13px] tabular-nums text-graphite">{counter}</span>
           </div>
         </div>
 
         <ul className="max-h-[min(22rem,50vh)] overflow-y-auto p-2">
-          {achievements.map((achievement) => {
-            const done = Boolean(unlocked[achievement.id]);
-            const hidden = achievement.secret && !done;
-            return (
-              <li key={achievement.id} className="flex items-center gap-3 rounded-md p-3">
-                <span
-                  className={`grid size-10 shrink-0 place-items-center rounded-md ${
-                    done ? "bg-reward text-paper" : "bg-muted text-graphite"
-                  }`}
-                >
-                  {hidden ? <Lock className="size-4" aria-hidden /> : <AchievementIcon id={achievement.id} className="size-5" />}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className={`block text-[15px] font-semibold ${done ? "" : "text-graphite"}`}>
-                    {hidden ? "???" : t(achievement.name)}
-                  </span>
-                  <span className="block text-[13px] leading-snug text-graphite">
-                    {hidden && achievement.hint ? t(achievement.hint) : t(achievement.description)}
-                  </span>
-                </span>
-                {done ? (
-                  <Check className="size-4 shrink-0 text-reward" aria-label={t(gameCopy.done)} />
-                ) : (
-                  <span className="font-pixel shrink-0 text-[11px] text-graphite">{achievement.xp}</span>
-                )}
-              </li>
-            );
-          })}
+          {achievements.map((achievement) => (
+            <AchievementRow key={achievement.id} achievement={achievement} done={Boolean(unlocked[achievement.id])} />
+          ))}
         </ul>
 
-        {/* A sala de troféus: o mesmo progresso, com cada conquista como objeto. */}
         <TrophyRoomLink className="group flex items-center justify-between gap-3 border-t border-rule px-5 py-3.5 text-[14px] font-semibold transition-colors hover:bg-muted hover:text-reward">
           <span className="flex items-center gap-2.5">
             <Trophy className="size-4" strokeWidth={1.75} aria-hidden />
@@ -115,6 +119,16 @@ export function ExplorerHud() {
           </span>
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
         </TrophyRoomLink>
+
+        {isComplete(unlocked) && (
+          <label className="flex cursor-pointer items-center justify-between gap-4 border-t border-rule px-5 py-3.5 text-[14px] font-semibold">
+            <span className="flex items-center gap-2.5">
+              <Crown className="size-4 text-neon" strokeWidth={1.75} aria-hidden />
+              {t(gameCopy.goldMode)}
+            </span>
+            <Switch checked={goldMode} onCheckedChange={setGoldMode} />
+          </label>
+        )}
 
         <div className="flex items-center justify-between gap-4 border-t border-rule p-4">
           <label className="flex cursor-pointer items-center gap-2.5 text-[13px]">
