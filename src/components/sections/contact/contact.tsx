@@ -63,11 +63,6 @@ export function Contact({ locale }: { locale: Locale }) {
                 </a>
               </li>
             ))}
-            <li>
-              <a href={profile.resumeHref} className={socialLinkClass}>
-                <LinkLabel text={text.resume[locale]} />
-              </a>
-            </li>
           </ul>
 
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-(--footer-fg)/65">

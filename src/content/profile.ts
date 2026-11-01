@@ -6,7 +6,6 @@ export const profile = {
     { label: "GitHub", href: "https://github.com/linnickgrisoste" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/linnick-grisoste" },
   ],
-  resumeHref: "#",
 };
 
 export const stats = [

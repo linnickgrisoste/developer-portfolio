@@ -99,7 +99,6 @@ export const copy = {
       en: "Code on GitHub, my journey on LinkedIn and an inbox always open to swap ideas.",
       es: "Código en GitHub, trayectoria en LinkedIn y el correo siempre abierto para intercambiar ideas.",
     },
-    resume: { pt: "Baixar currículo", en: "Download résumé", es: "Descargar currículum" },
     copy: { pt: "Copiar e-mail", en: "Copy email", es: "Copiar correo" },
     copied: { pt: "E-mail copiado", en: "Email copied", es: "Correo copiado" },
   },

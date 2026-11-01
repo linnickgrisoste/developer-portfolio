@@ -110,7 +110,7 @@ function Panel({ label, colors }: { label: string; colors: Palette }) {
 
       <div className="px-8 py-6" style={{ background: colors.night, color: colors.nightFg }}>
         <p className="text-2xl font-bold tracking-[-0.02em]">Onde me encontrar</p>
-        <p className="mt-2 text-sm opacity-70">GitHub · LinkedIn · Baixar currículo</p>
+        <p className="mt-2 text-sm opacity-70">GitHub · LinkedIn</p>
       </div>
     </div>
   );
