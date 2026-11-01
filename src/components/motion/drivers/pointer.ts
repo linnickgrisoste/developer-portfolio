@@ -1,12 +1,12 @@
 "use client";
 
-// Uma única fonte da posição do cursor para a página toda. Um `pointermove` passivo, agrupado
-// por quadro: quem assina recebe no máximo uma notificação por quadro, e o ouvinte só existe
-// enquanto alguém assina. Toque não conta: no celular, "engajar" é passar pela faixa central.
+// Um `pointermove` passivo e compartilhado, entregue no máximo uma vez por quadro. Toque não conta.
 
 export type PointerPosition = { readonly x: number; readonly y: number };
 
-const position = { x: -1e4, y: -1e4 };
+const FAR_AWAY = -1e4;
+
+const position = { x: FAR_AWAY, y: FAR_AWAY };
 const listeners = new Set<(pointer: PointerPosition) => void>();
 let frame = 0;
 

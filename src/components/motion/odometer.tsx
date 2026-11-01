@@ -2,16 +2,13 @@
 
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import { useInView } from "motion/react";
-import { useSkipEntrance } from "./entrance";
 import { cn } from "@/lib/utils";
 import { useCapabilities } from "./drivers/capabilities";
+import { useSkipEntrance } from "./entrance";
 
-// Número que gira como um hodômetro até o valor quando aparece na tela. Cada dígito é uma fita
-// 0–9 repetida duas vezes: ela dá uma volta inteira antes de parar, e as casas da esquerda
-// param depois das da direita, como um contador mecânico.
-// O servidor entrega a fita já no valor final (é o que buscadores e prévias leem).
-
-const DIGITS = "01234567890123456789";
+// Cada dígito é uma fita 0–9 repetida: dá uma volta inteira antes de parar, e as casas da esquerda
+// param depois das da direita. O servidor entrega a fita já no valor final, que é o que buscadores leem.
+const STRIP = Array.from("01234567890123456789");
 
 export function Odometer({ value, suffix = "", className }: { value: number; suffix?: string; className?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -20,7 +17,7 @@ export function Odometer({ value, suffix = "", className }: { value: number; suf
   const inView = useInView(ref, { once: true, margin: "-15% 0px" });
   const digits = String(value).split("");
 
-  // Antes de aparecer, volta as fitas para o zero (sem transição) para depois girar.
+  // Arma antes da pintura: as fitas voltam ao zero sem transição, para depois girar.
   useLayoutEffect(() => {
     ref.current?.toggleAttribute("data-armed", !reducedMotion && !skipEntrance);
   }, [reducedMotion, skipEntrance]);
@@ -40,7 +37,7 @@ export function Odometer({ value, suffix = "", className }: { value: number; suf
             style={{ "--digit": Number(digit), "--column": digits.length - 1 - column } as CSSProperties}
           >
             <span className="odometer-strip">
-              {Array.from(DIGITS).map((char, index) => (
+              {STRIP.map((char, index) => (
                 <span key={index}>{char}</span>
               ))}
             </span>

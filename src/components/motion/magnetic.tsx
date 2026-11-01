@@ -6,10 +6,9 @@ import { useCapabilities } from "./drivers/capabilities";
 import { subscribePointer } from "./drivers/pointer";
 import { useEngaged } from "./engaged";
 
-// Botão puxado pelo cursor enquanto engajado. Só com mouse: no toque, puxar não faz sentido.
-
 const MAGNET_SPRING = { stiffness: 260, damping: 18, mass: 0.4 };
 
+/** Puxado pelo cursor enquanto engajado. Só com mouse. */
 export function Magnetic({
   children,
   intensity = 0.3,

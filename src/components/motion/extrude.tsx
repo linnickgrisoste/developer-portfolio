@@ -7,11 +7,7 @@ import { cn } from "@/lib/utils";
 import { useDepth, type DepthDriver } from "./depth";
 import { useLevel } from "./engaged";
 
-/**
- * A lateral neon: cópias do conteúdo atrás dele, deslocadas por `transform` conforme `--depth`.
- * Em repouso não aparece; o driver decide quando ela cresce (ver `DepthDriver`).
- * Feito para texto: o conteúdo é duplicado em camadas `aria-hidden`, então não ponha links ou botões dentro.
- */
+/** As cópias do conteúdo são `aria-hidden`: só para texto, nunca links ou botões dentro. */
 export function Extrude({
   children,
   level = "title",
@@ -25,9 +21,7 @@ export function Extrude({
   level?: Level;
   driver?: DepthDriver;
   follow?: boolean;
-  /** Engaja pelo ancestral mais próximo que casa com o seletor (ex.: "a" para o card inteiro). */
   engageWith?: string;
-  /** Lateral acesa por fora do engajamento. */
   raised?: boolean;
   className?: string;
 }) {
@@ -43,7 +37,7 @@ export function Extrude({
   );
 }
 
-/** As camadas em si, da mais funda para a mais rasa. Também usadas letra a letra pelo `KineticText`. */
+/** As camadas, da mais funda para a mais rasa. O `KineticText` usa letra a letra. */
 export function ExtrudeLayers({ count, children }: { count: number; children: React.ReactNode }) {
   return Array.from({ length: count }, (_, index) => (
     <span key={index} aria-hidden className="extrude-layer" style={{ "--k": (count - index) / count } as CSSProperties}>

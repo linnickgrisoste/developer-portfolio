@@ -2,55 +2,52 @@
 
 import { useSyncExternalStore } from "react";
 
-// O que o aparelho e a pessoa permitem, lido de um lugar só. As primitivas decidem por aqui
-// se animam, como engajam (mouse ou faixa central) e se o 3D pode entrar.
-
 export type Capabilities = {
-  /** Pediu movimento reduzido no sistema. */
   reducedMotion: boolean;
-  /** Tem mouse ou caneta (hover de verdade). Sem isso, engajar é passar pela faixa central. */
+  /** Hover de verdade (mouse ou caneta). */
   finePointer: boolean;
-  /** Pediu economia de dados. */
   saveData: boolean;
-  /** WebGL 2 disponível. */
   webgl: boolean;
 };
 
-// No servidor (e na hidratação) assume o caso mais comum, sem 3D: o cliente corrige em seguida.
+// No servidor e na hidratação assume o caso mais comum, sem 3D; o cliente corrige em seguida.
 const serverSnapshot: Capabilities = { reducedMotion: false, finePointer: true, saveData: false, webgl: false };
 
 let snapshot = serverSnapshot;
-let webgl: boolean | null = null;
+let webglSupport: boolean | null = null;
 
 function detectWebgl() {
-  if (webgl === null) {
-    try {
-      webgl = Boolean(document.createElement("canvas").getContext("webgl2"));
-    } catch {
-      webgl = false;
-    }
+  if (webglSupport !== null) return webglSupport;
+  try {
+    webglSupport = Boolean(document.createElement("canvas").getContext("webgl2"));
+  } catch {
+    webglSupport = false;
   }
-  return webgl;
+  return webglSupport;
 }
 
-const reducedQuery = () => window.matchMedia("(prefers-reduced-motion: reduce)");
-const fineQuery = () => window.matchMedia("(hover: hover) and (pointer: fine)");
+const reducedMotionQuery = () => window.matchMedia("(prefers-reduced-motion: reduce)");
+const finePointerQuery = () => window.matchMedia("(hover: hover) and (pointer: fine)");
+
+function prefersSaveData() {
+  return Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+}
 
 function getSnapshot(): Capabilities {
   const next: Capabilities = {
-    reducedMotion: reducedQuery().matches,
-    finePointer: fineQuery().matches,
-    saveData: Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData),
+    reducedMotion: reducedMotionQuery().matches,
+    finePointer: finePointerQuery().matches,
+    saveData: prefersSaveData(),
     webgl: detectWebgl(),
   };
   // Mesmo valor, mesmo objeto: o React só re-renderiza quando algo muda de fato.
-  const same = (Object.keys(next) as (keyof Capabilities)[]).every((key) => next[key] === snapshot[key]);
-  if (!same) snapshot = next;
+  const unchanged = (Object.keys(next) as (keyof Capabilities)[]).every((key) => next[key] === snapshot[key]);
+  if (!unchanged) snapshot = next;
   return snapshot;
 }
 
 function subscribe(listener: () => void) {
-  const queries = [reducedQuery(), fineQuery()];
+  const queries = [reducedMotionQuery(), finePointerQuery()];
   queries.forEach((query) => query.addEventListener("change", listener));
   return () => queries.forEach((query) => query.removeEventListener("change", listener));
 }

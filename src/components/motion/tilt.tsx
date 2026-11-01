@@ -2,21 +2,31 @@
 
 import { useEffect, useRef, type CSSProperties } from "react";
 import { motion, useSpring } from "motion/react";
-import type { Level } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { useCapabilities } from "./drivers/capabilities";
 import { subscribePointer } from "./drivers/pointer";
+import { screenRect } from "./drivers/screen-rect";
 import { useEngaged, useLevel } from "./engaged";
+import { clamp } from "@/lib/math";
 
-// Card com espessura: engajado, ele inclina em perspectiva e revela placas neon atrás de si,
-// a mesma lateral do texto, agora em 3D de verdade (preserve-3d). Com mouse, a inclinação segue
-// o cursor; no toque, o card só se ergue ao passar pela faixa central.
-
-/** Placas atrás do card, da mais rasa para a mais funda. */
 const PLATES = [1, 2, 3];
 const TILT_SPRING = { stiffness: 220, damping: 22, mass: 0.6 };
-/** Distância mínima da câmera (px). Cards grandes afastam mais (2,5× a largura). */
+const TILT_DEG = { base: 6, perAmplitude: 10 };
+const PLATE_GAP_PX = { base: 6, perAmplitude: 8 };
+/** Inclinação fixa no toque, em fração da máxima. */
+const TOUCH_TILT = 0.45;
+// A câmera se afasta em cards grandes: com a mesma perspectiva, um pôster largo distorceria demais.
 const MIN_PERSPECTIVE = 900;
+const PERSPECTIVE_PER_WIDTH = 2.5;
+
+const byAmplitude = ({ base, perAmplitude }: { base: number; perAmplitude: number }, amplitude: number) =>
+  base + perAmplitude * amplitude;
+
+function fitPerspective(element: HTMLElement) {
+  const perspective = Math.max(MIN_PERSPECTIVE, element.offsetWidth * PERSPECTIVE_PER_WIDTH);
+  element.style.setProperty("--perspective", `${perspective}px`);
+  element.style.setProperty("--perspective-n", String(perspective));
+}
 
 export function Tilt({
   children,
@@ -28,46 +38,40 @@ export function Tilt({
   children: React.ReactNode;
   level?: "title" | "detail";
   className?: string;
-  /** Arredondamento das placas: o mesmo do conteúdo, para a espessura acompanhar o formato. */
+  /** O mesmo arredondamento do conteúdo, para a espessura acompanhar o formato. */
   plateClassName?: string;
-  /** Engaja pelo ancestral mais próximo que casa com o seletor (ex.: "a" para inclinar ao passar sobre o card inteiro). */
   engageWith?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const { reducedMotion, finePointer } = useCapabilities();
-  const { amplitude } = useLevel(level as Level);
+  const { amplitude } = useLevel(level);
   const engaged = useEngaged(ref, { closest: engageWith });
   const rotateX = useSpring(0, TILT_SPRING);
   const rotateY = useSpring(0, TILT_SPRING);
   const lift = useSpring(0, TILT_SPRING);
-  const maxDeg = 6 + 10 * amplitude;
-  const plateGap = 6 + 8 * amplitude;
+  const maxDeg = byAmplitude(TILT_DEG, amplitude);
+  const plateGap = byAmplitude(PLATE_GAP_PX, amplitude);
 
   useEffect(() => {
     const element = ref.current;
     if (reducedMotion || !element) return;
-    // A câmera se afasta para cards grandes: com a mesma perspectiva, um pôster largo distorceria demais.
-    if (engaged) {
-      const perspective = Math.max(MIN_PERSPECTIVE, element.offsetWidth * 2.5);
-      element.style.setProperty("--perspective", `${perspective}px`);
-      element.style.setProperty("--perspective-n", String(perspective));
-    }
     lift.set(engaged ? 1 : 0);
     if (!engaged) {
       rotateX.set(0);
       rotateY.set(0);
       return;
     }
+    fitPerspective(element);
     if (!finePointer) {
-      rotateX.set(maxDeg * 0.45);
+      rotateX.set(maxDeg * TOUCH_TILT);
       return;
     }
     return subscribePointer(({ x, y }) => {
-      const rect = element.getBoundingClientRect();
+      const rect = screenRect(element);
       const nx = ((x - rect.left) / rect.width - 0.5) * 2;
       const ny = ((y - rect.top) / rect.height - 0.5) * 2;
-      rotateY.set(Math.max(-1, Math.min(1, nx)) * maxDeg);
-      rotateX.set(Math.max(-1, Math.min(1, -ny)) * maxDeg);
+      rotateY.set(clamp(nx, -1, 1) * maxDeg);
+      rotateX.set(clamp(-ny, -1, 1) * maxDeg);
     });
   }, [engaged, finePointer, reducedMotion, maxDeg, lift, rotateX, rotateY]);
 

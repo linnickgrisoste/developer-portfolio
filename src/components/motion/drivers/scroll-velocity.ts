@@ -3,9 +3,11 @@
 import { useEffect } from "react";
 import { motionValue } from "motion/react";
 
-// Velocidade do scroll (px/s, positiva descendo), suavizada e compartilhada pela página.
-// Um ouvinte de `scroll` acorda um laço de quadros que mede a velocidade e para sozinho
-// quando a página assenta: parado, não custa nada.
+// Em px/s, positiva descendo. O laço de quadros para sozinho quando a rolagem assenta.
+
+const SMOOTHING_PER_SECOND = 10;
+const REST_VELOCITY = 5;
+const ASSUMED_FRAME_MS = 16;
 
 const velocity = motionValue(0);
 let users = 0;
@@ -20,8 +22,9 @@ function tick(now: number) {
   lastY = y;
   lastTime = now;
   // Média móvel exponencial: segue a rolagem sem tremer com a irregularidade dos eventos.
-  const next = velocity.get() + (raw - velocity.get()) * Math.min(1, dt * 10);
-  if (Math.abs(next) < 5 && raw === 0) {
+  const current = velocity.get();
+  const next = current + (raw - current) * Math.min(1, dt * SMOOTHING_PER_SECOND);
+  if (raw === 0 && Math.abs(next) < REST_VELOCITY) {
     velocity.set(0);
     frame = 0;
     return;
@@ -33,14 +36,11 @@ function tick(now: number) {
 function onScroll() {
   if (frame) return;
   // O primeiro quadro mede contra o quadro anterior presumido, não contra a última parada.
-  lastTime = performance.now() - 16;
+  lastTime = performance.now() - ASSUMED_FRAME_MS;
   frame = requestAnimationFrame(tick);
 }
 
-/**
- * A velocidade como MotionValue: dá para ligar direto em `style` ou derivar com `useTransform`.
- * Com `enabled` falso, devolve a mesma MotionValue sem ligar o ouvinte (hooks não podem ser condicionais).
- */
+/** Com `enabled` falso, devolve a mesma MotionValue sem ligar o ouvinte. */
 export function useScrollVelocity(enabled = true) {
   useEffect(() => {
     if (!enabled) return;
