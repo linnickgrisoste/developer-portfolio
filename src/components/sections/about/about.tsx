@@ -21,9 +21,12 @@ export function About({ locale }: { locale: Locale }) {
           as="p"
           className="max-w-[34ch] text-[clamp(1.5rem,2.6vw,2.25rem)] leading-[1.3] font-medium tracking-[-0.01em] text-pretty"
         >
+          {text.greeting[locale]}
+        </RevealItem>
+        <RevealItem as="p" className="mt-8 max-w-[56ch] text-lg leading-relaxed">
           {text.body[locale]}
         </RevealItem>
-        <RevealItem as="p" className="mt-8 max-w-[56ch] text-lg leading-relaxed text-graphite">
+        <RevealItem as="p" className="mt-4 max-w-[56ch] text-lg leading-relaxed text-graphite">
           {text.body2[locale]}
         </RevealItem>
 

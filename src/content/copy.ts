@@ -25,7 +25,7 @@ export const copy = {
   hero: {
     role: { pt: "Desenvolvedor full stack", en: "Full stack developer" },
     intro: {
-      pt: "Do banco de dados ao último pixel, construo software de ponta a ponta: apps, plataformas web e tudo o que roda por trás deles.",
+      pt: "Transformo ideias complexas em software que faz sentido. Do backend à interface, construo soluções digitais que conectam tecnologia, experiência e propósito.",
       en: "From the database to the last pixel, I build software end to end: apps, web platforms and everything running behind them.",
     },
     status: { pt: "Atualmente na Yandeh", en: "Currently at Yandeh" },
@@ -38,8 +38,17 @@ export const copy = {
   },
   work: {
     title: { pt: "Trabalhos selecionados", en: "Selected work" },
+    sphere: {
+      open: { pt: "Ver projeto", en: "View project" },
+      android: { pt: "Disponível no", en: "Get it on" },
+      ios: { pt: "Baixar na", en: "Download on the" },
+      drag: {
+        pt: "Arraste para girar a esfera · clique numa peça para trazê-la à frente",
+        en: "Drag to spin the sphere · click a tile to bring it forward",
+      },
+    },
     lede: {
-      pt: "Produtos de entretenimento, varejo, pagamentos, agronegócio, setor marítimo e bem-estar, do protótipo à loja de apps.",
+      pt: "Experiências e soluções digitais em diferentes setores, construídas para resolver problemas reais.",
       en: "Entertainment, retail, payments, agribusiness, maritime and wellness products, from prototype to app store.",
     },
     columns: {
@@ -51,13 +60,17 @@ export const copy = {
   },
   about: {
     title: { pt: "Sobre", en: "About" },
+    greeting: {
+      pt: "Prazer, sou o Linnick.",
+      en: "Nice to meet you, I'm Linnick.",
+    },
     body: {
-      pt: "Comecei no mobile e fui atravessando a stack inteira: interfaces, APIs, bancos de dados. Hoje circulo por todas essas camadas e escolho a ferramenta pelo problema, nunca o contrário.",
-      en: "I started in mobile and kept crossing the whole stack: interfaces, APIs, databases. Today I move across every layer and pick the tool for the problem, never the other way around.",
+      pt: "Gosto de entender o que existe por trás de um produto, desde a experiência de quem utiliza até as decisões técnicas que fazem tudo funcionar.",
+      en: "I like understanding what lies behind a product, from the experience of the people using it to the technical decisions that make everything work.",
     },
     body2: {
-      pt: "Em mais de cinco anos, passei por eventos, varejo, pagamentos, agronegócio e setor marítimo. Cada domínio novo me ensinou a mesma coisa: entender quem usa vem antes da primeira linha de código.",
-      en: "In more than five years I've worked across events, retail, payments, agribusiness and the maritime sector. Every new domain taught me the same thing: understanding who uses it comes before the first line of code.",
+      pt: "Essa curiosidade me levou a explorar diferentes áreas do desenvolvimento e construir uma visão abrangente sobre software. Hoje, gosto de atuar onde o desafio estiver, conectar diferentes tecnologias e transformar necessidades reais em soluções bem construídas.",
+      en: "That curiosity led me to explore different areas of development and build a broad view of software. Today, I like to work wherever the challenge is, connect different technologies and turn real needs into well-built solutions.",
     },
     stackTitle: { pt: "Ficha do personagem", en: "Character sheet" },
     stackHint: {

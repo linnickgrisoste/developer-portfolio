@@ -1,13 +1,10 @@
 import type { Locale, Localized } from "@/lib/i18n";
 import { copy } from "./copy";
 
-// Histórico profissional, do mais recente para o mais antigo.
-
 export type Role = {
   company: string;
   role: Localized;
   start: string;
-  /** Sem `end`, a experiência está em andamento (o site mostra "atual" / "present"). */
   end?: string;
   note: Localized;
 };
@@ -18,8 +15,8 @@ export const experience: Role[] = [
     role: { pt: "Desenvolvedor Full Stack Pleno", en: "Mid-level Full Stack Developer" },
     start: "2026",
     note: {
-      pt: "No SmartSales Pro, cuido das telas e das APIs. Boa parte do meu dia é pensar no vendedor parado em frente à gôndola, com pressa, tentando fechar um pedido.",
-      en: "On SmartSales Pro I handle both the screens and the APIs. A lot of my day goes into picturing a sales rep standing at a shelf, in a hurry, trying to close an order.",
+      pt: "Atuo no SmartSales Pro, plataforma usada por vendedores de grandes contas no varejo. Trabalho nas interfaces e nas APIs, com foco em pedidos de alto volume, funcionamento offline e um CRM apoiado por IA.",
+      en: "I work on SmartSales Pro, a platform used by key account sales reps in retail. I build both the interfaces and the APIs, focusing on high-volume orders, offline support and an AI-assisted CRM.",
     },
   },
   {
@@ -28,13 +25,12 @@ export const experience: Role[] = [
     start: "2021",
     end: "2025",
     note: {
-      pt: "Passei quatro anos fazendo apps para clientes que não tinham nada a ver um com o outro: festival de música, pagamento, fazenda, navio. Cada projeto novo começava comigo aprendendo um negócio do zero.",
-      en: "I spent four years building apps for clients that had nothing to do with each other: music festivals, payments, farms, ships. Every new project started with me learning a business from scratch.",
+      pt: "Desenvolvi apps para clientes de setores bem diferentes, como grandes festivais de música, pagamentos, agronegócio, saúde e setor marítimo. Cada projeto pedia entender um negócio novo antes da primeira linha de código, e vários deles me levaram além do mobile, para APIs e painéis web.",
+      en: "I built apps for clients across very different industries, such as major music festivals, payments, agribusiness, healthcare and the maritime sector. Each project meant understanding a new business before the first line of code, and several of them took me beyond mobile, into APIs and web dashboards.",
     },
   },
 ];
 
-/** "2021 – 2025" ou, se ainda em andamento, "2026 – atual". */
 export function rolePeriod(job: Role, locale: Locale) {
   return `${job.start} – ${job.end ?? copy.experience.present[locale]}`;
 }
