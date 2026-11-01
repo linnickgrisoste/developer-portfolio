@@ -119,7 +119,7 @@ void main() {
 
 const ROOT =
   'relative h-full w-full overflow-hidden outline-none @container text-[var(--infinite-menu-text)] [-webkit-tap-highlight-color:transparent] focus-visible:shadow-[inset_0_0_0_2px_var(--infinite-menu-text)]';
-const CANVAS = 'absolute inset-0 block h-full w-full cursor-grab touch-none active:cursor-grabbing';
+const CANVAS = 'absolute inset-0 block h-full w-full cursor-grab touch-pan-y active:cursor-grabbing';
 const LAYER = 'group pointer-events-none absolute inset-0';
 const CUSTOM = 'pointer-events-none absolute inset-0';
 const MOTION =
@@ -820,6 +820,15 @@ const InfiniteMenu = ({
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const onPointerCancel = (event: PointerEvent) => {
+      if (!drag.active || event.pointerId !== drag.id) return;
+      drag.active = false;
+      drag.dx = 0;
+      drag.dy = 0;
+      state.speed = 0;
+      wake();
+    };
+
       state.width = Math.max(1, root.clientWidth);
       state.height = Math.max(1, root.clientHeight);
       canvas.width = Math.round(state.width * dpr);
@@ -833,7 +842,7 @@ const InfiniteMenu = ({
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
-    canvas.addEventListener('pointercancel', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerCancel);
     root.addEventListener('keydown', onKeyDown);
     root.addEventListener('pointerenter', onEnter);
     root.addEventListener('pointerleave', onLeave);
@@ -860,7 +869,7 @@ const InfiniteMenu = ({
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);
-      canvas.removeEventListener('pointercancel', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerCancel);
       root.removeEventListener('keydown', onKeyDown);
       root.removeEventListener('pointerenter', onEnter);
       root.removeEventListener('pointerleave', onLeave);
