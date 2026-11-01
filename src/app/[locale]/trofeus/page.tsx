@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { BackToSite } from "@/components/layout/back-to-site";
 import { containerClass } from "@/components/layout/section";
 import { TrophyRoom } from "@/components/sections/trophies/trophy-room";
 import { achievements, gameCopy } from "@/content/game";
@@ -58,13 +58,13 @@ export default async function TrophiesPage({ params }: PageProps) {
   return (
     <div className="flex min-h-svh flex-col bg-night text-night-fg [--neon:var(--neon-soft)]">
       <header className={cn(containerClass, "flex h-16 w-full shrink-0 items-center")}>
-        <Link
+        <BackToSite
           href={`/${locale}`}
           className="inline-flex items-center gap-2 text-[15px] font-semibold text-night-fg/80 transition-colors hover:text-night-fg"
         >
           <ArrowLeft className="size-4" aria-hidden />
           {gameCopy.backToSite[locale]}
-        </Link>
+        </BackToSite>
       </header>
       <TrophyRoom entries={trophyEntries(locale)} labels={roomLabels(locale)} />
     </div>

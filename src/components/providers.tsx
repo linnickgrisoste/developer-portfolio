@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeProvider } from "next-themes";
 import { htmlLang, otherLocale, rememberLocale, type Locale, type Localized } from "@/lib/i18n";
+import { AnchorLinks } from "@/components/layout/anchor-links";
 import { markLocaleSwitch } from "@/components/motion/entrance";
 
 type LocaleContextValue = {
@@ -51,7 +52,10 @@ export function Providers({ locale, children }: { locale: Locale; children: Reac
       disableTransitionOnChange
       scriptProps={themeScriptProps}
     >
-      <LocaleProvider locale={locale}>{children}</LocaleProvider>
+      <LocaleProvider locale={locale}>
+        <AnchorLinks />
+        {children}
+      </LocaleProvider>
     </ThemeProvider>
   );
 }

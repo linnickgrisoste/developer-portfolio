@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { markOpenedFromSite } from "@/components/layout/back-to-site";
 import { useLocale } from "@/components/providers";
 import { preloadTrophyScene } from "@/components/three/trophies/preload";
 
@@ -21,7 +22,10 @@ export function TrophyRoomLink({
       className={className}
       onPointerEnter={preloadTrophyScene}
       onFocus={preloadTrophyScene}
-      onClick={onNavigate}
+      onClick={(event) => {
+        markOpenedFromSite(event);
+        onNavigate?.();
+      }}
     >
       {children}
     </Link>
