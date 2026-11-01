@@ -61,8 +61,10 @@ export function FullStop() {
         onClick={release}
         aria-label={t(gameCopy.fullStop)}
         style={{ opacity: loose ? 0 : 1 }}
-        className="full-stop-dot ml-[0.04em] inline-block size-[0.17em] cursor-pointer rounded-full bg-neon align-baseline transition-[scale] duration-200 hover:scale-125"
-      />
+        className="full-stop-hit group/dot relative ml-[0.04em] inline-block cursor-pointer rounded-full align-baseline"
+      >
+        <span className="full-stop-dot block size-[0.17em] rounded-full bg-neon transition-[scale] duration-200 group-hover/dot:scale-125" />
+      </button>
       {loose &&
         createPortal(
           <LooseDot origin={origin} label={t(gameCopy.catchFullStop)} onHome={returnHome} />,
@@ -81,7 +83,8 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
     const { size } = origin;
     let x = origin.left;
     let y = origin.top;
-    let vx = (x < window.innerWidth / 2 ? 1 : -1) * (500 + Math.random() * 400);
+    const pace = clamp(window.innerWidth / 1280, 0.45, 1);
+    let vx = (x < window.innerWidth / 2 ? 1 : -1) * (500 + Math.random() * 400) * pace;
     let vy = -1200;
     let squash = 0;
     let restingSince = 0;
@@ -131,7 +134,7 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
       x += vx * dt;
       y += vy * dt;
 
-      const floor = window.innerHeight - size;
+      const floor = (window.visualViewport?.height ?? window.innerHeight) - size;
       const rightWall = window.innerWidth - size;
 
       if (y >= floor) {
@@ -180,14 +183,16 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") catchRef.current();
       }}
-      className="dot-cycle fixed top-0 left-0 z-50 cursor-pointer rounded-full bg-neon outline-offset-4"
+      className="full-stop-hit fixed top-0 left-0 z-50 cursor-pointer touch-none rounded-full outline-offset-4"
       style={{
         ["--cycle-delay" as string]: `${origin.cycleDelay}ms`,
         width: origin.size,
         height: origin.size,
         transform: `translate(${origin.left}px, ${origin.top}px)`,
       }}
-    />
+    >
+      <span className="dot-cycle block size-full rounded-full bg-neon" />
+    </button>
   );
 }
 

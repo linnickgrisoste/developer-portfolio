@@ -136,7 +136,7 @@ html[data-hero3d] .hero-name .kinetic [data-k] {
 html[data-hero3d] .hero-name .full-stop-dot {
   opacity: 0 !important;
 }
-html[data-hero3d="on"] .hero-name .full-stop-dot {
+html[data-hero3d="on"] .hero-name .full-stop-hit {
   pointer-events: none;
 }
 .hero-3d {
@@ -165,6 +165,14 @@ html[data-hero3d="on"] .hero-3d {
 }
 .full-stop-dot {
   animation: stamp 480ms 1.3s backwards;
+}
+@media (pointer: coarse) {
+  .full-stop-hit::after {
+    content: "";
+    position: absolute;
+    inset: -16px;
+    border-radius: 9999px;
+  }
 }
 .full-stop-dot::before,
 .full-stop-dot::after,
