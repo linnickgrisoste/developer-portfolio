@@ -26,7 +26,7 @@ export const stack = [
     items: [
       { name: "Ruby on Rails", level: 8 },
       { name: "PostgreSQL", level: 7 },
-      { name: "MySQL", level: 6 },
+      { name: "MySQL", level: 7 },
       { name: "REST APIs", level: 9 },
       { name: "Node.js", level: 6 },
     ],
