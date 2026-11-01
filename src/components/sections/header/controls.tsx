@@ -52,12 +52,12 @@ export function LocaleToggle({ label }: { label: string }) {
               setLocale(code);
               unlock("polyglot");
             }}
-            className={`relative rounded-full px-1.5 py-1 transition-colors sm:px-2 ${current ? "text-ink" : "text-graphite hover:bg-muted hover:text-ink"}`}
+            className={`relative flex h-9 items-center rounded-full px-1.5 transition-colors sm:px-2 ${current ? "text-ink" : "text-graphite hover:bg-muted hover:text-ink"}`}
           >
             {current && (
               <motion.span
                 layoutId="locale-pill"
-                className="absolute inset-0 rounded-full ring-1 ring-rule"
+                className="absolute inset-x-0 inset-y-1 rounded-full ring-1 ring-rule"
                 transition={reduceMotion ? { duration: 0 } : spring.ui}
               />
             )}

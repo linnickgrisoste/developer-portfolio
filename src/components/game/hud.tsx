@@ -87,7 +87,7 @@ export function ExplorerHud() {
         <span className="sr-only">{t(gameCopy.hudLabel)}</span>
       </PopoverTrigger>
 
-      <PopoverContent align="end" sideOffset={10} className="w-[min(24rem,calc(100vw-2rem))] gap-0 p-0">
+      <PopoverContent align="end" sideOffset={10} collisionPadding={16} className="w-[min(24rem,calc(100vw-2rem))] gap-0 p-0">
         <div className="border-b border-rule p-5">
           <div className="flex items-baseline justify-between gap-4">
             <p className="text-lg font-semibold tracking-[-0.01em]">{t(gameCopy.title)}</p>

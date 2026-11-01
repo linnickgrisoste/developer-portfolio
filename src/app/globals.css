@@ -525,6 +525,16 @@ html[data-stage3d] .trophy-fallback:not([data-show]) {
 @utility trophy-bar {
   background: linear-gradient(90deg, var(--a-main), var(--a-glow));
 }
+@utility tap-area {
+  @media (pointer: coarse) {
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      inset: -12px -6px;
+    }
+  }
+}
 
 .toast-shine {
   position: absolute;

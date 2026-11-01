@@ -197,7 +197,7 @@ function OpenLink({ project, label, variant }: { project: ProjectCard; label: st
       target="_blank"
       rel="noreferrer"
       className={cn(
-        "group pointer-events-auto inline-flex items-center font-semibold group-data-[moving=true]/cascade:pointer-events-none",
+        "tap-area group pointer-events-auto inline-flex items-center font-semibold group-data-[moving=true]/cascade:pointer-events-none",
         variant === "pill"
           ? "gap-2 rounded-full bg-neon px-5 py-2.5 text-[14px] text-night transition-[filter] hover:brightness-110"
           : "gap-1.5 text-[14px] text-neon",

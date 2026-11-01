@@ -12,7 +12,7 @@ import { anchor, sections } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import { CopyEmail } from "./copy-email";
 
-const socialLinkClass = "text-(--footer-fg)/70 transition-colors hover:text-(--footer-fg)";
+const socialLinkClass = "tap-area text-(--footer-fg)/70 transition-colors hover:text-(--footer-fg)";
 
 export function Contact({ locale }: { locale: Locale }) {
   const text = copy.contact;
@@ -66,7 +66,7 @@ export function Contact({ locale }: { locale: Locale }) {
           </ul>
 
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-(--footer-fg)/65">
-            <TrophyRoomLink className="group inline-flex items-center gap-2 transition-colors hover:text-(--footer-fg)">
+            <TrophyRoomLink className="tap-area group inline-flex items-center gap-2 transition-colors hover:text-(--footer-fg)">
               <LinkLabel text={gameCopy.trophyRoom[locale]} />
               <ProgressBadge />
               <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
@@ -74,7 +74,7 @@ export function Contact({ locale }: { locale: Locale }) {
             <p>
               © {year} {profile.firstName} {profile.lastName}. {copy.footer.rights[locale]}
             </p>
-            <a href={anchor(sections.top)} className="transition-colors hover:text-(--footer-fg)">
+            <a href={anchor(sections.top)} className="tap-area transition-colors hover:text-(--footer-fg)">
               <LinkLabel text={copy.footer.top[locale]} />
             </a>
           </div>

@@ -28,7 +28,7 @@ export function Hero({ locale }: { locale: Locale }) {
             </Magnetic>
             <a
               href={anchor(sections.experience)}
-              className="text-[15px] font-semibold underline decoration-rule decoration-2 underline-offset-[6px] transition-colors hover:decoration-neon"
+              className="tap-area text-[15px] font-semibold underline decoration-rule decoration-2 underline-offset-[6px] transition-colors hover:decoration-neon"
             >
               {text.ctaAbout[locale]}
             </a>
@@ -55,7 +55,7 @@ export function Hero({ locale }: { locale: Locale }) {
               <dd className="text-graphite">{gameCopy.hint[locale].replace("{count}", String(achievements.length))}</dd>
             </div>
           </dl>
-          <a href={anchor(sections.work)} className="mt-2 inline-flex items-center gap-2 text-[13px] font-semibold text-ink">
+          <a href={anchor(sections.work)} className="tap-area mt-2 inline-flex items-center gap-2 text-[13px] font-semibold text-ink">
             <ArrowDown className="scroll-cue size-4" strokeWidth={2} aria-hidden />
             {text.scroll[locale]}
           </a>

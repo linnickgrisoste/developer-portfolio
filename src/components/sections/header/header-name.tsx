@@ -12,7 +12,7 @@ export function HeaderName({ name }: { name: string }) {
   return (
     <motion.a
       href={anchor(sections.top)}
-      className="shrink-0 text-[15px] font-semibold tracking-tight"
+      className="tap-area shrink-0 text-[15px] font-semibold tracking-tight"
       initial={false}
       animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
       transition={reduceMotion ? { duration: 0 } : spring.ui}
