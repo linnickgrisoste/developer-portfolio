@@ -11,16 +11,15 @@ import { ease, reveal } from "@/lib/motion";
 import { useSkipEntrance } from "@/components/motion/entrance";
 import type { ProjectCard } from "./project-card";
 
-// Entrada do pôster: uma cortina se abre de baixo para cima (primário) enquanto a imagem
-// assenta de um leve zoom (secundário). Os pôsteres seguintes entram um pouco depois.
+// Fora de uso: a seção mostra a esfera (project-sphere.tsx). Mantido para voltar fácil.
+
 const curtain = (order: number): Variants => ({
   hidden: { clipPath: "inset(100% 0% 0% 0%)" },
   shown: { clipPath: "inset(0% 0% 0% 0%)", transition: { duration: 1, ease: ease.out, delay: order * 0.12 } },
 });
 
-// `transform` inteiro (e não `scale`) para a animação rodar na placa de vídeo, com alvo explícito e
-// `transitionEnd` (ver `reveal` em lib/motion.ts). O zoom do hover usa a propriedade `scale` do CSS,
-// separada, então os dois não se atropelam.
+// `transform` inteiro (e não `scale`) para rodar na placa de vídeo; o zoom do hover usa a propriedade
+// `scale` do CSS, separada, então os dois não se atropelam.
 const settle = (order: number): Variants => ({
   hidden: { transform: "scale(1.15)" },
   shown: {
@@ -30,7 +29,6 @@ const settle = (order: number): Variants => ({
   },
 });
 
-/** Grade de pôsteres. O primeiro destaque ocupa a coluna alta à esquerda; os outros empilham à direita. */
 export function FeaturedProjects({ items, total }: { items: ProjectCard[]; total: number }) {
   const seenProjects = useGame((game) => game.seenProjects);
 
@@ -66,7 +64,6 @@ function FeaturedProject({
   const reduceMotion = useReducedMotion();
   const skipEntrance = useSkipEntrance();
   const ref = useRef<HTMLAnchorElement>(null);
-  // O pôster conta como visto quando a maior parte dele aparece na tela.
   const inView = useInView(ref, { once: true, amount: 0.6 });
   const featured = project.featured!;
 
@@ -78,12 +75,13 @@ function FeaturedProject({
     <motion.a
       ref={ref}
       href={project.href}
+      target="_blank"
+      rel="noreferrer"
       initial={reduceMotion || skipEntrance ? false : "hidden"}
       whileInView="shown"
       viewport={reveal.viewport}
       className={`group/feature flex flex-col md:col-span-6 ${tall ? "md:row-span-2" : ""}`}
     >
-      {/* Ao passar sobre o card inteiro, o pôster inclina e mostra a espessura neon. */}
       <Tilt level="title" engageWith="a" className={tall ? "md:flex-1" : undefined}>
         <motion.div
           variants={curtain(order)}
@@ -97,8 +95,7 @@ function FeaturedProject({
             {featured.fit === "cover" ? (
               <Image src={project.image} alt="" fill sizes="(min-width: 768px) 42vw, 100vw" className="object-cover" />
             ) : (
-              // Logos e capas pequenas ficam perto do tamanho original (sem borrar), com as bordas
-              // dissolvidas no painel da mesma cor para não aparecer emenda.
+              // Logos pequenos perto do tamanho original (sem borrar), bordas dissolvidas no painel da mesma cor.
               <div className="relative aspect-square h-[78%] [mask-image:radial-gradient(closest-side,black_72%,transparent)]">
                 <Image src={project.image} alt="" fill sizes="400px" className="object-contain" />
               </div>

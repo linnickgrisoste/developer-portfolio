@@ -11,10 +11,9 @@ import { reveal } from "@/lib/motion";
 import { useRevealGroup } from "@/components/motion/entrance";
 import { FloatingPreview, useFloatingPreview } from "./floating-preview";
 
-/** Rótulos do cabeçalho da lista, já no idioma da página. */
 export type ProjectListLabels = { project: string; segment: string; stack: string; year: string; seen: string };
 
-// Lista dos projetos que não são destaque, com prévia que segue o cursor.
+// Fora de uso: a seção mostra a esfera (project-sphere.tsx). Mantido para voltar fácil.
 export function ProjectList({ items, total, labels }: { items: ProjectCard[]; total: number; labels: ProjectListLabels }) {
   const seenProjects = useGame((game) => game.seenProjects);
   const [active, setActive] = useState<number | null>(null);
@@ -67,6 +66,8 @@ export function ProjectList({ items, total, labels }: { items: ProjectCard[]; to
           <motion.li key={project.title} data-project={project.title} variants={reveal.item}>
             <a
               href={project.href}
+              target="_blank"
+              rel="noreferrer"
               onPointerEnter={() => preview(index)}
               onFocus={() => preview(index)}
               onBlur={() => setActive(null)}
@@ -74,7 +75,6 @@ export function ProjectList({ items, total, labels }: { items: ProjectCard[]; to
             >
               <div className="md:col-span-6">
                 <h3 className="flex items-center gap-3">
-                  {/* A linha inteira engaja o título; a entrada é a da revelação da lista. */}
                   <KineticText
                     text={project.title}
                     level="title"

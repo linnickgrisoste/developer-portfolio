@@ -2,21 +2,16 @@ import { AchievementTrigger } from "@/components/game/triggers";
 import { Section } from "@/components/layout/section";
 import { SectionHeading } from "@/components/layout/section-heading";
 import { copy } from "@/content/copy";
-import { gameCopy } from "@/content/game";
 import { projects } from "@/content/projects";
 import type { Locale } from "@/lib/i18n";
 import { sections } from "@/lib/sections";
-import { FeaturedProjects } from "./featured-project";
-import { ProjectList } from "./project-list";
 import { toCard } from "./project-card";
+import { ProjectSphere } from "./project-sphere";
 
-// Os destaques aparecem como pôsteres no topo; os demais, na lista com prévia que segue o cursor.
-const featuredProjects = projects.filter((project) => project.featured);
-const listedProjects = projects.filter((project) => !project.featured);
+// A versão anterior (pôsteres + lista com prévia) segue em featured-project.tsx e project-list.tsx, para voltar fácil.
 
 export function WorkIndex({ locale }: { locale: Locale }) {
   const text = copy.work;
-  const cols = text.columns;
 
   return (
     <Section id={sections.work}>
@@ -28,17 +23,12 @@ export function WorkIndex({ locale }: { locale: Locale }) {
         </p>
       </div>
 
-      <FeaturedProjects items={featuredProjects.map((project) => toCard(project, locale))} total={projects.length} />
-
-      <ProjectList
-        items={listedProjects.map((project) => toCard(project, locale))}
-        total={projects.length}
+      <ProjectSphere
+        items={projects.map((project) => toCard(project, locale))}
         labels={{
-          project: cols.project[locale],
-          segment: cols.segment[locale],
-          stack: cols.stack[locale],
-          year: cols.year[locale],
-          seen: gameCopy.seen[locale],
+          open: text.sphere.open[locale],
+          drag: text.sphere.drag[locale],
+          stores: { android: text.sphere.android[locale], ios: text.sphere.ios[locale] },
         }}
       />
     </Section>

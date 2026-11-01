@@ -1,7 +1,5 @@
 import type { Localized } from "@/lib/i18n";
 
-// Projetos da seção Trabalhos. Os destaques viram pôsteres; os demais, a lista com prévia.
-
 export type Project = {
   title: string;
   segment: Localized;
@@ -10,11 +8,11 @@ export type Project = {
   year: string;
   image: string;
   href: string;
+  /** Páginas do app nas lojas; cada uma vira um botão próprio ao lado do link do projeto. */
+  stores?: { android?: string; ios?: string };
   /**
-   * Destaque no topo da seção Trabalhos, como um pôster. Os demais projetos ficam na lista abaixo.
-   * - "cover": a imagem preenche o painel (fotos).
-   * - "contain": a imagem aparece inteira sobre `background` (logos e capas pequenas,
-   *   que ficariam borradas se ampliadas). Use a cor do fundo da própria imagem.
+   * Vira pôster no topo de Trabalhos. "contain" é para logos e capas pequenas, que borrariam ampliadas:
+   * use em `background` a cor do fundo da própria imagem.
    */
   featured?: { fit: "cover" } | { fit: "contain"; background: string };
 };
@@ -30,7 +28,11 @@ export const projects: Project[] = [
     stack: ["Flutter"],
     year: "2024",
     image: "/projects/rock_in_rio.jpg",
-    href: "#",
+    href: "https://rockinrio.com/rio/pt-br/home/",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=br.com.rockinrio.app&hl=pt_BR",
+      ios: "https://apps.apple.com/br/app/rock-in-rio/id1478184797",
+    },
     featured: { fit: "cover" },
   },
   {
@@ -43,7 +45,11 @@ export const projects: Project[] = [
     stack: ["Ruby on Rails", "Vue.js", "Flutter"],
     year: "2023",
     image: "/projects/ecx_pay.png",
-    href: "#",
+    href: "https://ecxpay.com.br/",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=br.com.ecx.ecxpay&hl=pt_BR",
+      ios: "https://apps.apple.com/br/app/ecx-pay/id1631237943",
+    },
   },
   {
     title: "Lollapalooza",
@@ -55,7 +61,11 @@ export const projects: Project[] = [
     stack: ["Flutter"],
     year: "2024",
     image: "/projects/lollapalooza.avif",
-    href: "#",
+    href: "https://www.lollapaloozabr.com/",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=br.com.lollapalooza.app&hl=pt_BR",
+      ios: "https://apps.apple.com/us/app/lollapalooza-brasil/id6473182317",
+    },
   },
   {
     title: "Aperta e Solta",
@@ -68,6 +78,10 @@ export const projects: Project[] = [
     year: "2022",
     image: "/projects/aperta_e_solta.png",
     href: "#",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=br.com.apertaesolta&hl=pt_BR",
+      ios: "https://apps.apple.com/br/app/aperta-e-solta/id1531378854",
+    },
   },
   {
     title: "The Town",
@@ -79,7 +93,11 @@ export const projects: Project[] = [
     stack: ["Flutter"],
     year: "2023",
     image: "/projects/the_town.jpg",
-    href: "#",
+    href: "https://thetown.com.br/pt/",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=br.com.thetown.app&hl=pt_BR",
+      ios: "https://apps.apple.com/br/app/the-town/id6446201849",
+    },
   },
   {
     title: "Seafarer",
@@ -92,6 +110,10 @@ export const projects: Project[] = [
     year: "2023",
     image: "/projects/seafarer.png",
     href: "https://www.seafarer.com.br/",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=br.com.maritimo&hl=pt_BR",
+      ios: "https://apps.apple.com/br/app/seafarer/id6738363043",
+    },
     featured: { fit: "contain", background: "#001847" },
   },
   {
@@ -104,7 +126,11 @@ export const projects: Project[] = [
     stack: ["Flutter"],
     year: "2025",
     image: "/projects/mosca.png",
-    href: "https://play.google.com/store/apps/details?id=br.com.volare.mosca&hl=pt",
+    href: "https://volareconsultoria.com.br/",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=br.com.volare.mosca&hl=pt_BR",
+      ios: "https://apps.apple.com/br/app/mosca/id6746863666",
+    },
   },
   {
     title: "SmartSales Pro",
@@ -118,5 +144,34 @@ export const projects: Project[] = [
     image: "/projects/smartsales_pro.png",
     href: "https://www.yandeh.com.br/smartsalespro",
     featured: { fit: "contain", background: "#040807" },
+  },
+  {
+    title: "PersonalBov",
+    segment: { pt: "Agronegócio", en: "Agribusiness" },
+    summary: {
+      pt: "App Android que lê a balança do vagão misturador sem fio e acompanha o trato do gado baia a baia, do previsto ao realizado.",
+      en: "Android app that wirelessly reads the feed mixer's scale and tracks cattle feeding pen by pen, from planned to delivered.",
+    },
+    stack: ["Kotlin"],
+    year: "2021",
+    image: "/projects/personalbov.png",
+    href: "https://personalbov.com/",
+    stores: { android: "https://play.google.com/store/apps/details?id=com.jerasoftware.personalbov&hl=pt" },
+  },
+  {
+    title: "Sauver",
+    segment: { pt: "Saúde", en: "Healthcare" },
+    summary: {
+      pt: "App de telemedicina para consultar especialistas em casa e guardar exames, receitas e laudos num só lugar.",
+      en: "Telemedicine app to see specialists from home and keep exams, prescriptions and medical reports in one place.",
+    },
+    stack: ["Flutter", "Kotlin"],
+    year: "2022",
+    image: "/projects/sauver.png",
+    href: "https://www.sauver.med.br/",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=br.com.justworks.sauver&hl=pt_BR",
+      ios: "https://apps.apple.com/us/app/sauver/id1516890732",
+    },
   },
 ];
