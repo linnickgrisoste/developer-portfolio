@@ -1,4 +1,4 @@
-// Ficha de personagem: cada grupo é uma "classe" e o nível vai de 1 a 10 (valores fictícios).
+// Cada grupo é uma "classe" da ficha de personagem; nível de 1 a 10.
 export const stack = [
   {
     group: { pt: "Mobile", en: "Mobile" },

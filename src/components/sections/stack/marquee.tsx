@@ -5,22 +5,7 @@ import { useReducedMotion } from "motion/react";
 import ScrollVelocity from "@/components/vendor/bits/ScrollVelocity";
 import { Container } from "@/components/layout/section";
 
-function Row({ items }: { items: string[] }) {
-  return (
-    // Cada tecnologia fica inteira na mesma linha; na versão parada (movimento reduzido) a lista quebra entre itens.
-    <span className="inline-flex flex-wrap items-center">
-      {items.map((item) => (
-        <Fragment key={item}>
-          <span className="whitespace-nowrap">{item}</span>
-          <span aria-hidden className="mx-[0.45em] inline-block size-[0.22em] rotate-45 bg-neon" />
-        </Fragment>
-      ))}
-    </span>
-  );
-}
-
-// Faixa com a stack que acelera e inverte conforme a velocidade do scroll. Ela já se mexe o tempo todo,
-// então fica sem lateral neon: recalcular camadas de 8 cópias do texto a cada quadro de scroll pesava demais.
+// Sem lateral neon de propósito: a faixa já se mexe sempre, e recalcular 8 cópias do texto a cada quadro pesava demais.
 export function Marquee({ tools }: { tools: string[] }) {
   const reduceMotion = useReducedMotion();
   const half = Math.ceil(tools.length / 2);
@@ -34,12 +19,12 @@ export function Marquee({ tools }: { tools: string[] }) {
     >
       {reduceMotion ? (
         <Container className="text-[0.6em]">
-          <Row items={tools} />
+          <ToolRow tools={tools} />
         </Container>
       ) : (
         <ScrollVelocity
-          texts={rows.map((items, index) => (
-            <Row key={index} items={items} />
+          texts={rows.map((row, index) => (
+            <ToolRow key={index} tools={row} />
           ))}
           velocity={40}
           numCopies={4}
@@ -47,5 +32,19 @@ export function Marquee({ tools }: { tools: string[] }) {
         />
       )}
     </div>
+  );
+}
+
+function ToolRow({ tools }: { tools: string[] }) {
+  return (
+    // Na versão parada (movimento reduzido) a lista quebra só entre tecnologias.
+    <span className="inline-flex flex-wrap items-center">
+      {tools.map((tool) => (
+        <Fragment key={tool}>
+          <span className="whitespace-nowrap">{tool}</span>
+          <span aria-hidden className="mx-[0.45em] inline-block size-[0.22em] rotate-45 bg-neon" />
+        </Fragment>
+      ))}
+    </span>
   );
 }

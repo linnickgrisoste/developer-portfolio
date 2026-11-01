@@ -7,7 +7,6 @@ import { unlock } from "@/components/game/store";
 import { Magnetic } from "@/components/motion/magnetic";
 import { exit, spring } from "@/lib/motion";
 
-// Copiar o e-mail também desbloqueia "Sinal enviado". Sem acesso à área de transferência, abre o e-mail.
 export function CopyEmail({ email, labels }: { email: string; labels: { copy: string; copied: string } }) {
   const reduceMotion = useReducedMotion();
   const [copied, setCopied] = useState(false);
@@ -24,6 +23,7 @@ export function CopyEmail({ email, labels }: { email: string; labels: { copy: st
       setCopied(true);
       unlock("signal-sent");
     } catch {
+      // Sem acesso à área de transferência, abre o e-mail.
       window.location.href = `mailto:${email}`;
     }
   };
@@ -35,7 +35,7 @@ export function CopyEmail({ email, labels }: { email: string; labels: { copy: st
         onClick={copyEmail}
         className="relative mb-3 inline-flex h-11 items-center gap-2 rounded-full border border-(--footer-fg)/25 px-5 text-[15px] font-semibold transition-[color,border-color,scale] hover:border-neon hover:text-neon active:scale-[0.97]"
       >
-        {/* O check entra com o pop de recompensa: copiar o e-mail também desbloqueia uma conquista. */}
+        {/* spring.reward (exclusivo do jogo) porque copiar desbloqueia uma conquista. */}
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
             key={copied ? "copied" : "copy"}

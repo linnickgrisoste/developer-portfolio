@@ -14,9 +14,7 @@ type LocaleContextValue = {
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
-// O idioma é o da rota (/pt ou /en): as seções já chegam do servidor no idioma certo.
-// Este contexto serve só às ilhas do cliente que mostram texto próprio (HUD, avisos, ponto final).
-// Trocar de idioma navega para a outra página estática, mantendo a posição da rolagem e a âncora.
+// O idioma vem da rota; o contexto só serve às ilhas do cliente com texto próprio (HUD, avisos, ponto final).
 function LocaleProvider({ locale, children }: { locale: Locale; children: React.ReactNode }) {
   const router = useRouter();
 
@@ -42,9 +40,8 @@ export function useLocale() {
   return context;
 }
 
-// O next-themes põe um <script> que aplica o tema antes da primeira pintura. Ele só roda vindo do HTML do
-// servidor; no cliente, o React avisa ("Encountered a script tag...") porque nunca o executaria. Marcado
-// como dado no cliente, o aviso some e nada muda: o script do servidor já rodou.
+// No cliente o script do next-themes nunca roda (já rodou vindo do servidor); marcá-lo como dado cala o aviso
+// "Encountered a script tag" do React.
 const themeScriptProps = typeof window === "undefined" ? undefined : { type: "application/json" };
 
 export function Providers({ locale, children }: { locale: Locale; children: React.ReactNode }) {

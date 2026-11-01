@@ -14,10 +14,7 @@ export function useAchievementOnView(ref: RefObject<Element | null>, id: Achieve
   }, [inView, id]);
 }
 
-/**
- * A mesma coisa, declarada no JSX de uma seção do servidor: `<AchievementTrigger id="quest-log" />`.
- * Ocupa o primeiro ancestral posicionado inteiro (a `<Section>` já é), sem afetar o layout nem os cliques.
- */
+/** Para seções do servidor: cobre o primeiro ancestral posicionado, sem afetar layout nem cliques. */
 export function AchievementTrigger({ id, amount }: { id: AchievementId; amount?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   useAchievementOnView(ref, id, amount);

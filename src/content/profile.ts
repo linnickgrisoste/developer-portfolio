@@ -1,5 +1,4 @@
-// Quem é a pessoa por trás do portfolio, e os números de destaque da seção Sobre.
-// Os textos são fictícios: troque pelos reais e ajuste os links ("#") quando estiverem prontos.
+// Textos e links "#" ainda são provisórios.
 
 export const profile = {
   firstName: "Linnick",
@@ -12,7 +11,6 @@ export const profile = {
   resumeHref: "#",
 };
 
-// Números de destaque da seção Sobre (contam do zero quando aparecem na tela).
 export const stats = [
   { value: 5, suffix: "+", label: { pt: "anos de experiência", en: "years of experience" } },
   { value: 15, suffix: "+", label: { pt: "projetos entregues", en: "projects shipped" } },

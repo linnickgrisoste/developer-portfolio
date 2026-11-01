@@ -5,9 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { spring } from "@/lib/motion";
 import { anchor, type SectionId } from "@/lib/sections";
 
-// Menu das seções. Ao passar o mouse, as letras dão uma saltadinha em onda (CSS, ver .nav-hop),
-// e um ponto neon, o mesmo do fim do nome, desliza até o link. Sem mouse no menu,
-// o ponto pousa sob a seção que está na tela.
+// O ponto neon segue o link sob o mouse ou, sem hover, pousa na seção que está na tela.
 export function SectionNav({ label, links }: { label: string; links: { id: SectionId; label: string }[] }) {
   const reduceMotion = useReducedMotion();
   const [hovered, setHovered] = useState<SectionId | null>(null);
@@ -19,7 +17,6 @@ export function SectionNav({ label, links }: { label: string; links: { id: Secti
     <nav aria-label={label} className="hidden lg:block">
       <ul className="flex items-center gap-8 text-[15px] text-graphite" onPointerLeave={() => setHovered(null)}>
         {links.map((link) => {
-          const text = link.label;
           const current = link.id === activeSection;
           return (
             <li key={link.id} className="relative">
@@ -31,14 +28,7 @@ export function SectionNav({ label, links }: { label: string; links: { id: Secti
                 onBlur={() => setHovered(null)}
                 className={`nav-hop transition-colors hover:text-ink ${current ? "text-ink" : ""}`}
               >
-                <span className="sr-only">{text}</span>
-                <span aria-hidden>
-                  {Array.from(text).map((letter, index) => (
-                    <span key={index} data-hop style={{ "--i": index } as CSSProperties}>
-                      {letter}
-                    </span>
-                  ))}
-                </span>
+                <HoppingLabel text={link.label} />
               </a>
               {link.id === dotTarget && (
                 <motion.span
@@ -56,13 +46,29 @@ export function SectionNav({ label, links }: { label: string; links: { id: Secti
   );
 }
 
-// Id da seção que ocupa a faixa do meio da tela (ou null no topo, sobre o hero).
+// Letras soltas para o salto em onda do .nav-hop; o leitor de tela ouve a palavra inteira.
+function HoppingLabel({ text }: { text: string }) {
+  return (
+    <>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden>
+        {Array.from(text).map((letter, index) => (
+          <span key={index} data-hop style={{ "--i": index } as CSSProperties}>
+            {letter}
+          </span>
+        ))}
+      </span>
+    </>
+  );
+}
+
+// null no topo, sobre o hero.
 function useActiveSection(ids: SectionId[]) {
   const [active, setActive] = useState<SectionId | null>(null);
 
   useEffect(() => {
     const elements = ids.map((id) => document.getElementById(id)).filter((section) => section !== null);
-    // A faixa de observação é uma linha fina um pouco acima do meio da tela.
+    // Faixa fina logo acima do meio da tela.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

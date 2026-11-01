@@ -5,8 +5,6 @@ import { Check, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { spring } from "@/lib/motion";
 
-// Peças do catálogo de movimento que precisam de estado. O resto da página é do servidor.
-
 /** Remonta o conteúdo para a entrada tocar de novo. */
 export function Replay({ children }: { children: React.ReactNode }) {
   const [take, setTake] = useState(0);
@@ -26,7 +24,6 @@ export function Replay({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** A terceira personalidade, a da recompensa: o pop com overshoot que só o jogo usa. */
 export function RewardDemo() {
   const [unlocked, setUnlocked] = useState(false);
 

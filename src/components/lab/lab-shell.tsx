@@ -4,8 +4,6 @@ import { containerClass } from "@/components/layout/section";
 import type { Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-// Moldura do laboratório: páginas fora do site principal, para ver e ajustar peças isoladas.
-// Hoje só o catálogo de movimento mora aqui; os protótipos 3D já viraram o hero e a sala de troféus.
 export function LabShell({ locale, children }: { locale: Locale; children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-svh flex-col">

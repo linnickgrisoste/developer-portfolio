@@ -10,11 +10,9 @@ import { Odometer } from "@/components/motion/odometer";
 import { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { Tilt } from "@/components/motion/tilt";
 import type { Locale } from "@/lib/i18n";
-import { duration, ease, levels, spring, stagger } from "@/lib/motion";
+import { duration, ease, levels, spring, stagger, type Level } from "@/lib/motion";
 
 export const metadata: Metadata = { title: "Lab · Movimento", robots: { index: false } };
-
-// Catálogo vivo do sistema de movimento: cada primitiva, em cada nível, antes de entrar no site.
 
 function Block({ title, note, children }: { title: string; note: string; children: React.ReactNode }) {
   return (
@@ -35,6 +33,16 @@ function Caption({ children }: { children: React.ReactNode }) {
 }
 
 const headingClass = "text-[clamp(2.25rem,5vw,4rem)] leading-[0.95] tracking-[-0.02em]";
+
+const demoStats = [
+  { value: 5, suffix: "+", label: "anos de experiência" },
+  { value: 15, suffix: "+", label: "projetos entregues" },
+  { value: 100, suffix: "k+", label: "pessoas usando os apps" },
+];
+
+const demoProjectNames = ["Rock in Rio", "ECX Pay", "Lollapalooza", "Aperta e Solta", "The Town"];
+
+const levelNames: Record<Level, string> = { signature: "Assinatura", title: "Título", detail: "Detalhe" };
 
 export default async function LabMotionPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale as Locale;
@@ -171,11 +179,7 @@ export default async function LabMotionPage({ params }: { params: Promise<{ loca
         <Block title="Odometer" note="Números giram como um hodômetro: uma volta inteira, e as casas da esquerda param por último.">
           <Replay>
             <dl className="grid grid-cols-3 gap-6">
-              {[
-                { value: 5, suffix: "+", label: "anos de experiência" },
-                { value: 15, suffix: "+", label: "projetos entregues" },
-                { value: 100, suffix: "k+", label: "pessoas usando os apps" },
-              ].map((stat) => (
+              {demoStats.map((stat) => (
                 <div key={stat.label}>
                   <dt className="sr-only">{stat.label}</dt>
                   <dd className="text-[clamp(2.25rem,5vw,4rem)] leading-none font-bold tracking-[-0.03em] [font-variation-settings:'wdth'_125]">
@@ -201,7 +205,7 @@ export default async function LabMotionPage({ params }: { params: Promise<{ loca
         <Block title="Reveal" note="Entrada ao rolar: uma vez por visita, em cascata, dentro do teto de 500 ms.">
           <Replay>
             <RevealGroup as="ul" className="divide-y divide-rule border-y border-rule">
-              {["Rock in Rio", "ECX Pay", "Lollapalooza", "Aperta e Solta", "The Town"].map((name) => (
+              {demoProjectNames.map((name) => (
                 <RevealItem key={name} as="li" className="py-4 text-2xl font-semibold tracking-[-0.01em]">
                   {name}
                 </RevealItem>
@@ -244,7 +248,7 @@ export default async function LabMotionPage({ params }: { params: Promise<{ loca
               <tbody className="divide-y divide-rule">
                 {Object.entries(levels).map(([name, level]) => (
                   <tr key={name}>
-                    <td className="py-2">{{ signature: "Assinatura", title: "Título", detail: "Detalhe" }[name]}</td>
+                    <td className="py-2">{levelNames[name as Level]}</td>
                     <td className="py-2">{level.amplitude}</td>
                     <td className="py-2">{level.depth}em</td>
                     <td className="py-2">{level.layers}</td>

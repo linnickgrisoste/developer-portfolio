@@ -9,7 +9,6 @@ import { unlock } from "@/components/game/store";
 import { locales } from "@/lib/i18n";
 import { spring } from "@/lib/motion";
 
-// Seletor de idioma: leva à página do outro idioma e desbloqueia "Poliglota".
 export function LocaleToggle({ label }: { label: string }) {
   const { locale, toggleLocale } = useLocale();
   const reduceMotion = useReducedMotion();
@@ -21,14 +20,13 @@ export function LocaleToggle({ label }: { label: string }) {
         toggleLocale();
         unlock("polyglot");
       }}
-      // O nome acessível começa pelo texto visível ("PT EN"): quem usa comando de voz diz o que vê.
+      // Sem aria-label: o nome acessível começa pelo texto visível ("PT EN"), que é o que se diz no comando de voz.
       className="flex h-9 items-center rounded-full px-1.5 text-[13px] font-semibold tabular-nums transition-colors hover:bg-muted"
     >
       {locales.map((code) => {
         const current = locale === code;
         return (
           <span key={code} className="relative px-2 py-1">
-            {/* O contorno desliza até o idioma ativo, como o destaque das abas de stack. */}
             {current && (
               <motion.span
                 layoutId="locale-pill"
@@ -45,11 +43,10 @@ export function LocaleToggle({ label }: { label: string }) {
   );
 }
 
-// Alterna claro e escuro e desbloqueia "Coruja".
 export function ThemeToggle({ label }: { label: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   const reduceMotion = useReducedMotion();
-  // Cada troca de tema remonta o ícone para ele girar ao entrar. Começa em 0 para não girar no carregamento.
+  // A key remonta o ícone a cada troca para ele girar ao entrar; em 0 (carregamento) não gira.
   const [themeSwitches, setThemeSwitches] = useState(0);
 
   return (

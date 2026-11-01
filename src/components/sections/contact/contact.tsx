@@ -12,17 +12,19 @@ import { anchor, sections } from "@/lib/sections";
 import { cn } from "@/lib/utils";
 import { CopyEmail } from "./copy-email";
 
+const socialLinkClass = "text-(--footer-fg)/70 transition-colors hover:text-(--footer-fg)";
+
 export function Contact({ locale }: { locale: Locale }) {
   const text = copy.contact;
   const year = new Date().getFullYear();
 
   return (
+    // No fundo noturno, o neon do rodapé é o neon suave.
     <footer
       id={sections.contact}
       className="scroll-mt-16 bg-night text-(--footer-fg) [--neon:var(--neon-soft)] [--footer-fg:var(--night-fg)]"
     >
       <RevealGroup className={cn(containerClass, "pt-24 pb-10 md:pt-32")}>
-        {/* O título do rodapé é um título de seção como os outros, só maior. A lateral usa o neon suave do fundo noturno. */}
         <KineticText
           as="h2"
           level="title"
@@ -36,7 +38,6 @@ export function Contact({ locale }: { locale: Locale }) {
         </RevealItem>
 
         <RevealItem className="mt-14 flex flex-wrap items-end gap-x-8 gap-y-6">
-          {/* O e-mail é o destino do site: as letras reagem ao cursor como o nome, e o sublinhado cresce. */}
           <a
             href={`mailto:${profile.email}`}
             className="inline-block bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_3px] bg-left-bottom bg-no-repeat pb-2 text-[clamp(1.75rem,5vw,4.5rem)] leading-tight tracking-[-0.02em] transition-[background-size] duration-500 hover:bg-[length:100%_3px]"
@@ -55,25 +56,22 @@ export function Contact({ locale }: { locale: Locale }) {
         </RevealItem>
 
         <div className="mt-20 flex flex-col gap-10 border-t border-(--footer-fg)/15 pt-8 md:flex-row md:items-end md:justify-between">
-          {/* Os links do rodapé falam a mesma língua do resto, no nível detalhe: com o cursor (ou o foco),
-              as letras ganham peso e a lateral neon, discretas. */}
           <ul className="flex flex-wrap gap-x-8 gap-y-3 text-[15px]">
             {profile.socials.map((social) => (
               <li key={social.label}>
-                <a href={social.href} className="text-(--footer-fg)/70 transition-colors hover:text-(--footer-fg)">
+                <a href={social.href} className={socialLinkClass}>
                   <LinkLabel text={social.label} />
                 </a>
               </li>
             ))}
             <li>
-              <a href={profile.resumeHref} className="text-(--footer-fg)/70 transition-colors hover:text-(--footer-fg)">
+              <a href={profile.resumeHref} className={socialLinkClass}>
                 <LinkLabel text={text.resume[locale]} />
               </a>
             </li>
           </ul>
 
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-(--footer-fg)/65">
-            {/* A entrada principal da sala de troféus: o progresso do visitante vira a porta. */}
             <TrophyRoomLink className="group inline-flex items-center gap-2 transition-colors hover:text-(--footer-fg)">
               <LinkLabel text={gameCopy.trophyRoom[locale]} />
               <ProgressBadge />
@@ -92,7 +90,6 @@ export function Contact({ locale }: { locale: Locale }) {
   );
 }
 
-/** Rótulo de link do rodapé: texto cinético no nível detalhe, engajado pelo link inteiro, sem entrada própria. */
 function LinkLabel({ text }: { text: string }) {
   return <KineticText text={text} level="detail" weight={500} extrude entrance={false} engageWith="a" />;
 }

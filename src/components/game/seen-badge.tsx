@@ -6,7 +6,6 @@ import { useLocale } from "@/components/providers";
 import { gameCopy } from "@/content/game";
 import { spring } from "@/lib/motion";
 
-// Selo de "prévia vista" ao lado do título: aparece com o pop de recompensa do jogo.
 export function SeenBadge({ seen }: { seen: boolean }) {
   const { t } = useLocale();
   const reduceMotion = useReducedMotion();

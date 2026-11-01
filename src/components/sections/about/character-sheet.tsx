@@ -9,12 +9,11 @@ import { useSkipEntrance } from "@/components/motion/entrance";
 
 const MAX_LEVEL = 10;
 
-/** Uma classe da ficha, já no idioma da página. `id` é estável entre idiomas (conta para a conquista). */
+// `id` é estável entre idiomas: é ele que conta para a conquista.
 export type CharacterClass = { id: string; name: string; role: string; items: { name: string; level: number }[] };
 
 export type CharacterSheetLabels = { title: string; hint: string; level: string };
 
-// Ficha de personagem: a stack dividida em três "classes", cada uma com o nível de cada ferramenta.
 export function CharacterSheet({ classes, labels }: { classes: CharacterClass[]; labels: CharacterSheetLabels }) {
   const [selected, setSelected] = useState(0);
   const reduceMotion = useReducedMotion();
@@ -50,7 +49,6 @@ export function CharacterSheet({ classes, labels }: { classes: CharacterClass[];
         {classes.map((group, index) => {
           const active = index === selected;
           return (
-            // Cada classe é um card com espessura: inclina ao passar o mouse ou ao receber foco pelo teclado.
             <Tilt key={group.id} level="detail">
               <button
                 ref={(node) => {
@@ -89,29 +87,13 @@ export function CharacterSheet({ classes, labels }: { classes: CharacterClass[];
           {current.items.map((item, row) => (
             <li key={`${current.id}-${item.name}`} className="grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-2 py-4 sm:grid-cols-[12rem_1fr_auto]">
               <span className="text-lg">{item.name}</span>
-              <span
-                className="col-span-2 flex gap-1 sm:col-span-1"
-                role="meter"
-                aria-valuemin={0}
-                aria-valuemax={MAX_LEVEL}
-                aria-valuenow={item.level}
-                aria-label={`${item.name}: ${labels.level} ${item.level}/${MAX_LEVEL}`}
-              >
-                {Array.from({ length: MAX_LEVEL }, (_, segment) => {
-                  // Só os segmentos preenchidos crescem: o movimento conta o nível.
-                  // Eles esperam a ficha entrar na tela, senão a animação roda sem ninguém ver.
-                  const filled = segment < item.level;
-                  return (
-                    <motion.span
-                      key={segment}
-                      className={`h-2.5 flex-1 origin-bottom rounded-[2px] ${filled ? "bg-neon" : "bg-rule"}`}
-                      initial={reduceMotion || skipEntrance || !filled ? false : { opacity: 0, scaleY: 0.2 }}
-                      animate={inView ? { opacity: 1, scaleY: 1 } : undefined}
-                      transition={{ ...spring.ui, delay: row * 0.06 + segment * 0.035 }}
-                    />
-                  );
-                })}
-              </span>
+              <LevelMeter
+                item={item}
+                row={row}
+                levelLabel={labels.level}
+                inView={inView}
+                animateIn={!reduceMotion && !skipEntrance}
+              />
               <span className="font-pixel row-start-1 text-right text-[12px] text-graphite sm:col-start-3">
                 {labels.level} {item.level}
               </span>
@@ -120,5 +102,44 @@ export function CharacterSheet({ classes, labels }: { classes: CharacterClass[];
         </ul>
       </div>
     </div>
+  );
+}
+
+function LevelMeter({
+  item,
+  row,
+  levelLabel,
+  inView,
+  animateIn,
+}: {
+  item: { name: string; level: number };
+  row: number;
+  levelLabel: string;
+  inView: boolean;
+  animateIn: boolean;
+}) {
+  return (
+    <span
+      className="col-span-2 flex gap-1 sm:col-span-1"
+      role="meter"
+      aria-valuemin={0}
+      aria-valuemax={MAX_LEVEL}
+      aria-valuenow={item.level}
+      aria-label={`${item.name}: ${levelLabel} ${item.level}/${MAX_LEVEL}`}
+    >
+      {Array.from({ length: MAX_LEVEL }, (_, segment) => {
+        // Só os preenchidos crescem (o movimento conta o nível), e só com a ficha na tela, senão ninguém vê.
+        const filled = segment < item.level;
+        return (
+          <motion.span
+            key={segment}
+            className={`h-2.5 flex-1 origin-bottom rounded-[2px] ${filled ? "bg-neon" : "bg-rule"}`}
+            initial={animateIn && filled ? { opacity: 0, scaleY: 0.2 } : false}
+            animate={inView ? { opacity: 1, scaleY: 1 } : undefined}
+            transition={{ ...spring.ui, delay: row * 0.06 + segment * 0.035 }}
+          />
+        );
+      })}
+    </span>
   );
 }

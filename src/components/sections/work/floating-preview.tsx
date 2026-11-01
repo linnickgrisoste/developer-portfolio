@@ -20,13 +20,12 @@ const TILT_VELOCITY = 1500;
 
 type Follow = { springX: MotionValue<number>; springY: MotionValue<number>; tilt: MotionValue<number> };
 
-// Prévia que segue o cursor sobre a lista de projetos (só em dispositivos com mouse).
 export function useFloatingPreview() {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const springX = useSpring(x, { stiffness: 260, damping: 28, mass: 0.6 });
   const springY = useSpring(y, { stiffness: 260, damping: 28, mass: 0.6 });
-  // Follow-through: a prévia inclina na direção em que o cursor corre, como um cartão arrastado.
+  // Follow-through: inclina na direção em que o cursor corre.
   const velocityX = useVelocity(springX);
   const tilt = useTransform(velocityX, [-TILT_VELOCITY, TILT_VELOCITY], [-MAX_TILT, MAX_TILT]);
   const [canHover, setCanHover] = useState(false);

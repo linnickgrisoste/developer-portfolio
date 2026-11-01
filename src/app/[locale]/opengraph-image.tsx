@@ -4,22 +4,16 @@ import { profile } from "@/content/profile";
 import { isLocale, locales } from "@/lib/i18n";
 import { palette } from "@/lib/palette";
 
-// Imagem que aparece quando o link é compartilhado (LinkedIn, WhatsApp, X...):
-// o nome com o ponto neon, como na abertura do site.
-
 export const alt = `${profile.firstName} ${profile.lastName}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Gerada uma vez por idioma no build, como as páginas.
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
 const { paper: PAPER, ink: INK, neon: NEON } = palette.dark;
 
-// O gerador de imagem não lê woff2, então pede ao Google Fonts só as letras usadas, em TTF.
-// Se a rede falhar no build, a imagem sai com a fonte padrão em vez de quebrar.
 async function loadArchivo(weight: number, text: string): Promise<ArrayBuffer | null> {
   try {
     const cssUrl = `https://fonts.googleapis.com/css2?family=Archivo:wght@${weight}&text=${encodeURIComponent(text)}`;

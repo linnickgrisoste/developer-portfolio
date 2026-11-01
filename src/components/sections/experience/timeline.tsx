@@ -7,13 +7,14 @@ import { Extrude } from "@/components/motion/extrude";
 import { ease, reveal } from "@/lib/motion";
 import { useRevealGroup, useSkipEntrance } from "@/components/motion/entrance";
 
-/** Uma experiência já no idioma da página. */
 export type TimelineEntryData = { company: string; role: string; period: string; note: string; current: boolean };
 
 export type TimelineLabels = { current: string; done: string };
 
-// Linha do tempo como um diário de missões: a linha neon se preenche conforme a rolagem
-// e cada marco acende quando ela chega até ele. A linha só avança: o que já foi percorrido fica marcado.
+// Fade no fim do eixo: a linha do tempo continua para trás, antes do primeiro emprego.
+const axisFade = "[mask-image:linear-gradient(to_bottom,black_80%,transparent)]";
+
+// A linha neon se preenche com a rolagem e só avança: o que já foi percorrido fica marcado.
 export function Timeline({ entries, labels }: { entries: TimelineEntryData[]; labels: TimelineLabels }) {
   const reduceMotion = useReducedMotion();
   const revealGroup = useRevealGroup();
@@ -25,9 +26,6 @@ export function Timeline({ entries, labels }: { entries: TimelineEntryData[]; la
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
     if (progress > travelled.get()) travelled.set(progress);
   });
-
-  // Fade no fim do eixo: a linha do tempo continua para trás, antes do primeiro emprego.
-  const axisFade = "[mask-image:linear-gradient(to_bottom,black_80%,transparent)]";
 
   return (
     <motion.ol ref={timelineRef} {...revealGroup} className="relative md:col-span-8">
@@ -48,29 +46,16 @@ function TimelineEntry({ entry, labels }: { entry: TimelineEntryData; labels: Ti
   const reduceMotion = useReducedMotion();
   const skipEntrance = useSkipEntrance();
   const ref = useRef<HTMLLIElement>(null);
-  // Acende quando o topo do item passa do meio da tela, o mesmo ponto em que a linha o alcança.
+  // Topo do item no meio da tela: o mesmo ponto em que a linha o alcança.
   const reached = useInView(ref, { once: true, margin: "0px 0px -50% 0px" }) || Boolean(reduceMotion);
   const { current } = entry;
 
   return (
     <motion.li ref={ref} variants={reveal.item} className="relative pb-16 pl-10 last:pb-4">
       <div className="relative flex flex-wrap items-center gap-x-6 gap-y-2">
-        {/* O marco fica sobre o eixo, centralizado na linha do ano. */}
-        <motion.span
-          aria-hidden
-          className={`absolute top-1/2 -left-10 grid size-[15px] -translate-y-1/2 place-items-center rounded-full border-2 transition-colors duration-500 ${
-            reached ? "border-neon bg-neon" : "border-rule bg-paper"
-          }`}
-          animate={reached && !reduceMotion && !skipEntrance ? { scale: [1, 1.45, 1] } : undefined}
-          transition={{ duration: 0.5, ease: ease.out }}
-        >
-          {current && reached && (
-            <span className="milestone-ping absolute inset-0 rounded-full bg-neon opacity-50 motion-reduce:hidden" />
-          )}
-        </motion.span>
+        <Milestone reached={reached} current={current} pop={reached && !reduceMotion && !skipEntrance} />
 
         <p className="text-[clamp(1.75rem,3.5vw,2.75rem)] leading-none font-bold tracking-[-0.03em] tabular-nums [font-variation-settings:'wdth'_125]">
-          {/* O ano ganha volume quando a linha o alcança, e fica assim: o que foi percorrido fica marcado. */}
           <Extrude level="title" raised={reached}>
             {entry.period}
           </Extrude>
@@ -85,5 +70,22 @@ function TimelineEntry({ entry, labels }: { entry: TimelineEntryData; labels: Ti
       <p className="mt-1 text-[15px] text-graphite">{entry.role}</p>
       <p className="mt-4 max-w-[52ch] text-[15px] leading-relaxed text-graphite">{entry.note}</p>
     </motion.li>
+  );
+}
+
+function Milestone({ reached, current, pop }: { reached: boolean; current: boolean; pop: boolean }) {
+  return (
+    <motion.span
+      aria-hidden
+      className={`absolute top-1/2 -left-10 grid size-[15px] -translate-y-1/2 place-items-center rounded-full border-2 transition-colors duration-500 ${
+        reached ? "border-neon bg-neon" : "border-rule bg-paper"
+      }`}
+      animate={pop ? { scale: [1, 1.45, 1] } : undefined}
+      transition={{ duration: 0.5, ease: ease.out }}
+    >
+      {current && reached && (
+        <span className="milestone-ping absolute inset-0 rounded-full bg-neon opacity-50 motion-reduce:hidden" />
+      )}
+    </motion.span>
   );
 }
