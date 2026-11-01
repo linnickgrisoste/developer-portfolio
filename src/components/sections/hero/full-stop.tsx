@@ -6,52 +6,47 @@ import { animate, useReducedMotion } from "motion/react";
 import { useLocale } from "@/components/providers";
 import { gameCopy } from "@/content/game";
 import { unlock } from "@/components/game/store";
-import { spring } from "@/lib/motion";
+import { dotCycle, spring } from "@/lib/motion";
+import { clamp } from "@/lib/math";
 import { rewardPair } from "@/lib/palette";
 
-// O ponto final do nome é a conquista escondida: clicado, ele se solta e quica pela tela.
-// Quem pegar de volta desbloqueia "Ponto final". Se ninguém pegar, ele volta sozinho.
+// O ponto final do nome é uma conquista escondida: clicado, quica pela tela; pegá-lo desbloqueia "Ponto final".
 
 const GRAVITY = 2600; // px/s²
-const BOUNCE = 0.72; // energia que sobra a cada quique
-const ROLLING_FRICTION = 3; // quanto o rolar no chão freia por segundo
-const REST_BEFORE_RETURN_MS = 1500; // parado no chão por esse tempo, ele volta para casa
-const MAX_LOOSE_MS = 9000; // limite total solto, mesmo se ainda estiver quicando
+const BOUNCE = 0.72; // fração da velocidade que sobra a cada quique
+const ROLLING_FRICTION = 3; // por segundo
+const REST_BEFORE_RETURN_MS = 1500;
+const MAX_LOOSE_MS = 9000;
 
-// Com o nome em 3D, o ponto de verdade é a esfera da cena. Este botão continua no lugar (invisível),
-// porque é ele que recebe o foco e o Enter do teclado: com um comando registrado, ele encaminha para a cena.
+// Com o nome em 3D, o ponto de verdade é a esfera da cena. Este botão continua no lugar, invisível,
+// porque é ele que recebe o foco e o Enter: com um comando registrado, encaminha para a cena.
 let command3d: (() => void) | null = null;
 
-/** O hero em 3D registra aqui o comando do ponto (soltar ou, se já está solto, pegar). `null` desfaz. */
 export function setFullStopCommand(command: (() => void) | null) {
   command3d = command;
 }
 
-/**
- * A cor que o ponto mostra agora: o neon de base com as camadas violeta (::before) e azul-piscina
- * (::after) por cima, cada uma com a opacidade do instante (ver .full-stop-dot em globals.css).
- */
-export function currentDotColor(dot: HTMLElement) {
-  const over = (layer: CSSStyleDeclaration, under: string) =>
-    `color-mix(in srgb, ${layer.backgroundColor} ${(Number(layer.opacity) * 100).toFixed(1)}%, ${under})`;
-  const base = getComputedStyle(dot).backgroundColor;
-  return over(getComputedStyle(dot, "::after"), over(getComputedStyle(dot, "::before"), base));
-}
+type Origin = { home: HTMLButtonElement; left: number; top: number; size: number; cycleDelay: number };
 
-/** De onde o ponto saiu: o botão no nome (para onde ele volta), a posição, o tamanho e a cor. */
-type Origin = { home: HTMLButtonElement; left: number; top: number; size: number; color: string };
+// O ponto solto continua o ciclo de cor de onde o do nome estava.
+function remainingCycleDelay(dot: HTMLElement) {
+  const cycle = dot.getAnimations({ subtree: true }).find((animation) => (animation as CSSAnimation).animationName === "dot-second");
+  const elapsed = typeof cycle?.currentTime === "number" ? cycle.currentTime : 0;
+  return dotCycle.delaySeconds * 1000 - elapsed;
+}
 
 export function FullStop() {
   const { t } = useLocale();
   const reduceMotion = useReducedMotion();
   const [origin, setOrigin] = useState<Origin | null>(null);
+  const loose = origin !== null;
 
   const release = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (command3d) {
       command3d();
       return;
     }
-    if (origin) return; // já está solto
+    if (loose) return;
     // Com movimento reduzido não há perseguição: encontrar o segredo já basta.
     if (reduceMotion) {
       unlock("full-stop");
@@ -59,14 +54,10 @@ export function FullStop() {
     }
     const home = event.currentTarget;
     const rect = home.getBoundingClientRect();
-    // O ponto solto sai com a cor que o ciclo tinha no instante do clique.
-    const color = currentDotColor(home);
-    setOrigin({ home, left: rect.left, top: rect.top, size: rect.width, color });
+    setOrigin({ home, left: rect.left, top: rect.top, size: rect.width, cycleDelay: remainingCycleDelay(home) });
   };
 
   const returnHome = useCallback(() => setOrigin(null), []);
-
-  const loose = origin !== null;
 
   return (
     <>
@@ -74,7 +65,7 @@ export function FullStop() {
         type="button"
         onClick={release}
         aria-label={t(gameCopy.fullStop)}
-        // Enquanto o ponto está solto, o lugar dele fica vazio, sem mexer no layout.
+        // Opacidade (e não desmontar) para o lugar do ponto não mexer no layout do nome.
         style={{ opacity: loose ? 0 : 1 }}
         className="full-stop-dot ml-[0.04em] inline-block size-[0.17em] cursor-pointer rounded-full bg-neon align-baseline transition-[scale] duration-200 hover:scale-125"
       />
@@ -88,18 +79,18 @@ export function FullStop() {
 }
 
 function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; onHome: () => void }) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const dotRef = useRef<HTMLButtonElement>(null);
   const catchRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    const dot = ref.current!;
+    const dot = dotRef.current!;
     const { size } = origin;
     let x = origin.left;
     let y = origin.top;
     // Salta para cima e na direção do centro da tela, para não sumir pela borda mais próxima.
     let vx = (x < window.innerWidth / 2 ? 1 : -1) * (500 + Math.random() * 400);
     let vy = -1200;
-    let squash = 0; // 0 a 1: achatamento do último impacto, que se desfaz rápido
+    let squash = 0; // 0 a 1, achatamento do último impacto
     let restingSince = 0;
     let last = performance.now();
     const releasedAt = last;
@@ -107,11 +98,11 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
     let stopped = false;
 
     const draw = (scale = 1) => {
-      const s = squash * 0.35;
-      dot.style.transform = `translate(${x}px, ${y}px) scale(${scale * (1 + s)}, ${scale * (1 - s)})`;
+      const stretch = squash * 0.35;
+      dot.style.transform = `translate(${x}px, ${y}px) scale(${scale * (1 + stretch)}, ${scale * (1 - stretch)})`;
     };
 
-    // Volta voando para o lugar no nome. Se foi pego, incha no caminho como recompensa.
+    // Pego, ele incha no caminho de volta como recompensa.
     const flyHome = (caught: boolean) => {
       stopped = true;
       cancelAnimationFrame(frame);
@@ -127,7 +118,7 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
           draw(caught ? 1 + 0.6 * Math.sin(Math.PI * Math.min(progress, 1)) : 1);
         },
         onComplete: () => {
-          // O foco estava no ponto solto; devolve ao ponto do nome para o teclado não se perder.
+          // O foco estava no ponto solto: devolve ao do nome para o teclado não se perder.
           origin.home.focus({ preventScroll: true });
           onHome();
         },
@@ -142,7 +133,7 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
     };
 
     const step = (now: number) => {
-      // Limita o passo para a física não "teleportar" depois de uma aba em segundo plano.
+      // Passo limitado para a física não "teleportar" depois de uma aba em segundo plano.
       const dt = Math.min((now - last) / 1000, 1 / 30);
       last = now;
 
@@ -166,7 +157,7 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
         vy = -vy * BOUNCE;
       }
       if (x < 0 || x > rightWall) {
-        x = Math.min(Math.max(x, 0), rightWall);
+        x = clamp(x, 0, rightWall);
         vx = -vx * BOUNCE;
       }
       squash *= Math.exp(-18 * dt);
@@ -192,16 +183,16 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
 
   return (
     <button
-      ref={ref}
+      ref={dotRef}
       type="button"
       aria-label={label}
       onPointerDown={() => catchRef.current()}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") catchRef.current();
       }}
-      className="fixed top-0 left-0 z-50 cursor-pointer rounded-full outline-offset-4"
+      className="dot-cycle fixed top-0 left-0 z-50 cursor-pointer rounded-full bg-neon outline-offset-4"
       style={{
-        backgroundColor: origin.color,
+        ["--cycle-delay" as string]: `${origin.cycleDelay}ms`,
         width: origin.size,
         height: origin.size,
         transform: `translate(${origin.left}px, ${origin.top}px)`,
@@ -210,7 +201,7 @@ function LooseDot({ origin, label, onHome }: { origin: Origin; label: string; on
   );
 }
 
-// Pequena explosão de confete no ponto em que ele foi pego. A biblioteca só baixa nessa hora.
+// A biblioteca de confete só é baixada na hora da captura.
 async function burst(x: number, y: number) {
   const { default: confetti } = await import("canvas-confetti");
   void confetti({

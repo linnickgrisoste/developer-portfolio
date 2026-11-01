@@ -6,17 +6,17 @@ import { motion, useInView, type MotionValue } from "motion/react";
 import { unlock } from "@/components/game/store";
 import type { HeroSceneControl } from "@/components/three/hero/hero-scene";
 import type { HeroLayout } from "@/components/three/hero/layout";
-import { currentDotColor, setFullStopCommand } from "./full-stop";
+import { setFullStopCommand } from "./full-stop";
 import { setHeroIntro } from "./hero-intro";
 
-// A cena só é baixada quando este componente monta (desktop capaz): nunca entra no pacote inicial.
+// Importada só quando este componente monta (desktop capaz): three.js nunca entra no pacote inicial.
 const loadScene = () => import("@/components/three/hero/hero-scene");
 const HeroScene = dynamic(loadScene, { ssr: false });
 
-/** Se a cena não desenhar até aqui (ms), o nome em CSS aparece: ninguém fica sem nome por conexão lenta. */
+// Se a cena não desenhar até aqui, o nome em CSS aparece: ninguém fica sem nome por conexão lenta.
 const FALLBACK_AFTER_MS = 5000;
 
-/** Posição de um elemento relativa a um ancestral posicionado, ignorando `transform` (o nome é prensado ao rolar). */
+// Soma de offsets, que ignora `transform` (o nome é prensado ao rolar).
 function offsetWithin(element: HTMLElement, ancestor: HTMLElement) {
   let x = 0;
   let y = 0;
@@ -29,23 +29,27 @@ function offsetWithin(element: HTMLElement, ancestor: HTMLElement) {
   return { x, y };
 }
 
-// Mede o nome em CSS onde ele está (oculto, mas ocupando o lugar): cada letra (início do avanço e linha
-// de base) e o ponto final. A linha de base vem de uma sonda de altura zero alinhada a ela, uma por linha
-// do nome, medida com precisão de subpixel (somar `offsetTop`, que arredonda, desalinhava até 2 px).
+// Sonda de altura zero alinhada à linha de base: precisão de subpixel (somar `offsetTop` arredonda e desalinhava até 2 px).
+function measureBaseline(line: HTMLElement, sectionTop: number) {
+  const probe = document.createElement("span");
+  probe.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+  line.querySelector(":scope > [aria-hidden]")?.appendChild(probe);
+  const baseline = probe.getBoundingClientRect().top - sectionTop;
+  probe.remove();
+  return baseline;
+}
+
+// Mede o nome em CSS oculto (que segue ocupando o lugar) para as letras 3D assentarem exatamente ali.
 function measureName(section: HTMLElement): HeroLayout | null {
   const heading = section.querySelector("h1");
   if (!heading) return null;
-  // A prensa do scroll é um `transform` no título: neutralizada só durante a medição (nada é pintado no meio).
+  // Prensa do scroll neutralizada só durante a medição: nada é pintado no meio.
   const pressed = heading.style.transform;
   heading.style.transform = "none";
   const sectionTop = section.getBoundingClientRect().top + section.clientTop;
 
   const letters = Array.from(heading.querySelectorAll<HTMLElement>(".kinetic")).flatMap((line) => {
-    const probe = document.createElement("span");
-    probe.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
-    line.querySelector(":scope > [aria-hidden]")?.appendChild(probe);
-    const baseline = probe.getBoundingClientRect().top - sectionTop;
-    probe.remove();
+    const baseline = measureBaseline(line, sectionTop);
     return Array.from(line.querySelectorAll<HTMLElement>("[data-k]")).map((letter) => ({
       char: (letter.querySelector(".extrude-face")?.textContent ?? "").toUpperCase(),
       x: offsetWithin(letter, section).x,
@@ -74,17 +78,15 @@ export function Hero3D({
   sectionRef: RefObject<HTMLElement | null>;
   progress: MotionValue<number>;
   opacity: MotionValue<number>;
-  /** Tocar a queda das letras (falso logo após trocar de idioma: o nome já nasce no lugar). */
+  // Falso logo após trocar de idioma: o nome já nasce no lugar, sem a queda das letras.
   intro: boolean;
 }) {
   const inView = useInView(sectionRef);
   const [layout, setLayout] = useState<HeroLayout | null>(null);
   const control = useRef<HeroSceneControl | null>(null);
   const ready = useRef(false);
-  const colorProbe = useRef<CanvasRenderingContext2D | null>(null);
 
-  // Começa a baixar a cena já na montagem, em paralelo com a medição. A cena fica oculta ("pending")
-  // até desenhar; se não chegar a tempo, o atributo sai e o nome em CSS aparece no lugar.
+  // Baixa a cena já na montagem, em paralelo com a medição; "pending" a mantém oculta até desenhar.
   useLayoutEffect(() => {
     void loadScene();
     setHeroIntro("pending");
@@ -94,13 +96,11 @@ export function Hero3D({
     return () => window.clearTimeout(fallback);
   }, []);
 
-  // O ponto em DOM (que recebe o teclado) passa a comandar a esfera da cena.
   useEffect(() => {
     setFullStopCommand(() => control.current?.pokeDot());
     return () => setFullStopCommand(null);
   }, []);
 
-  // Mede depois das fontes e de novo a cada mudança de tamanho da seção.
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -124,25 +124,10 @@ export function Hero3D({
 
   const onCatch = useCallback(() => unlock("full-stop"), []);
 
-  // A cor do ponto em CSS vem como mistura (color-mix com oklch, ver `currentDotColor`):
-  // pintar num canvas de 1 px e ler de volta dá sempre RGB, que o three.js entende.
-  const readDotColor = useCallback(() => {
-    const dot = sectionRef.current?.querySelector<HTMLElement>(".full-stop-dot");
-    if (!dot) return null;
-    colorProbe.current ??= document.createElement("canvas").getContext("2d", { willReadFrequently: true });
-    const context = colorProbe.current;
-    if (!context) return null;
-    context.clearRect(0, 0, 1, 1);
-    context.fillStyle = currentDotColor(dot);
-    context.fillRect(0, 0, 1, 1);
-    const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
-    return `rgb(${r}, ${g}, ${b})`;
-  }, [sectionRef]);
-
   if (!layout) return null;
 
   return (
-    // Atrás de todo o conteúdo do hero. Fica oculto até a cena desenhar (ver .hero-3d em globals.css).
+    // Oculto até a cena desenhar (ver .hero-3d em globals.css).
     <div aria-hidden className="hero-3d pointer-events-none absolute inset-0 -z-10">
       <motion.div className="absolute inset-0" style={{ opacity }}>
         <HeroScene
@@ -151,7 +136,6 @@ export function Hero3D({
           eventSource={sectionRef}
           active={inView}
           intro={intro}
-          readDotColor={readDotColor}
           controlRef={control}
           onCatch={onCatch}
           onReady={onReady}

@@ -1,15 +1,10 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { HERO_INTRO_ATTRIBUTE } from "./hero-intro-script";
+import { HERO_INTRO_ATTRIBUTE } from "@/components/three/gate-script";
 
-// Se o nome do hero entra em 3D. Quem decide é um script mínimo no <head> (ver hero-intro-script.ts),
-// antes da primeira pintura: assim o nome em CSS já nasce oculto e a entrada antiga nunca aparece.
-// O atributo no <html> passa por três estados:
-// - "pending": decidido que entra em 3D; o nome em CSS está oculto e a cena está carregando;
-// - "on": a cena desenhou e está à mostra;
-// - ausente: sem 3D (celular, movimento reduzido, sem WebGL, ou a cena não chegou a tempo): fica o CSS.
-
+// Atributo no <html>, decidido antes da primeira pintura pelo script do <head> (three/gate-script.ts):
+// "pending" = vai entrar em 3D (nome em CSS oculto, cena carregando); "on" = cena à mostra; ausente = fica o CSS.
 export type HeroIntroState = "pending" | "on" | null;
 
 function subscribe(listener: () => void) {
@@ -18,7 +13,7 @@ function subscribe(listener: () => void) {
   return () => observer.disconnect();
 }
 
-/** O estado da entrada em 3D. No servidor e na hidratação é sempre `null` (o servidor não sabe o aparelho). */
+// No servidor e na hidratação é sempre null: o servidor não sabe o aparelho.
 export function useHeroIntro(): HeroIntroState {
   return useSyncExternalStore(
     subscribe,
