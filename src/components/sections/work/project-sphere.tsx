@@ -84,6 +84,7 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
         initialIndex={lastIndex}
         renderInfo={renderInfo}
         onActiveChange={onActiveChange}
+        bleed
       />
     </div>
   );

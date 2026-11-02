@@ -33,6 +33,7 @@ export interface InfiniteMenuProps {
   onActiveChange?: (item: InfiniteMenuItem, index: number, byUser: boolean) => void;
   onItemClick?: (item: InfiniteMenuItem, index: number) => void;
   controlRef?: React.Ref<InfiniteMenuControl>;
+  bleed?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -128,8 +129,13 @@ void main() {
 }`;
 
 const ROOT =
-  'relative h-full w-full overflow-hidden outline-none @container text-[var(--infinite-menu-text)] [-webkit-tap-highlight-color:transparent] focus-visible:shadow-[inset_0_0_0_2px_var(--infinite-menu-text)]';
+  'relative h-full w-full outline-none @container text-[var(--infinite-menu-text)] [-webkit-tap-highlight-color:transparent] focus-visible:shadow-[inset_0_0_0_2px_var(--infinite-menu-text)]';
 const CANVAS = 'absolute inset-0 block h-full w-full cursor-grab touch-pan-y active:cursor-grabbing';
+const BLEED_MASK: React.CSSProperties = {
+  maskImage:
+    'linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent)',
+  maskComposite: 'intersect'
+};
 const LAYER = 'group pointer-events-none absolute inset-0';
 const CUSTOM = 'pointer-events-none absolute inset-0';
 const MOTION =
@@ -240,6 +246,7 @@ const InfiniteMenu = ({
   onActiveChange,
   onItemClick,
   controlRef,
+  bleed = false,
   className = '',
   style
 }: InfiniteMenuProps) => {
@@ -263,6 +270,7 @@ const InfiniteMenu = ({
     grayscale,
     dim: clamp(dim, 0, 1),
     intro,
+    bleed,
     theme: theme === 'light' ? 'light' : 'dark'
   };
   const settingsRef = useRef(settings);
@@ -359,6 +367,7 @@ const InfiniteMenu = ({
     const drag = { active: false, id: -1, x: 0, y: 0, dx: 0, dy: 0, moved: 0, start: 0 };
     const state = {
       width: 1,
+      viewWidth: 1,
       height: 1,
       tiles: [] as number[][],
       assign: [] as number[],
@@ -746,7 +755,7 @@ const InfiniteMenu = ({
 
     const render = () => {
       const s = settingsRef.current;
-      const aspect = state.width / state.height;
+      const aspect = state.viewWidth / state.height;
       const f = 1 / Math.tan(FOV / 2);
       const near = 0.05;
       const far = 50;
@@ -898,7 +907,18 @@ const InfiniteMenu = ({
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       state.width = Math.max(1, root.clientWidth);
       state.height = Math.max(1, root.clientHeight);
-      canvas.width = Math.round(state.width * dpr);
+      if (settingsRef.current.bleed) {
+        // Largura da página sem a barra de rolagem: 100vw a incluiria e criaria rolagem horizontal.
+        const page = document.documentElement.clientWidth;
+        canvas.style.left = `${-root.getBoundingClientRect().left}px`;
+        canvas.style.width = `${page}px`;
+        state.viewWidth = Math.max(1, page);
+      } else {
+        canvas.style.left = '';
+        canvas.style.width = '';
+        state.viewWidth = state.width;
+      }
+      canvas.width = Math.round(state.viewWidth * dpr);
       canvas.height = Math.round(state.height * dpr);
       if (!raf) render();
       wake();
@@ -917,6 +937,7 @@ const InfiniteMenu = ({
     root.addEventListener('focusout', onFocusOut);
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(root);
+    window.addEventListener('resize', resize);
     const visibility = new IntersectionObserver(entries => {
       visible = entries.some(entry => entry.isIntersecting);
       if (visible) {
@@ -943,6 +964,7 @@ const InfiniteMenu = ({
       root.removeEventListener('focusin', onFocusIn);
       root.removeEventListener('focusout', onFocusOut);
       resizeObserver.disconnect();
+      window.removeEventListener('resize', resize);
       visibility.disconnect();
       gl.deleteTexture(atlasTexture);
       gl.deleteBuffer(cornerBuffer);
@@ -980,7 +1002,7 @@ const InfiniteMenu = ({
   return (
     <div
       ref={rootRef}
-      className={`${ROOT}${className ? ` ${className}` : ''}`}
+      className={`${ROOT} ${bleed ? 'overflow-visible' : 'overflow-hidden'}${className ? ` ${className}` : ''}`}
       tabIndex={0}
       role="group"
       aria-roledescription="carousel"
@@ -997,7 +1019,7 @@ const InfiniteMenu = ({
         } as React.CSSProperties
       }
     >
-      <canvas ref={canvasRef} className={CANVAS} />
+      <canvas ref={canvasRef} className={CANVAS} style={bleed ? BLEED_MASK : undefined} />
       {showInfo &&
         current &&
         (renderInfo ? (
