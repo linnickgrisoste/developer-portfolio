@@ -97,6 +97,16 @@ export const copy = {
       es: "Elige una clase para ver sus atributos.",
     },
     levelLabel: { pt: "nível", en: "level", es: "nivel" },
+    photoAlt: {
+      pt: "Linnick sorrindo, de boné e camiseta azul, com um copo na mão e um quadro de post-its ao fundo.",
+      en: "Linnick smiling, wearing a cap and a blue T-shirt, holding a cup in front of a wall of sticky notes.",
+      es: "Linnick sonriendo, con gorra y camiseta azul, con un vaso en la mano y un tablero de post-its al fondo.",
+    },
+    photoHint: {
+      pt: "Passe o mouse para ver em cores. Clique para revelar a foto inteira.",
+      en: "Hover to see it in color. Click to reveal the whole photo.",
+      es: "Pasa el mouse para verla en color. Haz clic para revelar la foto entera.",
+    },
   },
   experience: {
     title: { pt: "Experiência", en: "Experience", es: "Experiencia" },

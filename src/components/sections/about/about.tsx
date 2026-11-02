@@ -8,13 +8,21 @@ import { stack } from "@/content/stack";
 import type { Locale } from "@/lib/i18n";
 import { sections } from "@/lib/sections";
 import { CharacterSheet } from "./character-sheet";
+import { Portrait } from "./portrait";
 
 export function About({ locale }: { locale: Locale }) {
   const text = copy.about;
 
   return (
     <Section id={sections.about} className="grid gap-12 md:grid-cols-12">
-      <SectionHeading text={text.title[locale]} className="md:col-span-4" />
+      <div className="md:col-span-4">
+        <SectionHeading text={text.title[locale]} />
+        <Portrait
+          alt={text.photoAlt[locale]}
+          hint={text.photoHint[locale]}
+          className="mt-10 max-w-[340px] md:sticky md:top-24 md:mt-12 md:max-w-[380px]"
+        />
+      </div>
 
       <RevealGroup className="md:col-span-8">
         <RevealItem
