@@ -3,10 +3,11 @@
 import { useMemo, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Float, PresentationControls, Text } from "@react-three/drei";
-import { AdditiveBlending, Vector3, type Group, type Mesh, type MeshBasicMaterial } from "three";
-import { trophyStyles } from "@/lib/trophy-styles";
+import { AdditiveBlending, CanvasTexture, Vector3, type Group, type Mesh, type MeshBasicMaterial } from "three";
+import { roomSurfaces, trophyStyles } from "@/lib/trophy-styles";
 import type { TrophyId } from "@/content/game";
 import { palette } from "@/lib/palette";
+import { useDarkTheme, useThemeColors } from "@/components/motion/drivers/theme";
 import { clamp } from "@/lib/math";
 import { FONT_LABEL } from "../fonts";
 import { ReadySignal } from "../ready-signal";
@@ -181,6 +182,9 @@ function Trophy({
   const appear = useRef(reduceMotion ? 1 : 0);
   const Model = trophyModels[id];
   const style = trophyStyles[id];
+  const dark = useDarkTheme();
+  const colors = useThemeColors();
+  const hoverColor = unlocked ? (dark ? style.glow : colors.neon) : colors.reward;
 
   useFrame(({ clock }, delta) => {
     const now = clock.elapsedTime;
@@ -219,6 +223,7 @@ function Trophy({
 
   return (
     <group position={[slot.x, slot.y, 0]} scale={slot.scale}>
+      {unlocked && <Halo color={style.glow} index={slot.index} still={reduceMotion} />}
       <Pedestal glow={unlocked ? style.glow : null} ringRef={ringRef} poolRef={poolRef} />
 
       <group ref={appearRef} scale={reduceMotion ? 1 : 0.001}>
@@ -254,7 +259,7 @@ function Trophy({
         fontSize={slot.labelSize}
         anchorX="center"
         anchorY="middle"
-        color={hovered ? (unlocked ? style.glow : palette.dark.reward) : palette.dark.ink}
+        color={hovered ? hoverColor : colors.ink}
         fillOpacity={dimmed ? 0.12 : unlocked ? 1 : 0.4}
       >
         {label}
@@ -272,19 +277,20 @@ function Pedestal({
   ringRef: RefObject<Mesh | null>;
   poolRef: RefObject<MeshBasicMaterial | null>;
 }) {
+  const surfaces = roomSurfaces[useDarkTheme() ? "dark" : "light"];
   return (
     <>
       <mesh position={[0, -0.86, 0]}>
         <cylinderGeometry args={[0.6, 0.64, 0.08, 48]} />
-        <meshStandardMaterial color="#121418" roughness={0.55} metalness={0.1} />
+        <meshStandardMaterial color={surfaces.base} roughness={0.55} metalness={0.1} />
       </mesh>
       <mesh position={[0, -0.77, 0]}>
         <cylinderGeometry args={[0.5, 0.54, 0.12, 48]} />
-        <meshStandardMaterial color="#1d2026" roughness={0.45} metalness={0.15} />
+        <meshStandardMaterial color={surfaces.top} roughness={0.45} metalness={0.15} />
       </mesh>
       <mesh ref={ringRef} position={[0, -0.709, 0]} rotation-x={-Math.PI / 2}>
         <ringGeometry args={[0.43, 0.47, 64]} />
-        <meshBasicMaterial color={glow ?? "#2a2e35"} toneMapped={false} />
+        <meshBasicMaterial color={glow ?? surfaces.idle} toneMapped={false} />
       </mesh>
       {glow && (
         <mesh position={[0, -0.708, 0]} rotation-x={-Math.PI / 2}>
@@ -293,5 +299,49 @@ function Pedestal({
         </mesh>
       )}
     </>
+  );
+}
+
+let haloTexture: CanvasTexture | null = null;
+
+function radialGlow() {
+  if (haloTexture) return haloTexture;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext("2d")!;
+  const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gradient.addColorStop(0, "rgba(255,255,255,1)");
+  gradient.addColorStop(0.35, "rgba(255,255,255,0.45)");
+  gradient.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 128, 128);
+  haloTexture = new CanvasTexture(canvas);
+  return haloTexture;
+}
+
+const ignoreRaycast = () => {};
+
+function Halo({ color, index, still }: { color: string; index: number; still: boolean }) {
+  const material = useRef<MeshBasicMaterial>(null);
+  const texture = useMemo(() => radialGlow(), []);
+
+  useFrame(({ clock }) => {
+    if (material.current && !still) material.current.opacity = 0.32 + 0.1 * Math.sin(clock.elapsedTime * 1.3 + index * 0.9);
+  });
+
+  return (
+    <mesh position={[0, 0.1, -1.4]} scale={3.4} raycast={ignoreRaycast}>
+      <planeGeometry />
+      <meshBasicMaterial
+        ref={material}
+        map={texture}
+        color={color}
+        transparent
+        opacity={0.32}
+        blending={AdditiveBlending}
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
   );
 }

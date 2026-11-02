@@ -33,3 +33,8 @@ export const completeStyle = trophyStyles.crown;
 export function styleVars(style: AchievementStyle): CSSProperties {
   return { "--a-main": style.main, "--a-accent": style.accent, "--a-glow": style.glow } as CSSProperties;
 }
+
+export const roomSurfaces = {
+  dark: { base: "#121418", top: "#1d2026", idle: "#2a2e35", silhouette: "#2a2e35" },
+  light: { base: "#d3d4cc", top: "#e4e4dc", idle: "#bfc1b9", silhouette: "#c8cac2" },
+};

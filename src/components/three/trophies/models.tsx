@@ -3,12 +3,11 @@
 import { useMemo } from "react";
 import { Edges } from "@react-three/drei";
 import { DoubleSide, Shape, type Side } from "three";
-import { achievementStyles, TROPHY_GOLD, type AchievementStyle } from "@/lib/trophy-styles";
+import { achievementStyles, roomSurfaces, TROPHY_GOLD, type AchievementStyle } from "@/lib/trophy-styles";
+import { useDarkTheme } from "@/components/motion/drivers/theme";
 import type { TrophyId } from "@/content/game";
 
 type ModelProps = { style: AchievementStyle; locked: boolean };
-
-const SILHOUETTE = "#2a2e35";
 
 function Mat({
   color,
@@ -26,7 +25,8 @@ function Mat({
   flatShading?: boolean;
 }) {
   const shape = { side, flatShading };
-  if (locked) return <meshStandardMaterial color={SILHOUETTE} roughness={0.6} metalness={0.25} {...shape} />;
+  const surfaces = roomSurfaces[useDarkTheme() ? "dark" : "light"];
+  if (locked) return <meshStandardMaterial color={surfaces.silhouette} roughness={0.6} metalness={0.25} {...shape} />;
   const light = { emissive: glow > 0 ? color : "#000000", emissiveIntensity: glow, ...shape };
   if (finish === "gem") {
     return <meshPhysicalMaterial color={color} roughness={0.1} metalness={0.1} clearcoat={1} clearcoatRoughness={0.06} {...light} />;

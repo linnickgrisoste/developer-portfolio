@@ -97,7 +97,7 @@ export function TrophyRoom({ entries, labels }: { entries: TrophyEntry[]; labels
           <h1 className="text-[clamp(1.75rem,3.5vw,2.75rem)] leading-none font-bold tracking-[-0.02em] [font-variation-settings:'wdth'_112]">
             {labels.title}
           </h1>
-          <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-night-fg/65">{labels.intro}</p>
+          <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-graphite">{labels.intro}</p>
         </div>
         <p className="font-pixel text-[12px] text-reward">
           {labels.level}
@@ -138,7 +138,7 @@ export function TrophyRoom({ entries, labels }: { entries: TrophyEntry[]; labels
       </div>
 
       {stage === "3d" && (
-        <p className={cn(containerClass, "w-full pt-2 pb-6 text-center text-[13px] text-night-fg/65")}>
+        <p className={cn(containerClass, "w-full pt-2 pb-6 text-center text-[13px] text-graphite")}>
           {finePointer ? labels.hint : labels.hintTouch}
         </p>
       )}
@@ -150,25 +150,25 @@ function FocusedTrophy({ card, labels, onClose }: { card: TrophyCard; labels: Tr
   return (
     <div
       style={styleVars(trophyStyles[card.id])}
-      className="absolute right-4 bottom-4 left-4 overflow-hidden rounded-xl bg-night/90 p-5 ring-1 ring-white/10 backdrop-blur sm:left-auto sm:w-[22rem] lg:right-12"
+      className="absolute right-4 bottom-4 left-4 overflow-hidden rounded-xl bg-card/90 p-5 ring-1 ring-rule backdrop-blur sm:left-auto sm:w-[22rem] lg:right-12"
     >
-      <span aria-hidden className={cn("absolute inset-x-0 top-0 h-[3px]", card.unlocked ? "trophy-bar" : "bg-white/10")} />
+      <span aria-hidden className={cn("absolute inset-x-0 top-0 h-[3px]", card.unlocked ? "trophy-bar" : "bg-rule")} />
       <button
         type="button"
         onClick={onClose}
         aria-label={labels.close}
-        className="absolute top-3 right-3 grid size-8 place-items-center rounded-full text-night-fg/60 hover:bg-white/10 hover:text-night-fg"
+        className="absolute top-3 right-3 grid size-8 place-items-center rounded-full text-graphite hover:bg-muted hover:text-ink"
       >
         <X className="size-4" aria-hidden />
       </button>
-      <p className="text-[13px] text-night-fg/60">
+      <p className="text-[13px] text-graphite">
         {card.unlocked ? labels.done : labels.locked}
         {card.date && ` · ${card.date}`}
       </p>
-      <p className={cn("mt-1 text-xl font-semibold tracking-[-0.01em]", card.unlocked && "text-(--a-glow)")}>
+      <p className={cn("mt-1 text-xl font-semibold tracking-[-0.01em]", card.unlocked && "dark:text-(--a-glow)")}>
         {visibleName(card)}
       </p>
-      <p className="mt-2 text-[14px] leading-relaxed text-night-fg/70">
+      <p className="mt-2 text-[14px] leading-relaxed text-ink/70">
         {!card.unlocked && card.hint ? card.hint : card.description}
       </p>
       {card.xp ? <p className="font-pixel mt-4 text-[12px] text-reward">+{card.xp} XP</p> : null}
