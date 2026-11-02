@@ -56,6 +56,11 @@ export const copy = {
         es: "Usa las flechas para ir en orden · desliza hacia los lados para explorar",
       },
     },
+    views: {
+      label: { pt: "Visualização dos projetos", en: "Project view", es: "Vista de los proyectos" },
+      sphere: { pt: "Esfera", en: "Sphere", es: "Esfera" },
+      list: { pt: "Lista", en: "List", es: "Lista" },
+    },
     lede: {
       pt: "Experiências e soluções digitais em diferentes setores, construídas para resolver problemas reais.",
       en: "Digital experiences and solutions across different industries, built to solve real problems.",

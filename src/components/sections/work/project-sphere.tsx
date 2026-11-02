@@ -73,7 +73,7 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
   );
 
   return (
-    <div className="mt-12 h-[min(46rem,88svh)] min-h-[34rem]">
+    <div className="h-[min(46rem,88svh)] min-h-[34rem]">
       <InfiniteMenu
         controlRef={control}
         items={menuItems}
