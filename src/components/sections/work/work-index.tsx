@@ -25,6 +25,8 @@ export function WorkIndex({ locale }: { locale: Locale }) {
         items={projects.map((project) => toCard(project, locale))}
         labels={{
           open: text.sphere.open[locale],
+          prev: text.sphere.prev[locale],
+          next: text.sphere.next[locale],
           drag: text.sphere.drag[locale],
           swipe: text.sphere.swipe[locale],
           stores: { android: text.sphere.android[locale], ios: text.sphere.ios[locale] },

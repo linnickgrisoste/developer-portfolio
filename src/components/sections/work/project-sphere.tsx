@@ -1,18 +1,18 @@
 "use client";
 
-import { useCallback, useMemo, useSyncExternalStore } from "react";
-import { ArrowUpRight } from "lucide-react";
-import { markProjectSeen } from "@/components/game/store";
+import { useCallback, useMemo, useRef, useSyncExternalStore } from "react";
+import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { markProjectSeen, useGame } from "@/components/game/store";
 import { useCapabilities } from "@/components/motion/drivers/capabilities";
 import { useDarkTheme, useThemeColors } from "@/components/motion/drivers/theme";
 import { useSkipEntrance } from "@/components/motion/entrance";
-import InfiniteMenu, { type InfiniteMenuItem } from "@/components/vendor/bits/InfiniteMenu";
+import InfiniteMenu, { type InfiniteMenuControl, type InfiniteMenuItem } from "@/components/vendor/bits/InfiniteMenu";
 import { stagger } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import type { ProjectCard } from "./project-card";
 import { StoreBadges, type StoreLabels } from "./store-badges";
 
-export type SphereLabels = { open: string; drag: string; swipe: string; stores: StoreLabels };
+export type SphereLabels = { open: string; prev: string; next: string; drag: string; swipe: string; stores: StoreLabels };
 
 type PanelProps = { project: ProjectCard; index: number; total: number; moving: boolean; labels: SphereLabels };
 
@@ -52,6 +52,9 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
     [items],
   );
 
+  const control = useRef<InfiniteMenuControl>(null);
+  const goTo = useCallback((index: number) => control.current?.goToItem(index), []);
+
   const renderInfo = useCallback(
     (_: InfiniteMenuItem, index: number, moving: boolean) => {
       const panel = { project: items[index], index, total: items.length, moving, labels };
@@ -59,23 +62,20 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
         <>
           <SidePanels {...panel} />
           <StackedPanel {...panel} />
-          <div className="absolute inset-x-0 bottom-4 flex flex-col items-center gap-2">
-            <ol className="flex gap-1.5" aria-hidden>
-              {items.map((project, i) => (
-                <li key={project.title} className={cn("h-1 rounded-full transition-all duration-300", i === index ? "w-6 bg-neon" : "w-2 bg-rule")} />
-              ))}
-            </ol>
+          <div className="absolute inset-x-0 bottom-3 flex flex-col items-center gap-1.5">
+            <SphereNav items={items} index={index} labels={labels} onGo={goTo} />
             <p className="px-5 text-center text-[12px] text-graphite">{finePointer ? labels.drag : labels.swipe}</p>
           </div>
         </>
       );
     },
-    [items, labels, finePointer],
+    [items, labels, finePointer, goTo],
   );
 
   return (
     <div className="mt-12 h-[min(46rem,88svh)] min-h-[34rem]">
       <InfiniteMenu
+        controlRef={control}
         items={menuItems}
         theme={theme}
         accentColor={neon}
@@ -86,6 +86,63 @@ export function ProjectSphere({ items, labels }: { items: ProjectCard[]; labels:
         onActiveChange={onActiveChange}
       />
     </div>
+  );
+}
+
+type SphereNavProps = { items: ProjectCard[]; index: number; labels: SphereLabels; onGo: (index: number) => void };
+
+function SphereNav({ items, index, labels, onGo }: SphereNavProps) {
+  const seen = useGame((game) => game.seenProjects);
+
+  return (
+    <div className="pointer-events-auto flex items-center gap-1">
+      <NavButton label={labels.prev} onClick={() => onGo(index - 1)}>
+        <ChevronLeft className="size-4" aria-hidden />
+      </NavButton>
+      <ol className="flex items-center">
+        {items.map((project, i) => {
+          const current = i === index;
+          return (
+            <li key={project.title}>
+              <button
+                type="button"
+                aria-label={`${pad2(i + 1)} · ${project.title}`}
+                aria-current={current ? "true" : undefined}
+                onClick={() => onGo(i)}
+                className="group/dot grid h-9 place-items-center px-[3px]"
+              >
+                <span
+                  className={cn(
+                    "h-1 rounded-full transition-[width,background-color] duration-350 ease-brand",
+                    current
+                      ? "w-6 bg-neon"
+                      : seen.includes(project.title)
+                        ? "w-2 bg-graphite group-hover/dot:bg-ink"
+                        : "w-2 bg-rule group-hover/dot:bg-graphite",
+                  )}
+                />
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+      <NavButton label={labels.next} onClick={() => onGo(index + 1)}>
+        <ChevronRight className="size-4" aria-hidden />
+      </NavButton>
+    </div>
+  );
+}
+
+function NavButton({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className="grid size-9 place-items-center rounded-full border border-rule text-ink transition-[border-color,background-color,scale] hover:border-ink hover:bg-muted active:scale-[0.94]"
+    >
+      {children}
+    </button>
   );
 }
 
@@ -131,7 +188,7 @@ function SidePanels({ project, index, total, moving, labels }: PanelProps) {
 
 function StackedPanel({ project, index, moving, labels }: PanelProps) {
   return (
-    <div className="absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-background via-background/85 to-transparent px-5 pt-16 pb-14 @max-[760px]:block">
+    <div className="absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-background via-background/85 to-transparent px-5 pt-16 pb-28 @max-[760px]:block">
       <Cascade moving={moving} step={0}>
         <p className="text-[12px] font-semibold tracking-[0.08em] text-graphite uppercase">
           <span className="font-pixel text-neon">{pad2(index + 1)}</span> · {project.segment} · {project.year}

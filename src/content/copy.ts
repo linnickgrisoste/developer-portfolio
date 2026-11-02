@@ -43,15 +43,17 @@ export const copy = {
       open: { pt: "Ver projeto", en: "View project", es: "Ver proyecto" },
       android: { pt: "Disponível no", en: "Get it on", es: "Disponible en" },
       ios: { pt: "Baixar na", en: "Download on the", es: "Descárgalo en" },
+      prev: { pt: "Projeto anterior", en: "Previous project", es: "Proyecto anterior" },
+      next: { pt: "Próximo projeto", en: "Next project", es: "Proyecto siguiente" },
       drag: {
-        pt: "Arraste para girar a esfera · clique numa peça para trazê-la à frente",
-        en: "Drag to spin the sphere · click a tile to bring it forward",
-        es: "Arrastra para girar la esfera · haz clic en una pieza para traerla al frente",
+        pt: "Use as setas para seguir em ordem · arraste a esfera ou clique numa peça para explorar",
+        en: "Use the arrows to go in order · drag the sphere or click a tile to explore",
+        es: "Usa las flechas para ir en orden · arrastra la esfera o haz clic en una pieza para explorar",
       },
       swipe: {
-        pt: "Deslize para os lados para ver outros projetos",
-        en: "Swipe sideways to see more projects",
-        es: "Desliza hacia los lados para ver más proyectos",
+        pt: "Use as setas para seguir em ordem · deslize para os lados para explorar",
+        en: "Use the arrows to go in order · swipe sideways to explore",
+        es: "Usa las flechas para ir en orden · desliza hacia los lados para explorar",
       },
     },
     lede: {

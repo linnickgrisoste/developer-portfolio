@@ -2,7 +2,7 @@
 
 /* eslint-disable -- código do React Bits, mantido perto do original */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 export interface InfiniteMenuItem {
   image: string;
@@ -32,11 +32,18 @@ export interface InfiniteMenuProps {
   backgroundColor?: string;
   onActiveChange?: (item: InfiniteMenuItem, index: number, byUser: boolean) => void;
   onItemClick?: (item: InfiniteMenuItem, index: number) => void;
+  controlRef?: React.Ref<InfiniteMenuControl>;
   className?: string;
   style?: React.CSSProperties;
 }
 
-type Engine = { loadItems: (list: InfiniteMenuItem[]) => void; wake: () => void };
+export type InfiniteMenuControl = { goToItem: (index: number) => void };
+
+type Engine = {
+  loadItems: (list: InfiniteMenuItem[]) => void;
+  wake: () => void;
+  goToItem: (index: number, byUser: boolean) => void;
+};
 
 let atlasCache: { key: string; canvas: HTMLCanvasElement; cells: number; cell: number } | null = null;
 
@@ -232,12 +239,14 @@ const InfiniteMenu = ({
   backgroundColor,
   onActiveChange,
   onItemClick,
+  controlRef,
   className = '',
   style
 }: InfiniteMenuProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | null>(null);
+  useImperativeHandle(controlRef, () => ({ goToItem: (index: number) => engineRef.current?.goToItem(index, true) }), []);
   const [active, setActive] = useState(() => Math.max(0, Math.min(initialIndex, items.length - 1)));
   const [moving, setMoving] = useState(intro);
   const initialIndexRef = useRef(active);
@@ -570,6 +579,28 @@ const InfiniteMenu = ({
       wake();
     };
 
+    const itemCount = () => Math.max(1, itemsRef.current.length);
+    const currentItem = () => (state.assign[state.target >= 0 ? state.target : state.front] ?? 0) % itemCount();
+
+    const tileFor = (item: number) => {
+      let best = -1;
+      let bestZ = -2;
+      for (let i = 0; i < state.tiles.length; i++) {
+        if (state.assign[i] % itemCount() !== item) continue;
+        const z = rotate(state.orientation, state.tiles[i])[2];
+        if (z > bestZ) {
+          bestZ = z;
+          best = i;
+        }
+      }
+      return best;
+    };
+
+    const goToItem = (item: number, byUser: boolean) => {
+      state.byUser = byUser;
+      goTo(tileFor(((item % itemCount()) + itemCount()) % itemCount()));
+    };
+
     const pick = (clientX: number, clientY: number) => {
       const rect = canvas.getBoundingClientRect();
       const aspect = rect.width / rect.height;
@@ -684,8 +715,7 @@ const InfiniteMenu = ({
         state.idle += dt;
         if (state.idle >= s.autoplay) {
           state.idle = 0;
-          state.byUser = false;
-          goTo(neighbor(state.front, [1, 0]));
+          goToItem(currentItem() + 1, false);
         }
       } else {
         state.idle = 0;
@@ -830,13 +860,15 @@ const InfiniteMenu = ({
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
+      const steps: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1 };
       const directions: Record<string, number[]> = {
-        ArrowRight: [1, 0],
-        ArrowLeft: [-1, 0],
         ArrowUp: [0, 1],
         ArrowDown: [0, -1]
       };
-      if (directions[event.key]) {
+      if (steps[event.key]) {
+        event.preventDefault();
+        goToItem(currentItem() + steps[event.key], true);
+      } else if (directions[event.key]) {
         event.preventDefault();
         state.byUser = true;
         goTo(neighbor(state.target >= 0 ? state.target : state.front, directions[event.key]));
@@ -872,7 +904,7 @@ const InfiniteMenu = ({
       wake();
     };
 
-    engineRef.current = { loadItems, wake };
+    engineRef.current = { loadItems, wake, goToItem };
 
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
