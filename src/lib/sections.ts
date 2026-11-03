@@ -1,7 +1,7 @@
 export const sections = {
   top: "top",
-  work: "work",
   about: "about",
+  work: "work",
   experience: "experience",
   contact: "contact",
 } as const;

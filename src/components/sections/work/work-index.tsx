@@ -1,4 +1,3 @@
-import { AchievementTrigger } from "@/components/game/triggers";
 import { Section } from "@/components/layout/section";
 import { SectionHeading } from "@/components/layout/section-heading";
 import { copy } from "@/content/copy";
@@ -15,7 +14,6 @@ export function WorkIndex({ locale }: { locale: Locale }) {
 
   return (
     <Section id={sections.work}>
-      <AchievementTrigger id="first-step" />
       <div className="grid gap-6 md:grid-cols-12 md:items-end">
         <SectionHeading text={text.title[locale]} className="md:col-span-7" />
         <p className="max-w-[40ch] text-lg leading-relaxed text-graphite md:col-span-4 md:col-start-9">

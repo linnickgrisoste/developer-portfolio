@@ -1,3 +1,4 @@
+import { AchievementTrigger } from "@/components/game/triggers";
 import { Section } from "@/components/layout/section";
 import { SectionHeading } from "@/components/layout/section-heading";
 import { Odometer } from "@/components/motion/odometer";
@@ -15,6 +16,7 @@ export function About({ locale }: { locale: Locale }) {
 
   return (
     <Section id={sections.about} className="grid gap-12 md:grid-cols-12">
+      <AchievementTrigger id="first-step" />
       <div className="md:col-span-4">
         <SectionHeading text={text.title[locale]} />
         <Portrait

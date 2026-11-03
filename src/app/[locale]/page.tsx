@@ -26,8 +26,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <main>
         <Hero locale={locale} />
         <StackMarquee />
-        <WorkIndex locale={locale} />
         <About locale={locale} />
+        <WorkIndex locale={locale} />
         <Experience locale={locale} />
       </main>
       <Contact locale={locale} />

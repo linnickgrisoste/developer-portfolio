@@ -12,8 +12,8 @@ import { SectionNav } from "./section-nav";
 export function SiteHeader({ locale }: { locale: Locale }) {
   const nav = copy.nav;
   const links = [
-    { id: sections.work, label: nav.work[locale] },
     { id: sections.about, label: nav.about[locale] },
+    { id: sections.work, label: nav.work[locale] },
     { id: sections.experience, label: nav.experience[locale] },
     { id: sections.contact, label: nav.contact[locale] },
   ];
